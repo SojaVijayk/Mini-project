@@ -189,9 +189,20 @@
         <span class="arrow">←</span> Login
       </h2>
 
+      <!-- Display flash messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div style="color: red; margin-bottom: 1rem;">
+            {% for category, message in messages %}
+              {{ message }}
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
       <!-- The form's action is set to '#' which means it won't submit anywhere.
            The onsubmit="return false;" also prevents the page from reloading. -->
-      <form action="#" method="POST" onsubmit="return false;">
+      <form action="/login" method="POST">
         <div class="form-group">
           <label for="username">Username</label>
           <div class="input-wrapper">
