@@ -22,3 +22,5 @@ class User:
         self.email = email
         self.phone_no = phone_no
         self.preference = preference
+        self.role = role
+        
