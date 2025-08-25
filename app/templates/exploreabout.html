@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Story</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        /* Top Navigation Bar */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #fff;
+            padding: 10px 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            background: #f1f3f6;
+            padding: 6px 12px;
+            border-radius: 20px;
+            width: 350px;
+        }
+
+        .search-container input {
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .font-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .top-icons i {
+            cursor: pointer;
+            margin-left: 10px;
+            color: #555;
+        }
+
+        /* Title */
+        .title {
+            text-align: center;
+            margin: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* Story Card */
+        .story-card {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        /* Bottom Controls */
+        .bottom-controls {
+            max-width: 800px;
+            margin: 20px auto;
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .left-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 50%;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .pause-btn {
+            background-color: #e6e6e6;
+            color: #555;
+        }
+
+        .pause-btn:hover {
+            background-color: #d5d5d5;
+        }
+
+        .continue-btn {
+            background-color: #2979ff;
+            color: white;
+        }
+
+        .continue-btn:hover {
+            background-color: #1e5fd6;
+        }
+
+        /* Right Controls */
+        .right-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            width: 45%;
+        }
+
+        /* Rating */
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .rating i {
+            color: #ffc107;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        /* Feedback */
+        .feedback-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .feedback-container textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            resize: none;
+            height: 80px;
+            margin-bottom: 10px;
+        }
+
+        .save-btn {
+            padding: 8px 15px;
+            background-color: #28a745;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .save-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Bar -->
+    <div class="topbar">
+        <div class="page-info">
+            <i class="fas fa-arrow-left"></i>
+            <span>Page <input type="text" value="1" style="width: 30px; text-align: center;"> of 250</span>
+        </div>
+
+        <div class="search-container">
+            <i class="fas fa-search" style="color: gray;"></i>
+            <input type="text" placeholder="Search">
+        </div>
+
+        <div class="font-controls">
+            <button class="btn pause-btn" style="padding: 4px 8px;">- A</button>
+            <button class="btn pause-btn" style="padding: 4px 8px;">+ A</button>
+            <div class="top-icons">
+                <i class="far fa-window-minimize"></i>
+                <i class="far fa-square"></i>
+                <i class="fas fa-times"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Title -->
+    <div class="title">About Story</div>
+
+    <!-- Story Card -->
+    <div class="story-card">
+       Gathering Blossoms Under Fire is a collection of Alice Walker's edited journals spanning five decades, offering an intimate and unvarnished portrait of her life as an artist, intellectual, and activist. The book intertwines personal events like her marriage to a Jewish lawyer, her work in the Civil Rights Movement, her writing career, and her relationships with family and friends with the broader political and social changes of her time. It provides insight into her thoughts and feelings as a Black woman, writer, and citizen of the world, revealing a blend of personal, political, and spiritual journeys and offering a window into the development of a significant American literary and activist figure. 
+    </div>
+
+    <!-- Bottom Controls -->
+    <div class="bottom-controls">
+        <!-- Left Controls -->
+        <div class="left-controls">
+            <div class="buttons">
+                <button class="btn pause-btn">Pause</button>
+                <button class="btn continue-btn">Continue Reading</button>
+            </div>
+        </div>
+
+        <!-- Right Controls -->
+        <div class="right-controls">
+            <div class="rating">
+                Rating:
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="far fa-star"></i>
+            </div>
+            <div class="feedback-container">
+                <textarea placeholder="Share your feedback..."></textarea>
+                <button class="save-btn">Save</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

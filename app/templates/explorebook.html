@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Explore Books</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* === Reset === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Roboto", sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fb;
+            color: #333;
+            display: flex;
+        }
+
+        /* === Sidebar === */
+        .sidebar {
+            width: 250px;
+            background-color: #fff;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+            margin-bottom: 30px;
+        }
+
+        .logo i {
+            font-size: 28px;
+            color: #2563eb;
+            margin-right: 10px;
+        }
+
+        .logo span {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .menu {
+            list-style: none;
+        }
+
+        .menu li {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: #555;
+            transition: all 0.3s;
+        }
+
+        .menu li i {
+            margin-right: 12px;
+            font-size: 18px;
+        }
+
+        .menu li:hover,
+        .menu li.active {
+            background-color: #e8f0fe;
+            color: #2563eb;
+            border-radius: 8px;
+        }
+
+        /* === Submenu === */
+        .submenu {
+            display: none;
+            list-style: none;
+            margin-left: 40px;
+            margin-top: 5px;
+        }
+
+        .submenu li {
+            padding: 8px 0;
+            font-size: 15px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .submenu li:hover {
+            color: #2563eb;
+            font-weight: 500;
+        }
+
+        /* === Main Content === */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px 40px;
+            flex: 1;
+        }
+
+        .header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .header a:hover {
+            color: #2563eb;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 30px;
+            margin-bottom: 25px;
+            background-color: #fff;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .search-bar i {
+            color: #999;
+            margin-right: 10px;
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            flex: 1;
+            font-size: 15px;
+        }
+
+        /* === Books Section === */
+        .books-section {
+            margin-top: 20px;
+        }
+
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .book-card {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .book-card img {
+            width: 100%;
+            height: 200px;
+            border-radius: 10px;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        .book-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .book-author {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+
+        .rating i {
+            color: #fbc02d;
+            margin-right: 2px;
+        }
+
+        .rating span {
+            font-size: 14px;
+            margin-left: 6px;
+            color: #555;
+        }
+
+        .book-description {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 12px;
+        }
+
+        .book-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .book-actions button {
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: background 0.3s ease;
+        }
+
+        .favorite-btn {
+            background-color: #f1f3f4;
+            color: #333;
+        }
+
+        .favorite-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .read-btn {
+            background-color: #2563eb;
+            color: #fff;
+        }
+
+        .read-btn:hover {
+            background-color: #1d4ed8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-book-open"></i>
+            <span>Book Bot</span>
+        </div>
+        <ul class="menu">
+            <li class="active"><i class="fas fa-home"></i>Home</li>
+            <li><i class="fas fa-clock"></i>Recommended For You</li>
+            <li id="explore-toggle">
+                <i class="fas fa-compass"></i>Explore By Categories
+                <i class="fas fa-chevron-down" style="margin-left:auto;"></i>
+            </li>
+            <ul class="submenu" id="explore-submenu">
+                <li>📘 Books</li>
+                <li>✍️ Authors</li>
+                <li>🎭 Genres</li>
+            </ul>
+            <li><i class="fas fa-star"></i>Recently Rated</li>
+            <li><i class="fas fa-heart"></i>Favorites</li>
+            <li><i class="fas fa-book"></i>Continue Reading</li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <a href="#">Profile</a>
+            <a href="#">Logout</a>
+        </div>
+        <h1>Welcome!</h1>
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search for books, authors, genres...">
+        </div>
+
+        <h2>Explore by Books</h2>
+        <div class="books-section">
+            <div class="books-grid">
+                <!-- Book 1 -->
+                <div class="book-card">
+                    <img src="C:\Users\Lenovo\Pictures\Saved Pictures\blossom.jpg" alt="Book 1">
+                    <div class="book-title">Gathering Blossoms</div>
+                    <div class="book-author">Alice Walker</div>
+                    <div class="rating">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                        <i class="far fa-star"></i>
+                        <span>4.5</span>
+                    </div>
+                    <p class="book-description">
+                       Gathering Blossoms Under Fire is a compilation of the personal journals of author Alice Walker (winner of the Pulitzer Prize and National Book Award), offering an intimate account of her development as an artist, intellectual, and human rights activist over 50 years, interwoven with her personal and political experiences as an African American woman, mother, and citizen of the world
+                    </p>
+                    <div class="book-actions">
+                        <button class="favorite-btn"><i class="far fa-heart"></i> Add to Favorites</button>
+                        <button class="read-btn">Read</button>
+                    </div>
+                </div>
+
+                <!-- Book 2 -->
+                <div class="book-card">
+                    <img src="C:\Users\Lenovo\Pictures\Saved Pictures\volcano.jpg" alt="Book 2">
+                    <div class="book-title">The Golden Volcano</div>
+                    <div class="book-author">Jules Verne</div>
+                    <div class="rating">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <span>4.0</span>
+                    </div>
+                    <p class="book-description">
+                       "The Golden Volcano" follows two Canadian cousins who become involved in the Klondike Gold Rush, eventually hearing a deathbed confession about a mythical gold-filled volcano. 
+                    </p>
+                    <div class="book-actions">
+                        <button class="favorite-btn"><i class="far fa-heart"></i> Add to Favorites</button>
+                        <button class="read-btn">Read</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS for Submenu Toggle -->
+    <script>
+        const toggle = document.getElementById("explore-toggle");
+        const submenu = document.getElementById("explore-submenu");
+
+        toggle.addEventListener("click", () => {
+            submenu.style.display = submenu.style.display === "block" ? "none" : "block";
+        });
+    </script>
+</body>
+</html>

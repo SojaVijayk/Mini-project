@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Books - BookBot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            background-color: #f3f4f6;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #fff;
+            padding: 20px 15px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .logo i {
+            color: #2563eb;
+            font-size: 22px;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: #374151;
+            padding: 10px 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+            font-size: 15px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .sidebar .sub-menu {
+            margin-left: 25px;
+            margin-top: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Header */
+        .header {
+            width: calc(100% - 250px);
+            padding: 15px 25px;
+            background-color: white;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header a {
+            text-decoration: none;
+            color: #374151;
+            font-size: 15px;
+            margin-left: 25px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Main content */
+        .main-content {
+            width: calc(100% - 250px);
+            padding: 20px 30px;
+        }
+
+        .main-content h1 {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        /* Search bar */
+        .search-bar {
+            width: 100%;
+            background-color: #fff;
+            padding: 10px 15px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            flex: 1;
+            font-size: 15px;
+            background-color: transparent;
+        }
+
+        /* Explore Section */
+        .explore-section h2 {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .book-card {
+            width: 250px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 15px;
+        }
+
+        .book-card h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .book-card img {
+            width: 100%;
+            height: 180px;
+            border-radius: 10px;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        .book-card p {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+
+        .book-card button {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .book-card button:hover {
+            background-color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-book-open"></i>
+            <span>BookBot</span>
+        </div>
+        <a href="#" class="active"><i class="fas fa-home"></i> Home</a>
+        <a href="#"><i class="fas fa-clock"></i> Recommended for You</a>
+        <a href="#"><i class="fas fa-layer-group"></i> Explore by Category</a>
+        <div class="sub-menu">
+            <a href="#"><i class="fas fa-book"></i> Books</a>
+            <a href="#"><i class="fas fa-user"></i> Authors</a>
+            <a href="#"><i class="fas fa-tags"></i> Genres</a>
+        </div>
+        <a href="#"><i class="fas fa-star"></i> Recently Rated</a>
+        <a href="#"><i class="fas fa-heart"></i> Favorites</a>
+        <a href="#"><i class="fas fa-history"></i> Continue Reading</a>
+    </div>
+
+    <!-- Main Section -->
+    <div style="width: 100%;">
+        <!-- Header -->
+        <div class="header">
+            <a href="#"><i class="fas fa-user"></i> Profile</a>
+            <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+
+        <!-- Content -->
+        <div class="main-content">
+            <h1>Welcome!</h1>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search">
+            </div>
+
+            <div class="explore-section">
+                <h2>Explore by Books</h2>
+                <div class="book-card">
+                    <h3>Gathering Blossoms</h3>
+                    <img src="C:\Users\Lenovo\Pictures\Saved Pictures\blossom.jpg" alt="Book">
+                    <p>About Book...</p>
+                    <button>Read Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

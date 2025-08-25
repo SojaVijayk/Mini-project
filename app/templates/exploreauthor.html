@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Authors - BookBot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            background-color: #f9f9f9;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #f0f3f7;
+            height: 100vh;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #1a56db;
+            margin-bottom: 30px;
+        }
+
+        .logo img {
+            width: 28px;
+            height: 28px;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links a.active {
+            color: #1a56db;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            padding: 30px;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .welcome {
+            font-size: 28px;
+            font-weight: 700;
+            color: #222;
+        }
+
+        .top-right {
+            display: flex;
+            gap: 20px;
+        }
+
+        .top-right a {
+            text-decoration: none;
+            color: #555;
+            font-size: 15px;
+        }
+
+        /* Search Bar */
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 10px 15px;
+            margin-bottom: 25px;
+            width: 350px;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            flex: 1;
+            font-size: 14px;
+        }
+
+        /* Explore Authors Section */
+        h2 {
+            margin-bottom: 15px;
+            color: #222;
+        }
+
+        .author-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .author-card {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .author-card:hover {
+            border-color: #1a56db;
+            background: #f3f7ff;
+        }
+
+        .author-card label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Read Button */
+        .read-btn {
+            background-color: #1a56db;
+            color: white;
+            padding: 12px 28px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            transition: background 0.3s;
+        }
+
+        .read-btn:hover {
+            background-color: #1747b0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <img src="book-logo.png" alt="Logo">
+            BookBot
+        </div>
+        <div class="nav-links">
+            <a href="#">🏠 Home</a>
+            <a href="#">⏱ Recommended for you</a>
+            <a href="#" class="active">📚 Explore by category</a>
+            <a href="#">  Books</a>
+            <a href="#" style="color: #1a56db; font-weight: 600;">  Authors</a>
+            <a href="#">  Genres</a>
+            <a href="#">🔄 Recently rated</a>
+            <a href="#">❤️ Favorites</a>
+            <a href="#">🔖 Continue reading</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="welcome">Welcome!</div>
+            <div class="top-right">
+                <a href="#">Profile</a>
+                <a href="#">Logout</a>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" placeholder="Search">
+        </div>
+
+        <!-- Authors Section -->
+        <h2>Explore by Authors</h2>
+        <div class="author-grid">
+            <div class="author-card"><input type="checkbox"><label>Author 1</label></div>
+            <div class="author-card"><input type="checkbox"><label>Author 2</label></div>
+            <div class="author-card"><input type="checkbox"><label>Author 3</label></div>
+            <div class="author-card"><input type="checkbox"><label>Author 4</label></div>
+            <div class="author-card"><input type="checkbox"><label>Author 5</label></div>
+            <div class="author-card"><input type="checkbox"><label>Author 6</label></div>
+        </div>
+
+        <!-- Read Button -->
+        <button class="read-btn">Read</button>
+    </div>
+</body>
+</html>
