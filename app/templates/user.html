@@ -3,204 +3,1075 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Book Bot - User Home</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <title>Book Bot - Dashboard</title>
+  <!-- CSS removed since file doesn't exist -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
   <style>
+    :root {
+      --primary-color: #7c3aed;
+      --primary-light: #a855f7;
+      --primary-dark: #5b21b6;
+      --accent-color: #06d6a0;
+      --accent-light: #40e0d0;
+      --accent-secondary: #f59e0b;
+      --accent-tertiary: #ef4444;
+      --accent-quaternary: #10b981;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-tertiary: #f1f5f9;
+      --bg-sidebar: #1e293b;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --text-white: #ffffff;
+      --border-color: #e2e8f0;
+      --border-light: #f1f5f9;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-2xl: 20px;
+      --radius-full: 9999px;
+    }
+    
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-
+    
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: #d3d3d3;
-      display: flex;
-      min-height: 100vh;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      color: var(--text-primary);
+      line-height: 1.6;
     }
-
-    /* Sidebar */
+    
+    /* Sidebar Styling */
     .sidebar {
-      width: 220px;
-      background-color: #fff;
-      padding: 2rem 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
-    }
-
-    .sidebar .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #1e40af;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .sidebar .logo::before {
-      content: "📘";
-    }
-
-    .sidebar nav {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .sidebar nav a {
-      text-decoration: none;
-      color: #374151;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-weight: 500;
-      padding: 0.5rem;
-      border-radius: 0.375rem;
-      transition: background 0.2s;
-    }
-
-    .sidebar nav a:hover,
-    .sidebar nav a.active {
-      background-color: #e5e7eb;
-    }
-
-    /* Main */
-    .main {
-      flex: 1;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 280px;
+      height: 100vh;
+      background: linear-gradient(180deg, var(--bg-sidebar) 0%, #334155 100%);
+      color: var(--text-white);
       padding: 2rem;
-      background-color: #d1d5db;
+      z-index: 100;
+      box-shadow: var(--shadow-xl);
     }
-
-    .topbar {
-      display: flex;
-      justify-content: flex-end;
-      gap: 1rem;
-      margin-bottom: 2rem;
+    
+    .sidebar-brand {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 3rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+      background: linear-gradient(135deg, var(--primary-light), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-
-    .topbar a {
-      text-decoration: none;
-      color: #1f2937;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
+    
+    .sidebar-nav {
+      list-style: none;
     }
-
-    .content h1 {
-      font-size: 2rem;
-      font-weight: 700;
+    
+    .sidebar-nav li {
       margin-bottom: 0.5rem;
     }
-
-    .content p {
-      color: #6b7280;
-      margin-bottom: 1.5rem;
+    
+    .sidebar-nav a {
+      display: block;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-lg);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .sidebar-nav a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transform: translateX(4px);
+    }
+    
+    .sidebar-nav a.active {
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      color: white;
+      font-weight: 600;
+    }
+    
+    /* Main Content Styling */
+    .main-content {
+      margin-left: 280px;
+      min-height: 100vh;
+    }
+    
+    .navbar {
+      background: var(--bg-primary);
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    
+    .navbar-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+    
+    .navbar-nav {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .navbar-nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      transition: all 0.2s ease;
     }
 
-    .search-bar {
-      display: flex;
+    .navbar-nav a[href*='profile'] {
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      color: white;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      padding: 0.75rem 1.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .navbar-nav a[href*='profile']:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    /* Keep existing hover style for other links */
+    .navbar-nav a:hover {
+      color: var(--primary-color);
+      background: var(--bg-tertiary);
+    }
+    
+    /* Content Area Styling */
+    .container {
+      padding: 2rem;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .text-lg {
+      font-size: 1.125rem;
+    }
+    
+    .text-muted {
+      color: var(--text-muted);
+    }
+    
+    .mb-4 {
       margin-bottom: 2rem;
     }
-
-    .search-bar input {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: none;
-      border-radius: 9999px;
-      font-size: 1rem;
+    
+    /* Search Form Styling */
+    .search-form {
+      margin-bottom: 2rem;
     }
-
+    
+    .form-group {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    
+    .form-input {
+      flex: 1;
+      padding: 1rem 1.5rem;
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-full);
+      font-size: 1rem;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+    }
+    
+    .form-input::placeholder {
+      color: var(--text-muted);
+    }
+    
+    /* Button Styling */
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+      color: white;
+      border-radius: var(--radius-full);
+      padding: 1rem 2rem;
+    }
+    
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .btn-outline {
+      background: transparent;
+      color: var(--primary-color);
+      border: 2px solid var(--primary-color);
+    }
+    
+    .btn-outline:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+    
+    /* Grid Layout */
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 1.5rem;
     }
-
+    
+    .md\:grid-cols-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .lg\:grid-cols-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    
+    /* Card Styling */
     .card {
-      background-color: #f3f4f6;
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
       padding: 2rem;
-      border-radius: 0.5rem;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: all 0.2s ease;
       text-align: center;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-      font-weight: 600;
-      transition: transform 0.2s;
+      position: relative;
+      overflow: hidden;
     }
-
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.05), rgba(6, 214, 160, 0.05));
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    
     .card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary-color);
     }
-
+    
+    .card:hover::before {
+      opacity: 1;
+    }
+    
+    .card h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+      position: relative;
+      z-index: 2;
+    }
+    
+    .card p {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      position: relative;
+      z-index: 2;
+    }
+    
     .card-icon {
-      font-size: 2rem;
+      font-size: 3rem;
       margin-bottom: 1rem;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+      position: relative;
+      z-index: 2;
+    }
+    
+    /* Enhanced Search Bar Styling */
+    .search-container {
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .search-input-wrapper {
+      position: relative;
+      margin-bottom: 0;
+    }
+    
+    .search-input-container {
+      display: flex;
+      align-items: center;
+      background: var(--bg-primary);
+      border-radius: var(--radius-full);
+      border: 2px solid var(--border-color);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+    
+    .search-input-container:focus-within {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+    }
+    
+    .search-input-enhanced {
+      flex: 1;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 1.25rem 1.5rem;
+      font-size: 1rem;
+      background: transparent;
+    }
+    
+    .search-input-enhanced:focus {
+      outline: none;
+      box-shadow: none;
+      border-color: transparent;
+    }
+    
+    .search-btn {
+      border-radius: 0;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    /* Search Suggestions Styling */
+    .search-suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--bg-primary);
+      border: 2px solid var(--primary-color);
+      border-top: none;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      box-shadow: var(--shadow-xl);
+      z-index: 1000;
+      display: none;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    .search-suggestions.show {
+      display: block;
+    }
+    
+    .suggestions-header {
+      padding: 1rem 1.5rem 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+      background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+    }
+    
+    .suggestions-title {
+      font-weight: 700;
+      font-size: 0.875rem;
+      color: var(--primary-color);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .suggestions-list {
+      max-height: 250px;
+      overflow-y: auto;
+    }
+    
+    .suggestion-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border-light);
+      gap: 1rem;
+    }
+    
+    .suggestion-item:hover {
+      background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+      color: var(--primary-color);
+    }
+    
+    .suggestion-item:last-child {
+      border-bottom: none;
+    }
+    
+    .suggestion-icon {
+      font-size: 1.2rem;
+      width: 24px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    
+    .suggestion-content {
+      flex: 1;
+    }
+    
+    .suggestion-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+    
+    .suggestion-meta {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    
+    .suggestion-type {
+      padding: 0.25rem 0.5rem;
+      background: var(--primary-color);
+      color: white;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .suggestions-footer {
+      padding: 0.75rem 1.5rem;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      text-align: center;
+    }
+    
+    .suggestions-hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    
+    /* Quick Search Categories */
+    .quick-search-categories {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+    
+    .category-label {
+      display: inline-block;
+      margin-bottom: 1rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    
+    .category-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    
+    .category-btn {
+      padding: 0.5rem 1rem;
+      background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-full);
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 0.875rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .category-btn:hover {
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      color: white;
+      border-color: var(--primary-color);
     }
 
-    @media (max-width: 768px) {
+    /* Mobile Responsive */
+    .mobile-only {
+      display: none;
+    }
+    
+    @media (max-width: 968px) {
       .sidebar {
         display: none;
       }
-
-      .main {
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .mobile-only {
+        display: block;
+      }
+      
+      .lg\:grid-cols-3 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .container {
         padding: 1rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .md\:grid-cols-2,
+      .lg\:grid-cols-3 {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-group {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .form-input {
+        width: 100%;
+      }
+      
+      .btn-primary {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .search-input-container {
+        flex-direction: column;
+        border-radius: var(--radius-lg);
+      }
+      
+      .search-input-enhanced {
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      }
+      
+      .search-btn {
+        border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .search-suggestions {
+        border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      }
+      
+      .category-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .category-btn {
+        width: 100%;
+        max-width: 200px;
+        justify-content: center;
+      }
+      
+      .suggestion-item {
+        padding: 0.75rem 1rem;
+        flex-wrap: wrap;
+      }
+      
+      .suggestion-content {
+        min-width: 0;
+      }
+      
+      .suggestion-title {
+        font-size: 0.9rem;
+      }
+      
+      .suggestion-meta {
+        font-size: 0.8rem;
       }
     }
   </style>
 </head>
 <body>
-
+  <!-- Sidebar -->
   <aside class="sidebar">
-    <div class="logo">Book Bot</div>
+    <div class="sidebar-brand">
+      📖 Book Bot
+    </div>
     <nav>
-      <a href="#" class="active">🏠 Home</a>
-      <a href="#">🕒 Recommended For You</a>
-      <a href="#">🧭 Explore By Category</a>
-      <a href="#">⭐ Recently Rated</a>
-      <a href="#">❤️ Favorites</a>
-      <a href="#">📖 Continue Reading</a>
+      <ul class="sidebar-nav">
+        <li><a href="#" class="active">🏠 Dashboard</a></li>
+        <li><a href="{{ url_for('recommended_books') }}">🎯 Recommended For You</a></li>
+        <li><a href="#">🧭 Explore Categories</a></li>
+        <li><a href="#">⭐ Recently Rated</a></li>
+        <li><a href="{{ url_for('favorites') }}">❤️ Favorites</a></li>
+        <li><a href="#">📖 Continue Reading</a></li>
+      </ul>
     </nav>
   </aside>
 
-  <main class="main">
-    <div class="topbar">
-      <a href="#">👤 Profile</a>
-      <a href="#">🔓 Logout</a>
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Navigation Bar -->
+    <div class="navbar">
+      <div class="container">
+        <div class="navbar-container">
+          <div class="navbar-brand mobile-only">
+            📖 Book Bot
+          </div>
+          <div class="navbar-nav">
+            <a href="{{ url_for('profile') }}">👤 Profile</a>
+            <button type="button" onclick="handleLogout(event)" onkeypress="handleLogoutKeypress(event)" class="btn btn-outline logout-btn" style="background: transparent; border: 2px solid var(--primary-color); color: var(--primary-color); text-decoration: none; cursor: pointer;">🚪 Logout</button>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="content">
-      <h1>Welcome!</h1>
-      <p>What would you like to read today?</p>
-
-      <div class="search-bar">
-        <input type="text" placeholder="Search for books, authors, or genres" />
+    <!-- Main Content Area -->
+    <div class="container">
+      <!-- Welcome Section -->
+      <div class="mb-4">
+        <h1>Welcome back, {{ username }}!</h1>
+        <p class="text-lg text-muted">Ready to discover your next favorite book?</p>
       </div>
 
-      <div class="grid">
-        <div class="card">
-          <div class="card-icon">👍</div>
-          Recommended For You
+      <!-- Enhanced Search Bar with Suggestions -->
+      <div class="mb-4">
+        <div class="search-container">
+          <form method="GET" action="{{ url_for('search_books') }}" class="search-form" id="searchForm">
+            <div class="form-group search-input-wrapper">
+              <div class="search-input-container">
+                <input type="text" 
+                       name="q" 
+                       id="searchInput"
+                       class="form-input search-input-enhanced" 
+                       placeholder="Search for books, authors, or genres..." 
+                       autocomplete="off">
+                <button type="submit" class="btn btn-primary search-btn">
+                  <span class="search-icon">🔍</span>
+                  <span class="search-text">Search</span>
+                </button>
+              </div>
+              
+              <!-- Search Suggestions Dropdown -->
+              <div class="search-suggestions" id="searchSuggestions">
+                <div class="suggestions-header">
+                  <span class="suggestions-title">💡 Suggestions</span>
+                </div>
+                <div class="suggestions-list" id="suggestionsList">
+                  <!-- Dynamic suggestions will be populated here -->
+                </div>
+                <div class="suggestions-footer">
+                  <span class="suggestions-hint">Press Enter to search or click a suggestion</span>
+                </div>
+              </div>
+            </div>
+          </form>
+          
+          <!-- Quick Search Categories -->
+          <div class="quick-search-categories">
+            <span class="category-label">Quick Search:</span>
+            <div class="category-buttons">
+              <button class="category-btn" data-category="fiction" onclick="quickSearch('fiction')">
+                📚 Fiction
+              </button>
+              <button class="category-btn" data-category="non-fiction" onclick="quickSearch('non-fiction')">
+                📖 Non-Fiction
+              </button>
+              <button class="category-btn" data-category="romance" onclick="quickSearch('romance')">
+                💕 Romance
+              </button>
+              <button class="category-btn" data-category="mystery" onclick="quickSearch('mystery')">
+                🔍 Mystery
+              </button>
+              <button class="category-btn" data-category="science" onclick="quickSearch('science')">
+                🔬 Science
+              </button>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <!-- Action Cards -->
+      <div class="grid md:grid-cols-2 lg:grid-cols-3">
+        <div class="card" data-href="{{ url_for('recommended_books') }}">
+          <div class="card-icon">🎯</div>
+          <h3>Recommended For You</h3>
+          <p>Discover books tailored to your taste</p>
+        </div>
+        
         <div class="card">
           <div class="card-icon">🧭</div>
-          Explore By Category
+          <h3>Explore Categories</h3>
+          <p>Browse books by genre and topic</p>
         </div>
+        
         <div class="card">
           <div class="card-icon">⭐</div>
-          Recently Rated
+          <h3>Recently Rated</h3>
+          <p>See books you've recently reviewed</p>
         </div>
-        <div class="card">
+        
+        <div class="card" data-href="{{ url_for('favorites') }}">
           <div class="card-icon">❤️</div>
-          Favorites
+          <h3>Your Favorites</h3>
+          <p>Revisit your most loved books</p>
         </div>
+        
         <div class="card">
           <div class="card-icon">📖</div>
-          Continue Reading
+          <h3>Continue Reading</h3>
+          <p>Pick up where you left off</p>
         </div>
       </div>
     </div>
   </main>
+
+  <script>
+    // Sample search data - In a real application, this would come from your database
+    const searchData = [
+      { type: 'book', title: 'To Kill a Mockingbird', author: 'Harper Lee', genre: 'Fiction' },
+      { type: 'book', title: 'Pride and Prejudice', author: 'Jane Austen', genre: 'Romance' },
+      { type: 'book', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', genre: 'Fiction' },
+      { type: 'book', title: '1984', author: 'George Orwell', genre: 'Dystopian' },
+      { type: 'book', title: 'Romeo and Juliet', author: 'William Shakespeare', genre: 'Drama' },
+      { type: 'book', title: 'The Catcher in the Rye', author: 'J.D. Salinger', genre: 'Fiction' },
+      { type: 'author', title: 'William Shakespeare', meta: 'Classic Literature Author' },
+      { type: 'author', title: 'Jane Austen', meta: 'Romance & Social Commentary' },
+      { type: 'author', title: 'George Orwell', meta: 'Dystopian Fiction Author' },
+      { type: 'author', title: 'Harper Lee', meta: 'American Literature' },
+      { type: 'genre', title: 'Fiction', meta: 'Imaginative Literature' },
+      { type: 'genre', title: 'Romance', meta: 'Love Stories & Relationships' },
+      { type: 'genre', title: 'Mystery', meta: 'Crime & Detective Stories' },
+      { type: 'genre', title: 'Science Fiction', meta: 'Futuristic & Scientific Themes' },
+      { type: 'genre', title: 'Fantasy', meta: 'Magical & Mythical Stories' }
+    ];
+
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM loaded, initializing user.html'); // Debug log
+      
+      // Test logout button exists
+      const logoutBtn = document.querySelector('.logout-btn');
+      if (logoutBtn) {
+        console.log('Logout button found:', logoutBtn); // Debug log
+      } else {
+        console.error('Logout button not found!'); // Debug log
+      }
+      const searchInput = document.getElementById('searchInput');
+      const searchSuggestions = document.getElementById('searchSuggestions');
+      const suggestionsList = document.getElementById('suggestionsList');
+      const searchForm = document.getElementById('searchForm');
+      
+      let currentFocus = -1;
+      let debounceTimer;
+
+      // Confirmation dialog for logout - Simplified approach
+      // No need for event listeners since we're using direct onclick
+      console.log('Logout functionality initialized'); // Debug log
+
+      // Handle card clicks for navigation
+      const cards = document.querySelectorAll('.card[data-href]');
+      cards.forEach(card => {
+        card.addEventListener('click', function() {
+          window.location.href = this.getAttribute('data-href');
+        });
+      });
+
+      // Search input event listeners
+      if (searchInput) {
+        searchInput.addEventListener('input', function() {
+          clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(() => {
+            handleSearchInput(this.value.trim());
+          }, 300);
+        });
+
+        searchInput.addEventListener('focus', function() {
+          if (this.value.trim()) {
+            handleSearchInput(this.value.trim());
+          }
+        });
+
+        searchInput.addEventListener('keydown', function(e) {
+          const suggestions = suggestionsList.querySelectorAll('.suggestion-item');
+          
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            currentFocus++;
+            if (currentFocus >= suggestions.length) currentFocus = 0;
+            updateFocus(suggestions);
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            currentFocus--;
+            if (currentFocus < 0) currentFocus = suggestions.length - 1;
+            updateFocus(suggestions);
+          } else if (e.key === 'Enter') {
+            if (currentFocus > -1 && suggestions[currentFocus]) {
+              e.preventDefault();
+              suggestions[currentFocus].click();
+            }
+          } else if (e.key === 'Escape') {
+            hideSuggestions();
+          }
+        });
+      }
+
+      // Hide suggestions when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
+          hideSuggestions();
+        }
+      });
+
+      function handleSearchInput(query) {
+        if (query.length < 2) {
+          hideSuggestions();
+          return;
+        }
+
+        const matches = searchData.filter(item => {
+          const searchText = `${item.title} ${item.author || ''} ${item.genre || ''} ${item.meta || ''}`.toLowerCase();
+          return searchText.includes(query.toLowerCase());
+        });
+
+        if (matches.length > 0) {
+          showSuggestions(matches.slice(0, 8)); // Limit to 8 suggestions
+        } else {
+          hideSuggestions();
+        }
+      }
+
+      function showSuggestions(matches) {
+        suggestionsList.innerHTML = '';
+        
+        matches.forEach((item, index) => {
+          const suggestionItem = createSuggestionItem(item);
+          suggestionsList.appendChild(suggestionItem);
+        });
+
+        searchSuggestions.classList.add('show');
+        currentFocus = -1;
+      }
+
+      function createSuggestionItem(item) {
+        const div = document.createElement('div');
+        div.className = 'suggestion-item';
+        
+        const icon = getTypeIcon(item.type);
+        const typeLabel = item.type.charAt(0).toUpperCase() + item.type.slice(1);
+        
+        div.innerHTML = `
+          <span class="suggestion-icon">${icon}</span>
+          <div class="suggestion-content">
+            <div class="suggestion-title">${item.title}</div>
+            <div class="suggestion-meta">${item.author || item.meta || ''}</div>
+          </div>
+          <span class="suggestion-type">${typeLabel}</span>
+        `;
+        
+        div.addEventListener('click', function() {
+          searchInput.value = item.title;
+          hideSuggestions();
+          searchForm.submit();
+        });
+        
+        return div;
+      }
+
+      function getTypeIcon(type) {
+        const icons = {
+          'book': '📖',
+          'author': '✍️',
+          'genre': '🎭'
+        };
+        return icons[type] || '📚';
+      }
+
+      function updateFocus(suggestions) {
+        suggestions.forEach((item, index) => {
+          if (index === currentFocus) {
+            item.style.background = 'linear-gradient(135deg, var(--primary-color), var(--accent-color))';
+            item.style.color = 'white';
+            item.scrollIntoView({ block: 'nearest' });
+          } else {
+            item.style.background = '';
+            item.style.color = '';
+          }
+        });
+      }
+
+      function hideSuggestions() {
+        searchSuggestions.classList.remove('show');
+        currentFocus = -1;
+      }
+    });
+
+    // Logout confirmation function - called directly from onclick
+    function handleLogout(event) {
+      event.preventDefault();
+      console.log('handleLogout called'); // Debug log
+      
+      // Show confirmation modal with black styling
+      showLogoutConfirmation();
+    }
+    
+    // Handle logout via keyboard (Enter or Space)
+    function handleLogoutKeypress(event) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        handleLogout(event);
+      }
+    }
+    
+    function showLogoutConfirmation() {
+      // Create confirmation modal
+      const modal = document.createElement('div');
+      modal.className = 'logout-modal';
+      modal.innerHTML = `
+          <div class="modal-content">
+              <h3>Confirm Logout</h3>
+              <p>Are you sure you want to logout?</p>
+              <div class="modal-buttons">
+                  <button class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+                  <button class="btn-confirm" onclick="confirmLogout()">Logout</button>
+              </div>
+          </div>
+      `;
+      
+      // Add modal styles with click-outside-to-close
+      modal.style.cssText = `
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7);
+          display: flex; align-items: center; justify-content: center; z-index: 10000;
+      `;
+      
+      // Close modal when clicking outside
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          closeLogoutModal();
+        }
+      });
+      
+      // Close modal with Escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          closeLogoutModal();
+        }
+      });
+      
+      const content = modal.querySelector('.modal-content');
+      content.style.cssText = `
+          background: #1a1a1a; color: white; padding: 2rem; border-radius: 12px;
+          text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 400px; width: 90%;
+      `;
+      
+      const buttons = modal.querySelector('.modal-buttons');
+      buttons.style.cssText = 'display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: center;';
+      
+      const btnCancel = modal.querySelector('.btn-cancel');
+      btnCancel.style.cssText = `
+          padding: 0.75rem 1.5rem; border: 2px solid #666; background: transparent;
+          color: white; border-radius: 8px; cursor: pointer; font-weight: 600;
+      `;
+      
+      const btnConfirm = modal.querySelector('.btn-confirm');
+      btnConfirm.style.cssText = `
+          padding: 0.75rem 1.5rem; border: none; background: #ef4444;
+          color: white; border-radius: 8px; cursor: pointer; font-weight: 600;
+      `;
+      
+      document.body.appendChild(modal);
+    }
+    
+    function closeLogoutModal() {
+      const modal = document.querySelector('.logout-modal');
+      if (modal) {
+        modal.remove();
+      }
+    }
+    
+    function confirmLogout() {
+      // Close modal first
+      closeLogoutModal();
+      
+      // Show toast notification (with fallback)
+      if (typeof showInfo === 'function') {
+        showInfo('Logging out...');
+      } else {
+        console.log('Logging out...'); // Fallback if toast.js not loaded
+      }
+      
+      // Redirect to logout
+      setTimeout(() => {
+        window.location.href = "{{ url_for('logout') }}";
+      }, 1000);
+    }
+
+    // Quick search function
+    function quickSearch(category) {
+      const searchInput = document.getElementById('searchInput');
+      const searchForm = document.getElementById('searchForm');
+      
+      if (searchInput && searchForm) {
+        searchInput.value = category;
+        searchForm.submit();
+      }
+    }
+  </script>
 
 </body>
 </html>

@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Bot - Edit Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+  <style>
+    :root {
+      --primary-color: #7c3aed;
+      --primary-light: #a855f7;
+      --primary-dark: #5b21b6;
+      --secondary-color: #06d6a0;
+      --accent-color: #06d6a0;
+      --accent-light: #40e0d0;
+      --accent-secondary: #f59e0b;
+      --accent-tertiary: #ef4444;
+      --accent-quaternary: #10b981;
+      --success-color: #10b981;
+      --warning-color: #f59e0b;
+      --error-color: #ef4444;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-muted: #f1f5f9;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --border-color: #e2e8f0;
+      --border-focus: #7c3aed;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-2xl: 20px;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: var(--text-primary);
+    }
+    
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 280px;
+      height: 100vh;
+      background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      padding: 2rem 0;
+      z-index: 1000;
+      box-shadow: var(--shadow-xl);
+    }
+    
+    .sidebar-brand {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: white;
+      text-align: center;
+      margin-bottom: 3rem;
+      padding: 0 1.5rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .sidebar-nav {
+      list-style: none;
+    }
+    
+    .sidebar-nav li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .sidebar-nav a {
+      display: block;
+      padding: 1rem 1.5rem;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      font-weight: 500;
+      border-left: 4px solid transparent;
+    }
+    
+    .sidebar-nav a:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-left-color: var(--accent-color);
+    }
+    
+    .sidebar-nav a.active {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: white;
+      border-left-color: var(--accent-color);
+      font-weight: 600;
+    }
+    
+    .main-content {
+      margin-left: 280px;
+      min-height: 100vh;
+      background: var(--bg-secondary);
+    }
+    
+    .navbar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 0;
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    
+    .navbar-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+    
+    .navbar-nav {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .navbar-nav a {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+    }
+    
+    .navbar-nav a:hover {
+      background-color: rgba(124, 58, 237, 0.1);
+      color: var(--primary-color);
+    }
+    
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: var(--radius-lg);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+      color: white;
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+      box-shadow: var(--shadow-xl);
+    }
+    
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+    }
+    
+    .btn-outline:hover {
+      background: var(--primary-color);
+      color: white;
+      box-shadow: var(--shadow-md);
+    }
+    
+    .main-content .container {
+      padding: 3rem 2rem;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+      text-shadow: 0 2px 4px rgba(124, 58, 237, 0.1);
+    }
+    
+    h2 {
+      color: var(--primary-color);
+      font-weight: 700;
+    }
+    
+    h3 {
+      color: var(--primary-color);
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    
+    .text-lg {
+      font-size: 1.125rem;
+      line-height: 1.6;
+    }
+    
+    .text-muted {
+      color: var(--text-secondary);
+    }
+    
+    .mb-4 {
+      margin-bottom: 2rem;
+    }
+    
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color), var(--accent-secondary));
+    }
+    
+    .card-header {
+      padding: 2.5rem 2rem 1.5rem;
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.05), rgba(6, 214, 160, 0.05));
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .card-body {
+      padding: 2rem;
+    }
+    
+    .card-footer {
+      padding: 1.5rem 2rem 2rem;
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.02), rgba(6, 214, 160, 0.02));
+      border-top: 1px solid var(--border-color);
+    }
+    
+    .grid {
+      display: grid;
+      gap: 2rem;
+    }
+    
+    .md\:grid-cols-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+      display: block;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 0.75rem;
+      font-size: 0.95rem;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      font-size: 1rem;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1), var(--shadow-md);
+    }
+    
+    .form-input::placeholder {
+      color: var(--text-muted);
+    }
+    
+    select.form-input {
+      cursor: pointer;
+      background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%237c3aed" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 12px;
+      appearance: none;
+    }
+    
+    .alert {
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-lg);
+      margin-bottom: 1.5rem;
+      font-weight: 500;
+      border-left: 4px solid;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .alert-success {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 214, 160, 0.1));
+      color: var(--success-color);
+      border-left-color: var(--success-color);
+    }
+    
+    .alert-error {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+      color: var(--error-color);
+      border-left-color: var(--error-color);
+    }
+    
+    .error-message {
+      color: var(--error-color);
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+      display: block;
+      font-weight: 500;
+    }
+    
+    .form-input.error {
+      border-color: var(--error-color);
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+    
+    .mobile-only {
+      display: none;
+    }
+    
+    /* Enhanced sections styling */
+    .personal-info-section {
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.03), rgba(168, 85, 247, 0.03));
+      padding: 2rem;
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(124, 58, 237, 0.1);
+    }
+    
+    .preferences-section {
+      background: linear-gradient(135deg, rgba(6, 214, 160, 0.03), rgba(64, 224, 208, 0.03));
+      padding: 2rem;
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(6, 214, 160, 0.1);
+    }
+    
+    .preferences-section h3 {
+      color: var(--secondary-color);
+    }
+    
+    .preferences-section .form-label {
+      color: var(--secondary-color);
+    }
+    
+    .tip-box {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(251, 191, 36, 0.1));
+      border-radius: var(--radius-lg);
+      border-left: 4px solid var(--accent-secondary);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .tip-box h4 {
+      margin: 0 0 0.75rem 0;
+      color: var(--accent-secondary);
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    
+    .tip-box p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    
+    /* Profile icon styling */
+    .profile-icon {
+      font-size: 3.5rem;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 4px 8px rgba(124, 58, 237, 0.3));
+    }
+    
+    /* Form section headers */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid transparent;
+      border-image: linear-gradient(90deg, var(--primary-color), var(--accent-color)) 1;
+    }
+    
+    .section-icon {
+      font-size: 1.5rem;
+      padding: 0.5rem;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+      color: white;
+      box-shadow: var(--shadow-md);
+    }
+    
+    .preferences-section .section-icon {
+      background: linear-gradient(135deg, var(--secondary-color), var(--accent-light));
+    }
+    
+    /* Enhanced button styling */
+    .btn {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 968px) {
+      .md\:grid-cols-2 {
+        grid-template-columns: 1fr;
+      }
+      
+      .container {
+        padding: 0 1.5rem;
+      }
+      
+      .main-content .container {
+        padding: 2rem 1.5rem;
+      }
+      
+      .card-header, .card-body, .card-footer {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+      }
+      
+      .personal-info-section, .preferences-section {
+        padding: 1.5rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .mobile-only {
+        display: block;
+      }
+      
+      .card-footer > div {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      📖 Book Bot
+    </div>
+    <nav>
+      <ul class="sidebar-nav">
+        <li><a href="{{ url_for('user_home') }}">🏠 Dashboard</a></li>
+        <li><a href="#">🎯 Recommended For You</a></li>
+        <li><a href="#">🧭 Explore Categories</a></li>
+        <li><a href="#">⭐ Recently Rated</a></li>
+        <li><a href="#">❤️ Favorites</a></li>
+        <li><a href="#">📖 Continue Reading</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Navigation Bar -->
+    <div class="navbar">
+      <div class="container">
+        <div class="navbar-container">
+          <div class="navbar-brand mobile-only">
+            📖 Book Bot
+          </div>
+          <div class="navbar-nav">
+            <a href="{{ url_for('profile') }}">👤 Profile</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline">🚪 Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="container">
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ 'error' if category == 'error' else 'success' }}" style="margin-bottom: 1rem;">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <!-- Edit Profile Section -->
+      <div class="mb-4">
+        <h1>Edit Profile</h1>
+        <p class="text-lg text-muted">Update your personal information and reading preferences.</p>
+      </div>
+
+      <!-- Edit Profile Form -->
+      <div class="card" style="max-width: 800px; margin: 0 auto;">
+        <div class="card-header">
+          <div style="display: flex; align-items: center; gap: 1.5rem;">
+            <div class="profile-icon">✏️</div>
+            <div>
+              <h2 style="margin: 0; font-size: 1.5rem;">Update Your Information</h2>
+              <p style="margin: 0; color: var(--text-muted); font-size: 0.875rem;">Make changes to your profile</p>
+            </div>
+          </div>
+        </div>
+        
+        <form method="POST" action="{{ url_for('edit_profile') }}" id="editProfileForm">
+          <div class="card-body">
+            <div class="grid md:grid-cols-2" style="gap: 2rem;">
+              <!-- Personal Information -->
+              <div class="personal-info-section">
+                <div class="section-header">
+                  <div class="section-icon">👤</div>
+                  <h3>Personal Information</h3>
+                </div>
+                
+                <div class="form-group">
+                  <label for="username" class="form-label">Full Name *</label>
+                  <input type="text" id="username" name="username" class="form-input" 
+                         value="{{ user.username or '' }}" required>
+                  <span class="error-message" id="username-error"></span>
+                </div>
+                
+                <div class="form-group">
+                  <label for="email" class="form-label">Email Address *</label>
+                  <input type="email" id="email" name="email" class="form-input" 
+                         value="{{ user.email or '' }}" required>
+                  <span class="error-message" id="email-error"></span>
+                </div>
+                
+                <div class="form-group">
+                  <label for="phone_number" class="form-label">Phone Number *</label>
+                  <input type="tel" id="phone_number" name="phone_number" class="form-input" 
+                         value="{{ user.phone_number or '' }}" required>
+                  <span class="error-message" id="phone-error"></span>
+                </div>
+                
+                <div class="form-group">
+                  <label for="dob" class="form-label">Date of Birth *</label>
+                  <input type="date" id="dob" name="dob" class="form-input" 
+                         value="{{ user.dob or '' }}" required>
+                  <span class="error-message" id="dob-error"></span>
+                </div>
+                
+                <div class="form-group">
+                  <label for="gender" class="form-label">Gender *</label>
+                  <select id="gender" name="gender" class="form-input" required>
+                    <option value="">Select Gender</option>
+                    <option value="Male" {{ 'selected' if user.gender == 'Male' else '' }}>Male</option>
+                    <option value="Female" {{ 'selected' if user.gender == 'Female' else '' }}>Female</option>
+                    <option value="Other" {{ 'selected' if user.gender == 'Other' else '' }}>Other</option>
+                  </select>
+                  <span class="error-message" id="gender-error"></span>
+                </div>
+              </div>
+              
+              <!-- Reading Preferences -->
+              <div class="preferences-section">
+                <div class="section-header">
+                  <div class="section-icon">📚</div>
+                  <h3>Reading Preferences</h3>
+                </div>
+                
+                <div class="form-group">
+                  <label for="preferred_genre" class="form-label">Preferred Genre</label>
+                  <select id="preferred_genre" name="preferred_genre" class="form-input">
+                    <option value="">Select a genre</option>
+                    {% for genre in genres %}
+                      <option value="{{ genre }}" {{ 'selected' if user.preferred_genre == genre else '' }}>{{ genre }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label for="preferred_author" class="form-label">Preferred Author</label>
+                  <select id="preferred_author" name="preferred_author" class="form-input">
+                    <option value="">Select an author</option>
+                    {% for author in authors %}
+                      <option value="{{ author }}" {{ 'selected' if user.preferred_author == author else '' }}>{{ author }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <!-- Info Section -->
+                <div class="tip-box">
+                  <h4>💡 Tip</h4>
+                  <p>
+                    Update your reading preferences to get better book recommendations tailored to your taste.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card-footer">
+            <div style="display: flex; gap: 1rem; justify-content: flex-start;">
+              <button type="submit" class="btn btn-primary">
+                <span style="margin-right: 0.5rem;">💾</span>
+                Save Changes
+              </button>
+              <a href="{{ url_for('profile') }}" class="btn btn-outline">
+                <span style="margin-right: 0.5rem;">❌</span>
+                Cancel
+              </a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Confirmation dialog for logout
+    document.addEventListener('DOMContentLoaded', function() {
+      const logoutLinks = document.querySelectorAll('a[href*="logout"]');
+      
+      logoutLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          // Create confirmation modal
+          const modal = document.createElement('div');
+          modal.className = 'logout-modal';
+          modal.innerHTML = `
+              <div class="modal-content">
+                  <h3>Confirm Logout</h3>
+                  <p>Are you sure you want to logout?</p>
+                  <div class="modal-buttons">
+                      <button class="btn-cancel" onclick="this.closest('.logout-modal').remove()">Cancel</button>
+                      <button class="btn-confirm" onclick="confirmLogoutEditProfile('${this.href}'); this.closest('.logout-modal').remove();">Logout</button>
+                  </div>
+              </div>
+          `;
+          
+          // Add modal styles
+          modal.style.cssText = `
+              position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7);
+              display: flex; align-items: center; justify-content: center; z-index: 10000;
+          `;
+          
+          const content = modal.querySelector('.modal-content');
+          content.style.cssText = `
+              background: #1a1a1a; color: white; padding: 2rem; border-radius: 12px;
+              text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 400px; width: 90%;
+          `;
+          
+          const buttons = modal.querySelector('.modal-buttons');
+          buttons.style.cssText = 'display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: center;';
+          
+          const btnCancel = modal.querySelector('.btn-cancel');
+          btnCancel.style.cssText = `
+              padding: 0.75rem 1.5rem; border: 2px solid #666; background: transparent;
+              color: white; border-radius: 8px; cursor: pointer; font-weight: 600;
+          `;
+          
+          const btnConfirm = modal.querySelector('.btn-confirm');
+          btnConfirm.style.cssText = `
+              padding: 0.75rem 1.5rem; border: none; background: #ef4444;
+              color: white; border-radius: 8px; cursor: pointer; font-weight: 600;
+          `;
+          
+          document.body.appendChild(modal);
+        });
+      });
+    });
+
+    function confirmLogoutEditProfile(href) {
+      showInfo('Logging out...');
+      setTimeout(() => {
+        window.location.href = href;
+      }, 1000);
+    }
+  </script>
+
+  <script src="{{ url_for('static', filename='js/validation.js') }}"></script>
+  
+  <script>
+    // Form validation for edit profile
+    document.getElementById('editProfileForm').addEventListener('submit', function(e) {
+      let isValid = true;
+      
+      // Clear previous errors
+      document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+      
+      // Username validation
+      const username = document.getElementById('username').value.trim();
+      if (!username) {
+        document.getElementById('username-error').textContent = 'Full name is required';
+        isValid = false;
+      }
+      
+      // Email validation
+      const email = document.getElementById('email').value.trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email) {
+        document.getElementById('email-error').textContent = 'Email is required';
+        isValid = false;
+      } else if (!emailRegex.test(email)) {
+        document.getElementById('email-error').textContent = 'Please enter a valid email address';
+        isValid = false;
+      }
+      
+      // Phone validation
+      const phone = document.getElementById('phone_number').value.trim();
+      const phoneRegex = /^[0-9]{10}$/;
+      if (!phone) {
+        document.getElementById('phone-error').textContent = 'Phone number is required';
+        isValid = false;
+      } else if (!phoneRegex.test(phone)) {
+        document.getElementById('phone-error').textContent = 'Phone number must be 10 digits';
+        isValid = false;
+      }
+      
+      // Date of birth validation
+      const dob = document.getElementById('dob').value;
+      if (!dob) {
+        document.getElementById('dob-error').textContent = 'Date of birth is required';
+        isValid = false;
+      }
+      
+      // Gender validation
+      const gender = document.getElementById('gender').value;
+      if (!gender) {
+        document.getElementById('gender-error').textContent = 'Please select your gender';
+        isValid = false;
+      }
+      
+      if (!isValid) {
+        e.preventDefault();
+      }
+    });
+  </script>
+
+
+</body>
+</html>

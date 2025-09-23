@@ -3,177 +3,592 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Bot - Preferences</title>
+    <title>Book Bot - Set Your Preferences</title>
+    <!-- CSS removed since file doesn't exist -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        :root {
+            --primary-color: #7c3aed;
+            --primary-light: #a855f7;
+            --primary-dark: #5b21b6;
+            --accent-color: #06d6a0;
+            --accent-light: #40e0d0;
+            --accent-secondary: #f59e0b;
+            --accent-tertiary: #ef4444;
+            --accent-quaternary: #10b981;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-muted: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --border-focus: #7c3aed;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --radius-2xl: 20px;
+        }
+        
+        * {
             margin: 0;
             padding: 0;
-            background-color: #f9eef5e5;
+            box-sizing: border-box;
         }
-        header {
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .preferences-page {
+            min-height: 100vh;
+            background-color: #7c3aed;
+            position: relative;
+        }
+        
+        .preferences-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="%23fff" stop-opacity=".1"/><stop offset="100%" stop-color="%23fff" stop-opacity="0"/></radialGradient></defs><circle cx="100" cy="100" r="60" fill="url(%23a)"/><circle cx="900" cy="200" r="80" fill="url(%23a)"/><circle cx="300" cy="900" r="70" fill="url(%23a)"/><circle cx="800" cy="800" r="90" fill="url(%23a)"/><circle cx="500" cy="300" r="75" fill="url(%23a)"/><circle cx="200" cy="600" r="65" fill="url(%23a)"/></svg>');
+            background-size: cover;
+            pointer-events: none;
+        }
+        
+        .preferences-header {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .preferences-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .navbar-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 30px;
-            background-color: white;
-            border-bottom: 1px solid #ddd;
         }
-        header h1 { font-size: 20px; display: flex; align-items: center; }
-        nav a { margin-left: 20px; text-decoration: none; color: black; font-weight: 500; }
-        main { padding: 20px 40px; }
-        h2 { font-size: 22px; margin-bottom: 5px; }
-        p { color: #555; margin-top: 0; margin-bottom: 15px; }
-        .search-box {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        .genre-card {
-            background-color: #ccc;
+        
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: 800;
             color: white;
-            font-weight: bold;
-            height: 100px;
-            border-radius: 8px;
-            /* Use flexbox for centering and ensure it shows up */
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .navbar-nav {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .navbar-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+        }
+        
+        .navbar-nav a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .preferences-content {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-2xl);
+            padding: 4rem;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            font-size: 1rem;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+        
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .form-group {
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .section-description {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .preferences-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .preference-card {
+            position: relative;
+            background-color: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 2rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            min-height: 140px;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
+        }
+        
+        .preference-card:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-color);
+        }
+        
+        .preference-card input[type="radio"] {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            accent-color: var(--primary-color);
+            z-index: 3;
+        }
+        
+        .preference-card.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(124, 58, 237, 0.1);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .preference-card.selected .preference-text {
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+        
+        .preference-text {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 1rem;
+            line-height: 1.4;
             position: relative;
-            font-size: 16px;
+            z-index: 2;
+        }
+        
+        .section {
+            margin-bottom: 4rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            padding: 5px; /* Add some padding for better text display */
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .btn-lg {
+            padding: 1.25rem 2.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+        
+        .btn-outline:hover {
+            background: white;
+            color: var(--primary-color);
+        }
+        
+        .save-button {
+            width: 100%;
+            max-width: 400px;
+            margin: 3rem auto 0;
+            display: block;
+        }
+        
+        .flash-messages {
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .flash-message {
+            padding: 1rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .flash-message::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: currentColor;
+        }
+        
+        .flash-error {
+            background-color: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+        
+        .flash-success {
+            background-color: #d1fae5;
+            color: #059669;
+            border: 1px solid #6ee7b7;
+        }
+        
+        .text-center {
             text-align: center;
         }
-        input[type="radio"] {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            width: 20px;
-            height: 20px;
+        
+        .mb-4 {
+            margin-bottom: 2rem;
         }
-        .save-btn {
-            background-color: #007bff;
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
+        
+        .page-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
         }
-        .save-btn:hover { background-color: #0056b3; }
-        section { margin-bottom: 40px; }
+        
+        .page-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 968px) {
+            .preferences-content {
+                padding: 3rem 2rem;
+            }
+            
+            .preferences-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 1rem;
+            }
+            
+            .preference-card {
+                padding: 1.5rem 1rem;
+                min-height: 120px;
+            }
+            
+            .page-title {
+                font-size: 2.5rem;
+            }
+            
+            .section-title {
+                font-size: 1.75rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .preferences-content {
+                padding: 2rem 1rem;
+            }
+            
+            .preferences-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 0.75rem;
+            }
+            
+            .preference-card {
+                padding: 1rem;
+                min-height: 100px;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+        }
+        
+        /* Icon styles for different categories */
+        .author-icon {
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+        }
+        
+        .genre-icon {
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+        }
+        
+        .preference-card.selected .author-icon,
+        .preference-card.selected .genre-icon {
+            filter: drop-shadow(0 8px 16px rgba(124, 58, 237, 0.4));
+        }
     </style>
 </head>
-<body>
+<body class="preferences-page">
+    <!-- Header -->
+    <div class="preferences-header">
+        <div class="preferences-container">
+            <div class="navbar-container">
+                <div class="navbar-brand" style="color: white;">
+                    ⚙️ Book Bot - Preferences
+                </div>
+                <div class="navbar-nav">
+                    <a href="#" style="color: white;">👤 Profile</a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline" style="border-color: white; color: white;">🚪 Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<header>
-    <h1> 📖 Book Bot</h1>
-    <nav>
-        <a href="#">👤Profile</a>
-        <a href="{{ url_for('logout') }}">🔓Logout</a>
-    </nav>
-</header>
+    <!-- Main Content -->
+    <div class="preferences-container">
+        <div class="preferences-content">
+            <div class="text-center mb-4">
+                <h1 class="page-title">Set Your Reading Preferences</h1>
+                <p class="page-subtitle">Help us personalize your book recommendations by selecting your favorite author and genre.</p>
+            </div>
 
-<main>
-    <form method="POST" action="/preferences">
-        
-        <!-- Authors Section -->
-        <section>
-            <h2>Choose your favorite author!</h2>
-            <p>Select one author to get personalized book recommendations.</p>
-            <!-- ADDED: ID and onkeyup event for search functionality -->
-            <input type="text" id="author-search" class="search-box" placeholder="Search for authors..." onkeyup="filterGrid('author-search', 'author-grid')">
+            <form method="POST" action="/preferences" id="preferencesForm">
+                <!-- Flash messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    <div class="flash-messages">
+                      {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">
+                          {{ message }}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                {% endwith %}
+                
+                <!-- Authors Section -->
+                <div class="section">
+                    <h2 class="section-title">Choose Your Favorite Author</h2>
+                    <p class="section-description">Select one author to get personalized book recommendations based on their writing style and works.</p>
+                    
+                    <div class="form-group">
+                        <input type="text" id="author-search" class="form-input" placeholder="Search for authors..." onkeyup="filterGrid('author-search', 'author-grid')">
+                    </div>
+                    
+                    <div id="author-grid" class="preferences-grid">
+                        {% for author in authors %}
+                        <label class="preference-card" onclick="selectCard(this)">
+                            <input type="radio" name="author" value="{{ author }}" required>
+                            <div style="display: flex; flex-direction: column; align-items: center;">
+                                <div class="author-icon">📝</div>
+                                <span class="preference-text">{{ author }}</span>
+                            </div>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Genres Section -->
+                <div class="section">
+                    <h2 class="section-title">Choose Your Favorite Genre</h2>
+                    <p class="section-description">Select one genre that you enjoy most to receive targeted book suggestions.</p>
+                    
+                    <div class="form-group">
+                        <input type="text" id="genre-search" class="form-input" placeholder="Search for genres..." onkeyup="filterGrid('genre-search', 'genre-grid')">
+                    </div>
+                    
+                    <div id="genre-grid" class="preferences-grid">
+                        {% for genre in genres %}
+                        <label class="preference-card" onclick="selectCard(this)">
+                            <input type="radio" name="genre" value="{{ genre }}" required>
+                            <div style="display: flex; flex-direction: column; align-items: center;">
+                                <div class="genre-icon">📚</div>
+                                <span class="preference-text">{{ genre }}</span>
+                            </div>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg save-button">Save My Preferences</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Handle card selection visual feedback
+        function selectCard(card) {
+            // Remove selected class from siblings
+            const siblings = card.parentElement.querySelectorAll('.preference-card');
+            siblings.forEach(sibling => sibling.classList.remove('selected'));
             
-            <!-- MODIFIED: Dynamic grid generation with Jinja2 loop -->
-            <div id="author-grid" class="grid">
-                {% for author in authors %}
-                <label class="genre-card">
-                    <input type="radio" name="author" value="{{ author }}" required>
-                    {{ author }}
-                </label>
-                {% endfor %}
-            </div>
-        </section>
+            // Add selected class to clicked card
+            card.classList.add('selected');
+        }
+        
+        // Filter grid items based on search input
+        function filterGrid(inputId, gridId) {
+            const filter = document.getElementById(inputId).value.toLowerCase();
+            const grid = document.getElementById(gridId);
+            const items = grid.getElementsByClassName('preference-card');
 
-        <!-- Genres Section -->
-        <section>
-            <h2>Choose your favorite genre!</h2>
-            <p>Select one genre to get personalized book recommendations.</p>
-            <!-- ADDED: ID and onkeyup event for search functionality -->
-            <input type="text" id="genre-search" class="search-box" placeholder="Search for genres..." onkeyup="filterGrid('genre-search', 'genre-grid')">
-
-            <!-- MODIFIED: Dynamic grid generation with Jinja2 loop -->
-            <div id="genre-grid" class="grid">
-                 {% for genre in genres %}
-                <label class="genre-card">
-                    <input type="radio" name="genre" value="{{ genre }}" required>
-                    {{ genre }}
-                </label>
-                {% endfor %}
-            </div>
-        </section>
-
-        <button type="submit" class="save-btn">Save Preferences</button>
-    </form>
-</main>
-
-<!-- ADDED: JavaScript for search and display logic -->
-<script>
-    // This function filters the items in a grid based on search input
-    function filterGrid(inputId, gridId) {
-        const filter = document.getElementById(inputId).value.toLowerCase();
-        const grid = document.getElementById(gridId);
-        const items = grid.getElementsByClassName('genre-card');
-
-        // If the search box is empty, revert to showing the first 10
-        if (filter === "") {
+            // If search box is empty, show first 15 items
+            if (filter === "") {
+                for (let i = 0; i < items.length; i++) {
+                    items[i].style.display = (i < 15) ? "flex" : "none";
+                }
+                return;
+            }
+            
+            // Filter based on search term
             for (let i = 0; i < items.length; i++) {
-                items[i].style.display = (i < 10) ? "flex" : "none";
-            }
-            return;
-        }
-        
-        // Otherwise, filter based on the search term
-        for (let i = 0; i < items.length; i++) {
-            const text = items[i].innerText || items[i].textContent;
-            if (text.toLowerCase().indexOf(filter) > -1) {
-                items[i].style.display = "flex"; // Show matching items
-            } else {
-                items[i].style.display = "none"; // Hide non-matching items
+                const text = items[i].innerText || items[i].textContent;
+                if (text.toLowerCase().indexOf(filter) > -1) {
+                    items[i].style.display = "flex";
+                } else {
+                    items[i].style.display = "none";
+                }
             }
         }
-    }
 
-    // This function runs when the page loads to set the initial view (show first 10)
-    function setInitialView() {
-        // Initialize author grid
-        const authorGrid = document.getElementById('author-grid');
-        const authorItems = authorGrid.getElementsByClassName('genre-card');
-        for (let i = 0; i < authorItems.length; i++) {
-            authorItems[i].style.display = (i < 10) ? "flex" : "none";
+        // Set initial view on page load
+        function setInitialView() {
+            // Show first 15 items for authors
+            const authorGrid = document.getElementById('author-grid');
+            const authorItems = authorGrid.getElementsByClassName('preference-card');
+            for (let i = 0; i < authorItems.length; i++) {
+                authorItems[i].style.display = (i < 15) ? "flex" : "none";
+            }
+            
+            // Show first 15 items for genres
+            const genreGrid = document.getElementById('genre-grid');
+            const genreItems = genreGrid.getElementsByClassName('preference-card');
+            for (let i = 0; i < genreItems.length; i++) {
+                genreItems[i].style.display = (i < 15) ? "flex" : "none";
+            }
+        }
+
+        // Icon mapping functions
+        function getAuthorIcon(author) {
+            // Same icon for all authors
+            return '✍️';
         }
         
-        // Initialize genre grid
-        const genreGrid = document.getElementById('genre-grid');
-        const genreItems = genreGrid.getElementsByClassName('genre-card');
-        for (let i = 0; i < genreItems.length; i++) {
-            genreItems[i].style.display = (i < 10) ? "flex" : "none";
+        function getGenreIcon(genre) {
+            // Same icon for all genres
+            return '📚';
         }
-    }
-
-    // Add event listener to run the initial setup once the page content is loaded
-    document.addEventListener('DOMContentLoaded', setInitialView);
-</script>
-
+        
+        // Update the template rendering to use JavaScript functions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update author icons
+            const authorCards = document.querySelectorAll('#author-grid .preference-card');
+            authorCards.forEach(card => {
+                const authorName = card.querySelector('.preference-text').textContent;
+                const iconElement = card.querySelector('.author-icon');
+                iconElement.textContent = getAuthorIcon(authorName);
+            });
+            
+            // Update genre icons
+            const genreCards = document.querySelectorAll('#genre-grid .preference-card');
+            genreCards.forEach(card => {
+                const genreName = card.querySelector('.preference-text').textContent;
+                const iconElement = card.querySelector('.genre-icon');
+                iconElement.textContent = getGenreIcon(genreName);
+            });
+            
+            setInitialView();
+            
+            // Add change listeners to radio buttons
+            const radioButtons = document.querySelectorAll('input[type="radio"]');
+            radioButtons.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.checked) {
+                        selectCard(this.closest('.preference-card'));
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

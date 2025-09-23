@@ -3,124 +3,816 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create New Account</title>
+  <title>Create New Account - Book Bot</title>
+  <!-- CSS removed since file doesn't exist -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body {
+    :root {
+      --primary-color: #7c3aed;
+      --primary-light: #a855f7;
+      --primary-dark: #5b21b6;
+      --accent-color: #06d6a0;
+      --accent-light: #40e0d0;
+      --accent-secondary: #f59e0b;
+      --bg-primary: #f8fafc;
+      --bg-secondary: #ffffff;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --border-color: #e2e8f0;
+      --border-focus: #7c3aed;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+    }
+    
+    * {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f8f9fb;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #7c3aed;
+      min-height: 100vh;
       display: flex;
-      justify-content: center;
       align-items: center;
-      height: 100vh;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
     }
-    .container {
-      display: flex;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.08);
+    
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="%23fff" stop-opacity=".15"/><stop offset="100%" stop-color="%23fff" stop-opacity="0"/></radialGradient></defs><circle cx="150" cy="150" r="80" fill="url(%23a)"/><circle cx="850" cy="200" r="120" fill="url(%23a)"/><circle cx="300" cy="800" r="100" fill="url(%23a)"/><circle cx="700" cy="700" r="90" fill="url(%23a)"/><circle cx="500" cy="400" r="110" fill="url(%23a)"/></svg>');
+      background-size: cover;
+      pointer-events: none;
+    }
+    
+    .auth-container {
+      width: 100%;
+      max-width: 1100px;
+      position: relative;
+      z-index: 10;
+    }
+    
+    .auth-card {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
       overflow: hidden;
-      width: 850px;
-      max-width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 700px;
+      border: 1px solid var(--border-color);
+      position: relative;
     }
-    .left {
-      background-color: #1e66f5;
+    
+    .auth-left {
+      background-color: var(--primary-color);
       color: white;
-      padding: 40px;
-      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .auth-left::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="%23fff" opacity="0.1"/><circle cx="80" cy="40" r="1.5" fill="%23fff" opacity="0.15"/><circle cx="40" cy="80" r="1" fill="%23fff" opacity="0.1"/><circle cx="90" cy="90" r="2.5" fill="%23fff" opacity="0.08"/><circle cx="60" cy="30" r="1.8" fill="%23fff" opacity="0.12"/></svg>');
+      animation: sparkle 20s infinite linear;
+    }
+    
+    @keyframes sparkle {
+      0% { transform: translateX(-50px) translateY(-50px) rotate(0deg); }
+      100% { transform: translateX(-50px) translateY(-50px) rotate(360deg); }
+    }
+    
+    .auth-left-content {
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .auth-title {
+      font-size: 2.8rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      background: linear-gradient(45deg, #fff, #f0f9ff, #e0f2fe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s infinite;
+    }
+    
+    @keyframes shimmer {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    .auth-subtitle {
+      font-size: 1.15rem;
+      opacity: 0.9;
+      line-height: 1.6;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .auth-right {
+      padding: 3rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .auth-form-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 2rem;
+      text-align: center;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      background-size: 200% 200%;
+      animation: gradientMove 4s ease-in-out infinite;
+    }
+    
+    @keyframes gradientMove {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+    
+    .form-label {
+      display: block;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .form-input,
+    .form-select {
+      width: 100%;
+      padding: 1rem;
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      position: relative;
+    }
+    
+    .form-input:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1), 0 8px 25px rgba(124, 58, 237, 0.15);
+      background: white;
+      transform: translateY(-2px);
+    }
+    
+    .form-input::placeholder {
+      color: var(--text-muted);
+    }
+    
+    .form-select {
+      cursor: pointer;
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%237c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 1rem;
+      padding-right: 3rem;
+    }
+    
+    .btn {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.6s;
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 30%, var(--accent-color) 70%, var(--accent-secondary) 100%);
+      color: white;
+      box-shadow: var(--shadow-md);
+      background-size: 200% 200%;
+      animation: buttonGradient 3s ease-in-out infinite;
+    }
+    
+    @keyframes buttonGradient {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-xl);
+      animation-duration: 1s;
+    }
+    
+    .btn-full {
+      width: 100%;
+    }
+    
+    .btn-lg {
+      padding: 1.25rem 2rem;
+      font-size: 1.1rem;
+    }
+    
+    .flash-messages {
+      margin-bottom: 1.5rem;
+    }
+    
+    .flash-message {
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .flash-message::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: currentColor;
+    }
+    
+    .flash-error {
+      background: linear-gradient(135deg, #fee2e2, #fecaca);
+      color: #dc2626;
+      border: 1px solid #fca5a5;
+    }
+    
+    .flash-success {
+      background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+      color: #059669;
+      border: 1px solid #6ee7b7;
+    }
+    
+    .text-center {
       text-align: center;
     }
-    .left .icon {
-      font-size: 48px;
-      margin-bottom: 10px;
+    
+    .text-sm {
+      font-size: 0.875rem;
     }
-    .left h1 {
-      font-size: 28px;
-      margin-bottom: 15px;
+    
+    .text-muted {
+      color: var(--text-muted);
     }
-    .left p {
-      font-size: 16px;
-      line-height: 1.5;
-    }
-    .right {
-      flex: 1;
-      padding: 40px;
-    }
-    .right h2 {
-      margin-bottom: 20px;
-      font-size: 22px;
-      color: #222;
-    }
-    label {
+    
+    .font-medium {
       font-weight: 500;
-      margin-bottom: 5px;
-      display: block;
     }
-    input, select {
+    
+    .mt-4 {
+      margin-top: 1.5rem;
+    }
+    
+    a {
+      color: var(--primary-color);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    a::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+      transition: width 0.3s ease;
+    }
+    
+    a:hover {
+      color: var(--primary-dark);
+    }
+    
+    a:hover::after {
       width: 100%;
-      box-sizing: border-box;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
     }
-    button {
-      background-color: #1e66f5;
-      color: white;
-      border: none;
-      padding: 12px;
-      width: 100%;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
+    
+    .register-icons {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      animation: pulse 2s infinite;
     }
-    button:hover {
-      background-color: #1553c1;
+    
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+    
+    .icon-large {
+      font-size: 3.5rem;
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
+      animation: bounce 3s infinite;
+    }
+    
+    .icon-medium {
+      font-size: 2.5rem;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+      animation: bounce 3s infinite 0.5s;
+    }
+    
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-15px);
+      }
+      60% {
+        transform: translateY(-8px);
+      }
+    }
+    
+    @media (max-width: 968px) {
+      .auth-card {
+        grid-template-columns: 1fr;
+        margin: 1rem;
+        min-height: auto;
+      }
+      
+      .auth-left {
+        padding: 2rem;
+        min-height: 250px;
+      }
+      
+      .auth-right {
+        padding: 2rem;
+      }
+      
+      .auth-title {
+        font-size: 2.2rem;
+      }
+      
+      .auth-form-title {
+        font-size: 1.8rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .auth-left,
+      .auth-right {
+        padding: 1.5rem;
+      }
+      
+      .register-icons {
+        gap: 1rem;
+      }
+      
+      .icon-large {
+        font-size: 2.5rem;
+      }
+      
+      .icon-medium {
+        font-size: 2rem;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="left">
-      <div class="icon">📖</div>
-      <h1>Welcome to Book Bot</h1>
-      <p>Discover your next favorite book. Join our community of readers today!</p>
-    </div>
-    <div class="right">
-      <h2>Create New Account</h2>
-      <form action="{{ url_for('register') }}" method="POST">
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-left">
+        <div class="auth-left-content">
+          <div class="register-icons">
+            <div class="icon-large">✨</div>
+            <div class="icon-medium">📚</div>
+            <div class="icon-large">🚀</div>
+          </div>
+          <h1 class="auth-title">Join Book Bot</h1>
+          <p class="auth-subtitle">Create your account and start your personalized reading journey. Discover books tailored just for you and unlock a world of literary adventures!</p>
+        </div>
+      </div>
+      <div class="auth-right">
+        <h2 class="auth-form-title">Create New Account</h2>
         
-        <label for="username">Name</label>
-        <input type="text" id="username" name="username" placeholder="Enter your name" required>
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-messages">
+              {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+        
+        <form action="{{ url_for('register') }}" method="POST" id="registerForm" novalidate>
+          <div class="form-group">
+            <label for="username" class="form-label">Full Name</label>
+            <input type="text" id="username" name="username" class="form-input" 
+                   placeholder="Enter your full name" 
+                   maxlength="50" 
+                   autocomplete="name">
+          </div>
 
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+          <div class="form-group">
+            <label for="email" class="form-label">Email Address</label>
+            <input type="email" id="email" name="email" class="form-input" 
+                   placeholder="Enter your email address" 
+                   autocomplete="email">
+          </div>
 
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" placeholder="Enter a secure password" required>
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" name="password" class="form-input" 
+                   placeholder="Create a secure password" 
+                   autocomplete="new-password">
+          </div>
 
-        <label for="phone_number">Phone Number</label>
-        <input type="tel" id="phone_number" name="phone_number" placeholder="Enter your phone number" pattern="[0-9]{10}" required>
+          <div class="form-group">
+            <label for="phone_number" class="form-label">Phone Number</label>
+            <input type="tel" id="phone_number" name="phone_number" class="form-input" 
+                   placeholder="Enter your 10-digit phone number" 
+                   maxlength="15" 
+                   autocomplete="tel">
+          </div>
 
-        <label for="dob">Date of Birth</label>
-        <input type="date" id="dob" name="dob" min="1960-01-01" max="2015-12-31" required>
+          <div class="form-group">
+            <label for="dob" class="form-label">Date of Birth</label>
+            <input type="date" id="dob" name="dob" class="form-input" 
+                   min="1960-01-01" 
+                   max="2015-12-31" 
+                   autocomplete="bday">
+          </div>
 
-        <label for="gender">Gender</label>
-        <select id="gender" name="gender" required>
-          <option value="">Select gender</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-          <option value="other">Other</option>
-        </select>
+          <div class="form-group">
+            <label for="gender" class="form-label">Gender</label>
+            <select id="gender" name="gender" class="form-select">
+              <option value="">Select your gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+              <option value="prefer-not-to-say">Prefer not to say</option>
+            </select>
+          </div>
 
-        <button type="submit">Register</button>
-      </form>
+          <button type="submit" class="btn btn-primary btn-full btn-lg">Create Account</button>
+        </form>
+        
+        <div class="text-center mt-4">
+          <p class="text-sm text-muted">
+            Already have an account? 
+            <a href="{{ url_for('login') }}" class="font-medium">Sign in here</a>
+          </p>
+        </div>
+        
+        <div class="text-center mt-4">
+          <p class="text-sm text-muted">
+            By creating an account, you agree to our 
+            <a href="#" class="font-medium">Terms of Service</a> and 
+            <a href="#" class="font-medium">Privacy Policy</a>
+          </p>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- Enhanced form validation and interactive effects -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('registerForm');
+      const inputs = document.querySelectorAll('.form-input, .form-select');
+      
+      // Add focus effects with enhanced animations
+      inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+          this.parentElement.style.transform = 'scale(1.02)';
+          this.parentElement.style.transition = 'transform 0.3s ease';
+        });
+        
+        input.addEventListener('blur', function() {
+          this.parentElement.style.transform = 'scale(1)';
+        });
+        
+        // Real-time validation feedback
+        input.addEventListener('input', function() {
+          validateField(this);
+        });
+      });
+      
+      // Form submission validation
+      form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Clear all previous errors
+        clearAllErrors();
+        
+        // Full Name validation
+        const fullName = document.getElementById('username');
+        if (!fullName.value.trim()) {
+          showFieldError(fullName, 'Full name is required');
+          isValid = false;
+        } else if (fullName.value.trim().length < 2) {
+          showFieldError(fullName, 'Full name must be at least 2 characters long');
+          isValid = false;
+        } else if (!/^[a-zA-Z\s]+$/.test(fullName.value.trim())) {
+          showFieldError(fullName, 'Full name can only contain letters and spaces');
+          isValid = false;
+        }
+        
+        // Email validation
+        const email = document.getElementById('email');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email.value.trim()) {
+          showFieldError(email, 'Email address is required');
+          isValid = false;
+        } else if (!emailRegex.test(email.value.trim())) {
+          showFieldError(email, 'Please enter a valid email address');
+          isValid = false;
+        }
+        
+        // Password validation
+        const password = document.getElementById('password');
+        if (!password.value) {
+          showFieldError(password, 'Password is required');
+          isValid = false;
+        } else if (password.value.length < 6) {
+          showFieldError(password, 'Password must be at least 6 characters long');
+          isValid = false;
+        } else if (!/(?=.*[a-z])(?=.*[A-Z])/.test(password.value)) {
+          showFieldError(password, 'Password must contain at least one uppercase and one lowercase letter');
+          isValid = false;
+        }
+        
+        // Phone number validation
+        const phone = document.getElementById('phone_number');
+        const phoneRegex = /^\d{10}$/;
+        if (!phone.value.trim()) {
+          showFieldError(phone, 'Phone number is required');
+          isValid = false;
+        } else if (!phoneRegex.test(phone.value.replace(/\D/g, ''))) {
+          showFieldError(phone, 'Please enter a valid 10-digit phone number');
+          isValid = false;
+        }
+        
+        // Date of Birth validation
+        const dob = document.getElementById('dob');
+        if (!dob.value) {
+          showFieldError(dob, 'Date of birth is required');
+          isValid = false;
+        } else {
+          const dobDate = new Date(dob.value);
+          const today = new Date();
+          const age = today.getFullYear() - dobDate.getFullYear();
+          const monthDiff = today.getMonth() - dobDate.getMonth();
+          
+          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) {
+            age--;
+          }
+          
+          if (age < 8) {
+            showFieldError(dob, 'You must be at least 8 years old to register');
+            isValid = false;
+          } else if (age > 120) {
+            showFieldError(dob, 'Please enter a valid date of birth');
+            isValid = false;
+          }
+        }
+        
+        // Gender validation
+        const gender = document.getElementById('gender');
+        if (!gender.value) {
+          showFieldError(gender, 'Please select your gender');
+          isValid = false;
+        }
+        
+        if (!isValid) {
+          e.preventDefault();
+          // Shake animation for invalid form
+          form.style.animation = 'shake 0.5s';
+          setTimeout(() => {
+            form.style.animation = '';
+          }, 500);
+          
+          // Focus on first error field
+          const firstError = document.querySelector('.field-error');
+          if (firstError) {
+            const errorField = firstError.parentElement.querySelector('.form-input, .form-select');
+            if (errorField) {
+              errorField.focus();
+            }
+          }
+        }
+      });
+      
+      function validateField(field) {
+        clearFieldError(field);
+        
+        switch(field.id) {
+          case 'username':
+            if (field.value.trim() && field.value.trim().length < 2) {
+              showFieldError(field, 'Name too short');
+            } else if (field.value.trim() && !/^[a-zA-Z\s]+$/.test(field.value.trim())) {
+              showFieldError(field, 'Only letters and spaces allowed');
+            }
+            break;
+          case 'email':
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (field.value.trim() && !emailRegex.test(field.value.trim())) {
+              showFieldError(field, 'Invalid email format');
+            }
+            break;
+          case 'password':
+            if (field.value && field.value.length < 6) {
+              showFieldError(field, 'Password too short');
+            } else if (field.value && !/(?=.*[a-z])(?=.*[A-Z])/.test(field.value)) {
+              showFieldError(field, 'Need uppercase and lowercase letters');
+            }
+            break;
+          case 'phone_number':
+            // Auto-format phone number
+            let value = field.value.replace(/\D/g, '');
+            if (value.length > 10) value = value.slice(0, 10);
+            field.value = value;
+            
+            if (field.value && field.value.length > 0 && field.value.length < 10) {
+              showFieldError(field, 'Phone number must be 10 digits');
+            }
+            break;
+          case 'dob':
+            if (field.value) {
+              const dobDate = new Date(field.value);
+              const today = new Date();
+              const age = today.getFullYear() - dobDate.getFullYear();
+              
+              if (age < 8 || age > 120) {
+                showFieldError(field, 'Please enter a valid age');
+              }
+            }
+            break;
+        }
+      }
+      
+      function showFieldError(field, message) {
+        clearFieldError(field);
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'field-error';
+        errorDiv.textContent = message;
+        errorDiv.style.color = '#dc2626';
+        errorDiv.style.fontSize = '0.75rem';
+        errorDiv.style.marginTop = '0.5rem';
+        errorDiv.style.fontWeight = '500';
+        errorDiv.style.padding = '0.25rem 0.5rem';
+        errorDiv.style.backgroundColor = '#fee2e2';
+        errorDiv.style.borderRadius = '4px';
+        errorDiv.style.border = '1px solid #fca5a5';
+        field.parentElement.appendChild(errorDiv);
+        field.style.borderColor = '#dc2626';
+        field.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+      }
+      
+      function clearFieldError(field) {
+        const existingError = field.parentElement.querySelector('.field-error');
+        if (existingError) {
+          existingError.remove();
+        }
+        field.style.borderColor = '';
+        field.style.boxShadow = '';
+      }
+      
+      function clearAllErrors() {
+        const allErrors = document.querySelectorAll('.field-error');
+        allErrors.forEach(error => error.remove());
+        
+        inputs.forEach(input => {
+          input.style.borderColor = '';
+          input.style.boxShadow = '';
+        });
+      }
+      
+      // Phone number formatting
+      const phoneInput = document.getElementById('phone_number');
+      phoneInput.addEventListener('input', function() {
+        // Remove all non-digits
+        let value = this.value.replace(/\D/g, '');
+        // Limit to 10 digits
+        if (value.length > 10) {
+          value = value.slice(0, 10);
+        }
+        this.value = value;
+      });
+      
+      // Set maximum date for DOB (today - 8 years)
+      const dobInput = document.getElementById('dob');
+      const today = new Date();
+      const maxDate = new Date(today.getFullYear() - 8, today.getMonth(), today.getDate());
+      const minDate = new Date(today.getFullYear() - 120, today.getMonth(), today.getDate());
+      
+      dobInput.max = maxDate.toISOString().split('T')[0];
+      dobInput.min = minDate.toISOString().split('T')[0];
+    });
+    
+    // Add shake animation CSS
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+      }
+      
+      .field-error {
+        animation: slideIn 0.3s ease-out;
+      }
+      
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      .form-input:invalid, .form-select:invalid {
+        animation: none;
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
 </body>
 </html>

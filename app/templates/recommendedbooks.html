@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Bot - Recommended</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+  <style>
+    :root {
+      --primary-color: #7c3aed;
+      --primary-light: #a855f7;
+      --primary-dark: #5b21b6;
+      --accent-color: #06d6a0;
+      --accent-light: #40e0d0;
+      --accent-secondary: #f59e0b;
+      --accent-tertiary: #ef4444;
+      --accent-quaternary: #10b981;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-tertiary: #f1f5f9;
+      --bg-sidebar: #1e293b;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --text-white: #ffffff;
+      --border-color: #e2e8f0;
+      --border-light: #f1f5f9;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-2xl: 20px;
+      --radius-full: 9999px;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+    /* Sidebar Styling */
+    .sidebar {
+      width: 280px;
+      background: linear-gradient(180deg, var(--bg-sidebar) 0%, #334155 100%);
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      padding: 2rem;
+      box-shadow: var(--shadow-xl);
+      z-index: 100;
+    }
+    
+    .sidebar h2 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 3rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+      background: linear-gradient(135deg, var(--primary-light), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align: center;
+    }
+    
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .sidebar ul li {
+      margin-bottom: 0.5rem;
+      padding: 1rem 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: rgba(255, 255, 255, 0.8);
+      border-radius: var(--radius-lg);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .sidebar ul li:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transform: translateX(4px);
+    }
+    
+    .sidebar ul li.active {
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      color: white;
+      font-weight: 600;
+    }
+    
+    .sidebar ul li i {
+      font-size: 1.1rem;
+      width: 20px;
+      text-align: center;
+    }
+    /* Main Content Styling */
+    .content {
+      margin-left: 280px;
+      padding: 2rem 3rem;
+      min-height: 100vh;
+    }
+    
+    .topbar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .topbar span {
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .topbar span:hover {
+      color: var(--primary-color);
+      background: var(--bg-tertiary);
+    }
+    
+    .topbar span i {
+      font-size: 1rem;
+    }
+    /* Search and Heading Styling */
+    .search-section {
+      padding: 1.5rem;
+      margin: 1rem 0 2rem 0;
+    }
+    
+    .search-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .search-box-enhanced {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .search-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    
+    .search-input-container {
+      display: flex;
+      align-items: center;
+      background: var(--bg-primary);
+      border-radius: var(--radius-full);
+      border: 2px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    
+    .search-input-container:focus-within {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+    }
+    
+    .search-icon {
+      padding: 1rem 1.5rem;
+      color: var(--text-muted);
+      background: var(--bg-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .search-input {
+      flex: 1;
+      padding: 1rem 1.5rem;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      background: transparent;
+      color: var(--text-primary);
+    }
+    
+    .search-input::placeholder {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    
+    .search-btn {
+      padding: 1rem 2rem;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+      color: white;
+      border: none;
+      font-weight: 600;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .search-btn:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+    }
+
+    .search-box {
+      margin: 2rem 0;
+      max-width: 600px;
+    }
+    
+    .search-box input {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-full);
+      border: 2px solid var(--border-color);
+      font-size: 1rem;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+    }
+    
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+    }
+    
+    .search-box input::placeholder {
+      color: var(--text-muted);
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 1rem 0;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    h2 {
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 2rem 0 1.5rem 0;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    /* Book Cards Styling */
+    .book-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    
+    .book-card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      transition: all 0.2s ease;
+      border: 1px solid var(--border-color);
+      position: relative;
+    }
+    
+    .book-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.05), rgba(6, 214, 160, 0.05));
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    
+    .book-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-xl);
+      border-color: var(--primary-color);
+    }
+    
+    .book-card:hover::before {
+      opacity: 1;
+    }
+    
+    .book-card img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .book-card .details {
+      padding: 1.5rem;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .book-card h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin: 0 0 0.5rem 0;
+      line-height: 1.4;
+    }
+    
+    .book-card p {
+      margin: 0.25rem 0;
+      color: var(--text-secondary);
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    
+    .stars {
+      color: var(--accent-secondary);
+      font-size: 1.1rem;
+      margin-right: 0.5rem;
+    }
+    
+    .rating {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    /* Action Buttons Styling */
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 1.5rem 1.5rem 1.5rem;
+      gap: 1rem;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .actions button {
+      padding: 0.75rem 1.25rem;
+      border: none;
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .fav-btn {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 2px solid var(--border-color);
+      flex: 1;
+    }
+    
+    .fav-btn:hover {
+      background: var(--accent-tertiary);
+      color: white;
+      border-color: var(--accent-tertiary);
+      transform: translateY(-1px);
+    }
+    
+    .fav-btn i {
+      font-size: 1rem;
+    }
+    
+    .read-btn {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+      color: white;
+      flex: 1;
+    }
+    
+    .read-btn:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .book-list {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+      }
+    }
+    
+    @media (max-width: 968px) {
+      .sidebar {
+        width: 0;
+        overflow: hidden;
+      }
+      
+      .content {
+        margin-left: 0;
+        padding: 1.5rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      h2 {
+        font-size: 1.5rem;
+      }
+      
+      .book-list {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1rem;
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .content {
+        padding: 1rem;
+      }
+      
+      .book-list {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      
+      .topbar {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .actions {
+        flex-direction: column;
+      }
+      
+      .actions button {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .search-section {
+        padding: 1.5rem;
+        margin: 1rem 0 2rem 0;
+      }
+      
+
+      
+      .search-input-container {
+        flex-direction: column;
+        border-radius: var(--radius-lg);
+      }
+      
+      .search-icon {
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      }
+      
+      .search-input {
+        padding: 1rem;
+      }
+      
+      .search-btn {
+        width: 100%;
+        justify-content: center;
+        border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2><i class="fa-solid fa-book"></i> Book Bot</h2>
+    <ul>
+      <li data-href="{{ url_for('user_home') }}"><i class="fa fa-home"></i> Home</li>
+      <li class="active"><i class="fa fa-clock"></i> Recommended for you</li>
+      <li><i class="fa fa-compass"></i> Explore by category</li>
+      <li><i class="fa fa-star"></i> Recently rated</li>
+      <li data-href="{{ url_for('favorites') }}"><i class="fa fa-heart"></i> Favorites</li>
+      <li><i class="fa fa-play-circle"></i> Continue Reading</li>
+    </ul>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+    <div class="topbar">
+      <span data-href="{{ url_for('profile') }}"><i class="fa fa-user"></i> Profile</span>
+      <span id="logout-btn"><i class="fa fa-right-from-bracket"></i> Logout</span>
+    </div>
+    
+    <h1>Welcome, {{ username }}!</h1>
+    
+    <!-- Enhanced Search Section -->
+    <div class="search-section">
+      <h2 class="search-title">🔍 Discover Your Next Great Read</h2>
+      <div class="search-box-enhanced">
+        <form method="GET" action="{{ url_for('search_books') }}" class="search-form">
+          <div class="search-input-container">
+            <div class="search-icon">
+              <i class="fa fa-search"></i>
+            </div>
+            <input type="text" 
+                   name="q" 
+                   class="search-input" 
+                   placeholder="Search for books, authors, or genres..." 
+                   value="{{ request.args.get('q', '') }}"
+                   autocomplete="off">
+            <button type="submit" class="search-btn">
+              <span>Search</span>
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+
+    <h2>Recommended Books Based on Your Preferences</h2>
+    {% if user.preferred_author or user.preferred_genre %}
+      <div style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-tertiary); border-radius: var(--radius-lg); border-left: 4px solid var(--primary-color);">
+        <p style="color: var(--text-secondary); font-weight: 500;">
+          📚 Showing recommendations based on your preferences: 
+          {% if user.preferred_author %}<strong style="color: var(--primary-color);">{{ user.preferred_author }}</strong>{% endif %}
+          {% if user.preferred_author and user.preferred_genre %} • {% endif %}
+          {% if user.preferred_genre %}<strong style="color: var(--accent-color);">{{ user.preferred_genre }}</strong>{% endif %}
+        </p>
+      </div>
+    {% endif %}
+
+    <div class="book-list">
+      {% if recommended_books %}
+        {% for book in recommended_books %}
+          <div class="book-card">
+            <img src="{{ url_for('static', filename='images/default-book.jpg') }}" alt="{{ book.title }} Cover" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDI4MCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjI4MCIgaGVpZ2h0PSIyNTAiIGZpbGw9IiNmMWY1ZjkiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzY0NzQ4YiIgZm9udC1zaXplPSI0MHB4Ij7wn5OWPC90ZXh0Pjwvc3ZnPg=='">
+            <div class="details">
+              <h3>{{ book.title }}</h3>
+              <p><strong>Author:</strong> {{ book.author }}</p>
+              <p><strong>Genre:</strong> {{ book.genre }}</p>
+              <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+              <div>
+                <span class="stars">★★★★☆</span>
+                <span class="rating">4.2</span>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="fav-btn" onclick="addToFavorites('{{ book.id }}')">
+                <i class="fa fa-heart"></i> Add to Favorites
+              </button>
+              <button class="read-btn" onclick="readBook('{{ book.id }}')">
+                📖 Read Now
+              </button>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--bg-primary); border-radius: var(--radius-2xl); border: 2px dashed var(--border-color);">
+          <div style="font-size: 4rem; margin-bottom: 1rem;">📚</div>
+          <h3 style="color: var(--text-primary); margin-bottom: 1rem;">No Recommendations Yet</h3>
+          <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+            We're working on finding books based on your preferences. 
+            {% if not user.preferred_author and not user.preferred_genre %}
+              Please update your profile with preferred authors and genres to get personalized recommendations.
+            {% endif %}
+          </p>
+          <a href="{{ url_for('edit_profile') }}" style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); color: white; padding: 0.75rem 1.5rem; border-radius: var(--radius-lg); text-decoration: none; font-weight: 600;">
+            ✏️ Update Preferences
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  <script>
+    // Navigation and logout confirmation
+    document.addEventListener('DOMContentLoaded', function() {
+      // Handle sidebar navigation
+      const sidebarItems = document.querySelectorAll('.sidebar li[data-href]');
+      sidebarItems.forEach(item => {
+        item.addEventListener('click', function() {
+          window.location.href = this.getAttribute('data-href');
+        });
+      });
+
+      // Handle topbar navigation
+      const topbarItems = document.querySelectorAll('.topbar span[data-href]');
+      topbarItems.forEach(item => {
+        item.addEventListener('click', function() {
+          window.location.href = this.getAttribute('data-href');
+        });
+      });
+
+      // Handle logout with confirmation
+      const logoutBtn = document.getElementById('logout-btn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          // Create confirmation modal
+          const modal = document.createElement('div');
+          modal.className = 'logout-modal';
+          modal.innerHTML = `
+              <div class="modal-content">
+                  <h3>Confirm Logout</h3>
+                  <p>Are you sure you want to logout?</p>
+                  <div class="modal-buttons">
+                      <button class="btn-cancel" onclick="this.closest('.logout-modal').remove()">Cancel</button>
+                      <button class="btn-confirm" onclick="window.location.href='{{ url_for('logout') }}'; this.closest('.logout-modal').remove();">Logout</button>
+                  </div>
+              </div>
+          `;
+          
+          // Add modal styles
+          modal.style.cssText = `
+              position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7);
+              display: flex; align-items: center; justify-content: center; z-index: 10000;
+          `;
+          
+          const content = modal.querySelector('.modal-content');
+          content.style.cssText = `
+              background: #1a1a1a; color: white; padding: 2rem; border-radius: 12px;
+              text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 400px; width: 90%;
+          `;
+          
+          const buttons = modal.querySelector('.modal-buttons');
+          buttons.style.cssText = 'display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: center;';
+          
+          const btnCancel = modal.querySelector('.btn-cancel');
+          btnCancel.style.cssText = `
+              padding: 0.75rem 1.5rem; border: 2px solid #666; background: transparent;
+              color: white; border-radius: 8px; cursor: pointer; font-weight: 600;
+          `;
+          
+          const btnConfirm = modal.querySelector('.btn-confirm');
+          btnConfirm.style.cssText = `
+              padding: 0.75rem 1.5rem; border: none; background: #ef4444;
+              color: white; border-radius: 8px; cursor: pointer; font-weight: 600;
+          `;
+          
+          document.body.appendChild(modal);
+        });
+      }
+
+      // Enhanced search functionality
+      const searchForm = document.querySelector('.search-form');
+      const searchInput = document.querySelector('.search-input');
+      const searchBtn = document.querySelector('.search-btn');
+
+      // Handle search form submission
+      if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+          const query = searchInput.value.trim();
+          if (!query) {
+            e.preventDefault();
+            searchInput.focus();
+            searchInput.style.borderColor = '#ef4444';
+            setTimeout(() => {
+              searchInput.style.borderColor = '';
+            }, 2000);
+            return;
+          }
+        });
+      }
+
+      // Handle Enter key in search input
+      if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            searchForm.submit();
+          }
+        });
+
+        // Clear error styling when user starts typing
+        searchInput.addEventListener('input', function() {
+          this.style.borderColor = '';
+        });
+      }
+
+      // Auto-focus search input
+      if (searchInput && !searchInput.value) {
+        searchInput.focus();
+      }
+    });
+
+    // Book interaction functions
+    function addToFavorites(bookId) {
+      // Add visual feedback
+      const button = event.target.closest('.fav-btn');
+      const originalText = button.innerHTML;
+      
+      button.innerHTML = '<i class="fa fa-heart" style="color: #ef4444;"></i> Adding...';
+      button.style.opacity = '0.7';
+      
+      // Send AJAX request to add to favorites
+      fetch('/add_favorite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ book_id: bookId })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          button.innerHTML = '<i class="fa fa-heart" style="color: #ef4444;"></i> Added!';
+          button.style.background = '#fee2e2';
+          button.style.color = '#ef4444';
+          button.style.border = '2px solid #ef4444';
+          
+          showSuccess('Book added to favorites successfully!');
+          
+          setTimeout(() => {
+            button.innerHTML = '<i class="fa fa-heart-broken"></i> Remove from Favorites';
+            button.style.background = '';
+            button.style.color = '';
+            button.style.border = '';
+            button.onclick = function() { removeFromFavorites(bookId); };
+          }, 2000);
+        } else {
+          button.innerHTML = originalText;
+          button.style.opacity = '';
+          showError(data.message || 'Failed to add to favorites');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        button.innerHTML = originalText;
+        button.style.opacity = '';
+        showError('An error occurred. Please try again.');
+      });
+    }
+    
+    function removeFromFavorites(bookId) {
+      // Create confirmation modal
+      const modal = document.createElement('div');
+      modal.className = 'logout-modal';
+      modal.innerHTML = `
+          <div class="modal-content">
+              <h3>Remove from Favorites</h3>
+              <p>Are you sure you want to remove this book from your favorites?</p>
+              <div class="modal-buttons">
+                  <button class="btn-cancel" onclick="this.closest('.logout-modal').remove()">Cancel</button>
+                  <button class="btn-confirm" onclick="confirmRemoveFromFavoritesRecommended(${bookId}); this.closest('.logout-modal').remove();">Remove</button>
+              </div>
+          </div>
+      `;
+      
+      // Add modal styles
+      modal.style.cssText = `
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7);
+          display: flex; align-items: center; justify-content: center; z-index: 10000;
+      `;
+      
+      const content = modal.querySelector('.modal-content');
+      content.style.cssText = `
+          background: #1a1a1a; color: white; padding: 2rem; border-radius: 12px;
+          text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 400px; width: 90%;
+      `;
+      
+      const buttons = modal.querySelector('.modal-buttons');
+      buttons.style.cssText = 'display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: center;';
+      
+      const btnCancel = modal.querySelector('.btn-cancel');
+      btnCancel.style.cssText = `
+          padding: 0.75rem 1.5rem; border: 2px solid #666; background: transparent;
+          color: white; border-radius: 8px; cursor: pointer; font-weight: 600;
+      `;
+      
+      const btnConfirm = modal.querySelector('.btn-confirm');
+      btnConfirm.style.cssText = `
+          padding: 0.75rem 1.5rem; border: none; background: #ef4444;
+          color: white; border-radius: 8px; cursor: pointer; font-weight: 600;
+      `;
+      
+      document.body.appendChild(modal);
+    }
+    
+    function confirmRemoveFromFavoritesRecommended(bookId) {
+        const button = event.target.closest('.fav-btn');
+        const originalText = button.innerHTML;
+        
+        button.innerHTML = '<i class="fa fa-heart-broken"></i> Removing...';
+        button.style.opacity = '0.7';
+        
+        // Send AJAX request to remove from favorites
+        fetch('/remove_favorite', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ book_id: bookId })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            button.innerHTML = '<i class="fa fa-heart"></i> Add to Favorites';
+            button.style.opacity = '';
+            button.onclick = function() { addToFavorites(bookId); };
+            showSuccess('Book removed from favorites successfully!');
+          } else {
+            button.innerHTML = originalText;
+            button.style.opacity = '';
+            showError(data.message || 'Failed to remove from favorites');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          button.innerHTML = originalText;
+          button.style.opacity = '';
+          showError('An error occurred. Please try again.');
+        });
+      }
+
+    function readBook(bookId) {
+      // Add visual feedback
+      const button = event.target.closest('.read-btn');
+      const originalText = button.innerHTML;
+      
+      button.innerHTML = '📖 Opening...';
+      button.style.opacity = '0.7';
+      
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.opacity = '';
+        showInfo('Opening book reader... (Feature coming soon)');
+      }, 1000);
+      
+      // Future: Add actual book reading functionality
+      console.log('Opening book reader for:', bookId);
+    }
+  </script>
+</body>
+</html>

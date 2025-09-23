@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Bot - Search Results</title>
+  <!-- CSS removed since file doesn't exist -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+  <style>
+    :root {
+      --primary-color: #7c3aed;
+      --primary-light: #a855f7;
+      --primary-dark: #5b21b6;
+      --accent-color: #06d6a0;
+      --accent-light: #40e0d0;
+      --accent-secondary: #f59e0b;
+      --accent-tertiary: #ef4444;
+      --accent-quaternary: #10b981;
+      --success-color: #10b981;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-tertiary: #f1f5f9;
+      --bg-muted: #f1f5f9;
+      --bg-sidebar: #1e293b;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --text-white: #ffffff;
+      --border-color: #e2e8f0;
+      --border-light: #f1f5f9;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-2xl: 20px;
+      --radius-full: 9999px;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+    
+    /* Sidebar Styling */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 280px;
+      height: 100vh;
+      background: linear-gradient(180deg, var(--bg-sidebar) 0%, #334155 100%);
+      color: var(--text-white);
+      padding: 2rem;
+      z-index: 100;
+      box-shadow: var(--shadow-xl);
+    }
+    
+    .sidebar-brand {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 3rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+      background: linear-gradient(135deg, var(--primary-light), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .sidebar-nav {
+      list-style: none;
+    }
+    
+    .sidebar-nav li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .sidebar-nav a {
+      display: block;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-lg);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .sidebar-nav a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transform: translateX(4px);
+    }
+    
+    .sidebar-nav a.active {
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      color: white;
+      font-weight: 600;
+    }
+    
+    .dropdown-nav {
+      position: relative;
+    }
+    
+    .sidebar-dropdown {
+      list-style: none;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: var(--radius-md);
+      margin-top: 0.5rem;
+      padding: 0.5rem 0;
+      display: none;
+    }
+    
+    .sidebar-dropdown li {
+      margin-bottom: 0;
+    }
+    
+    .sidebar-dropdown a {
+      padding: 0.75rem 2rem;
+      font-size: 0.9rem;
+    }
+    
+    /* Main Content Styling */
+    .main-content {
+      margin-left: 280px;
+      min-height: 100vh;
+    }
+    
+    .navbar {
+      background: var(--bg-primary);
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .navbar-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+    }
+    
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+    
+    .navbar-nav {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .navbar-nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .navbar-nav a:hover {
+      color: var(--primary-color);
+      background: var(--bg-tertiary);
+    }
+    
+    .mobile-only {
+      display: none;
+    }
+    
+    /* Content Styling */
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+    
+    .text-lg {
+      font-size: 1.125rem;
+    }
+    
+    .text-muted {
+      color: var(--text-muted);
+    }
+    
+    .mb-4 {
+      margin-bottom: 2rem;
+    }
+    
+    /* Alert Styling */
+    .alert {
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-lg);
+      font-weight: 500;
+      border-left: 4px solid;
+    }
+    
+    .alert-success {
+      background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+      color: #059669;
+      border-left-color: var(--success-color);
+    }
+    
+    .alert-error {
+      background: linear-gradient(135deg, #fee2e2, #fecaca);
+      color: #dc2626;
+      border-left-color: var(--accent-tertiary);
+    }
+    
+    /* Form Styling */
+    .search-form {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-full);
+      font-size: 1rem;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+    }
+    
+    .form-input::placeholder {
+      color: var(--text-muted);
+    }
+    
+    /* Button Styling */
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .btn-outline {
+      background: transparent;
+      color: var(--primary-color);
+      border: 2px solid var(--primary-color);
+    }
+    
+    .btn-outline:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-sm {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+    }
+    
+    /* Card Styling */
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+    }
+    
+    .card-header {
+      background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .card-header h3 {
+      margin: 0;
+      font-size: 1.25rem;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .card-body {
+      padding: 0;
+    }
+    
+    /* Search Results Styling */
+    .search-results-list {
+      padding: 0;
+    }
+    
+    .search-result-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border-color);
+      transition: all 0.2s ease;
+    }
+    
+    .search-result-item:hover {
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.02), rgba(6, 214, 160, 0.02));
+    }
+    
+    .search-result-item:last-child {
+      border-bottom: none;
+    }
+    
+    .book-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex: 1;
+    }
+    
+    .book-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: white;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .book-details {
+      flex: 1;
+    }
+    
+    .book-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+      font-size: 1.1rem;
+    }
+    
+    .book-meta {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+    
+    .book-author {
+      font-weight: 500;
+      color: var(--primary-dark);
+    }
+    
+    .book-genre {
+      color: var(--accent-color);
+      font-weight: 500;
+    }
+    
+    .book-isbn {
+      color: var(--text-muted);
+    }
+    
+    .book-actions {
+      flex-shrink: 0;
+    }
+    
+    /* Empty State Styling */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .empty-state h3 {
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .empty-state p {
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    /* Modal Styling */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+    }
+    
+    .modal-content {
+      background: var(--bg-primary);
+      margin: 3% auto;
+      padding: 0;
+      border-radius: var(--radius-xl);
+      width: 90%;
+      max-width: 600px;
+      box-shadow: var(--shadow-xl);
+      border: 1px solid var(--border-color);
+    }
+    
+    .modal-header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    }
+    
+    .modal-header h2 {
+      margin: 0;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 1.5rem;
+    }
+    
+    .modal-close {
+      color: var(--text-secondary);
+      font-size: 2rem;
+      font-weight: bold;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.2s ease;
+    }
+    
+    .modal-close:hover {
+      color: var(--accent-tertiary);
+    }
+    
+    .modal-body {
+      padding: 2rem;
+    }
+    
+    .modal-footer {
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      background: var(--bg-secondary);
+      border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+    }
+    
+    .book-details-grid {
+      display: grid;
+      gap: 1rem;
+    }
+    
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .detail-item:last-child {
+      border-bottom: none;
+    }
+    
+    .detail-item label {
+      font-weight: 600;
+      color: var(--text-secondary);
+      min-width: 100px;
+    }
+    
+    .detail-item span {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    
+    .status-available {
+      color: var(--success-color);
+      font-weight: 600;
+      background: rgba(16, 185, 129, 0.1);
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-full);
+      font-size: 0.875rem;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 968px) {
+      .sidebar {
+        display: none;
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .mobile-only {
+        display: block;
+      }
+      
+      .container {
+        padding: 1rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .search-result-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem;
+      }
+      
+      .book-info {
+        width: 100%;
+      }
+      
+      .book-actions {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+      }
+      
+      .modal-content {
+        width: 95%;
+        margin: 10% auto;
+      }
+      
+      .detail-item {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      .detail-item label {
+        min-width: unset;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      📖 Book Bot
+    </div>
+    <nav>
+      <ul class="sidebar-nav">
+        {% if session.role == 'admin' %}
+          <li><a href="{{ url_for('admin_home') }}">📋 Dashboard</a></li>
+          <li><a href="{{ url_for('view_registered_users') }}">👤 View User Profile</a></li>
+          <li class="dropdown-nav">
+            <a href="#" onclick="toggleSidebarDropdown(event)">📚 Manage Books ▼</a>
+            <ul class="sidebar-dropdown" id="sidebarBooksDropdown">
+              <li><a href="{{ url_for('view_books') }}">👁️ View Books</a></li>
+              <li><a href="{{ url_for('add_book') }}">➕ Add Books</a></li>
+            </ul>
+          </li>
+          <li><a href="#">⭐ View Ratings</a></li>
+          <li><a href="#">💬 View Feedback</a></li>
+        {% else %}
+          <li><a href="{{ url_for('user_home') }}" class="active">🏠 Home</a></li>
+          <li><a href="#">🎯 Recommended</a></li>
+          <li><a href="#">🧭 Explore Categories</a></li>
+          <li><a href="#">⭐ Recently Rated</a></li>
+          <li><a href="#">❤️ Favorites</a></li>
+          <li><a href="#">📖 Continue Reading</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Navigation Bar -->
+    <div class="navbar">
+      <div class="container">
+        <div class="navbar-container">
+          <div class="navbar-brand mobile-only">
+            📖 Book Bot
+          </div>
+          <div class="navbar-nav">
+            {% if session.role == 'admin' %}
+              <a href="{{ url_for('logout') }}" class="btn btn-outline">🚪 Logout</a>
+            {% else %}
+              <a href="{{ url_for('profile') }}">👤 Profile</a>
+              <a href="{{ url_for('logout') }}" class="btn btn-outline">🚪 Logout</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="container">
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ 'error' if category == 'error' else 'success' }}" style="margin-bottom: 1rem;">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <!-- Search Header -->
+      <div class="mb-4">
+        <h1>🔍 Search Results</h1>
+        {% if query %}
+          <p class="text-lg text-muted">Results for "<strong>{{ query }}</strong>"</p>
+        {% else %}
+          <p class="text-lg text-muted">Enter a search term to find books</p>
+        {% endif %}
+      </div>
+
+      <!-- Search Bar -->
+      <div class="mb-4">
+        <form method="GET" action="{{ url_for('search_books') }}" class="search-form">
+          <div class="form-group" style="margin-bottom: 0;">
+            <input type="text" name="q" class="form-input" 
+                   placeholder="Search for books, authors, genres, or ISBN..." 
+                   value="{{ query or '' }}"
+                   style="border-radius: 50px; padding: 1rem 1.5rem; font-size: 1rem;">
+          </div>
+        </form>
+      </div>
+
+      <!-- Search Results -->
+      {% if query %}
+        {% if books %}
+          <div class="card">
+            <div class="card-header">
+              <h3 style="margin: 0; font-size: 1.25rem;">Found {{ books|length }} book(s)</h3>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <div class="search-results-list">
+                {% for book in books %}
+                  <div class="search-result-item">
+                    <div class="book-info">
+                      <div class="book-icon">📖</div>
+                      <div class="book-details">
+                        <div class="book-title">{{ book.title }}</div>
+                        <div class="book-meta">
+                          <span class="book-author">by {{ book.author }}</span>
+                          <span class="book-genre">• {{ book.genre }}</span>
+                          <span class="book-isbn">• ISBN: {{ book.isbn }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="book-actions">
+                      <button class="btn btn-outline btn-sm" 
+                              onclick="viewBookDetails('{{ book.title }}', '{{ book.author }}', '{{ book.isbn }}', '{{ book.genre }}')">
+                        👁️ View
+                      </button>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <div class="empty-state">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">📚</div>
+            <h3>No Books Found</h3>
+            <p>No books match your search term "{{ query }}". Try different keywords or check the spelling.</p>
+            <div style="margin-top: 1rem;">
+              <a href="{{ url_for('user_home') }}" class="btn btn-primary">🏠 Back to Home</a>
+              {% if session.role == 'admin' %}
+                <a href="{{ url_for('view_books') }}" class="btn btn-outline">📚 View All Books</a>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="empty-state">
+          <div style="font-size: 4rem; margin-bottom: 1rem;">🔍</div>
+          <h3>Start Your Search</h3>
+          <p>Enter keywords above to search for books by title, author, genre, or ISBN.</p>
+        </div>
+      {% endif %}
+    </div>
+  </main>
+
+  <script>
+    // Confirmation dialog for logout
+    document.addEventListener('DOMContentLoaded', function() {
+      const logoutLinks = document.querySelectorAll('a[href*="logout"]');
+      
+      logoutLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          // Create confirmation modal
+          const modal = document.createElement('div');
+          modal.className = 'logout-modal';
+          modal.innerHTML = `
+              <div class="modal-content">
+                  <h3>Confirm Logout</h3>
+                  <p>Are you sure you want to logout?</p>
+                  <div class="modal-buttons">
+                      <button class="btn-cancel" onclick="this.closest('.logout-modal').remove()">Cancel</button>
+                      <button class="btn-confirm" onclick="confirmLogoutSearchResults('${this.href}'); this.closest('.logout-modal').remove();">Logout</button>
+                  </div>
+              </div>
+          `;
+          
+          // Add modal styles
+          modal.style.cssText = `
+              position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7);
+              display: flex; align-items: center; justify-content: center; z-index: 10000;
+          `;
+          
+          const content = modal.querySelector('.modal-content');
+          content.style.cssText = `
+              background: #1a1a1a; color: white; padding: 2rem; border-radius: 12px;
+              text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 400px; width: 90%;
+          `;
+          
+          const buttons = modal.querySelector('.modal-buttons');
+          buttons.style.cssText = 'display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: center;';
+          
+          const btnCancel = modal.querySelector('.btn-cancel');
+          btnCancel.style.cssText = `
+              padding: 0.75rem 1.5rem; border: 2px solid #666; background: transparent;
+              color: white; border-radius: 8px; cursor: pointer; font-weight: 600;
+          `;
+          
+          const btnConfirm = modal.querySelector('.btn-confirm');
+          btnConfirm.style.cssText = `
+              padding: 0.75rem 1.5rem; border: none; background: #ef4444;
+              color: white; border-radius: 8px; cursor: pointer; font-weight: 600;
+          `;
+          
+          document.body.appendChild(modal);
+        });
+      });
+    });
+
+    function confirmLogoutSearchResults(href) {
+      showInfo('Logging out...');
+      setTimeout(() => {
+        window.location.href = href;
+      }, 1000);
+    }
+  </script>
+
+  <!-- User Details Modal -->
+  <div id="bookModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalBookTitle">Book Details</h2>
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Book details will be populated here -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript removed since file doesn't exist -->
+  
+  <script>
+    // Sidebar dropdown functionality
+    function toggleSidebarDropdown(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      const dropdown = document.getElementById('sidebarBooksDropdown');
+      const isVisible = dropdown.style.display === 'block';
+      
+      document.querySelectorAll('.sidebar-dropdown').forEach(menu => {
+        menu.style.display = 'none';
+      });
+      
+      dropdown.style.display = isVisible ? 'none' : 'block';
+    }
+    
+    // View book details modal
+    function viewBookDetails(title, author, isbn, genre) {
+      document.getElementById('modalBookTitle').textContent = title;
+      
+      const modalBody = document.getElementById('modalBody');
+      modalBody.innerHTML = `
+        <div class="book-details-grid">
+          <div class="detail-item">
+            <label>Book Title:</label>
+            <span>${title}</span>
+          </div>
+          <div class="detail-item">
+            <label>Author:</label>
+            <span>${author}</span>
+          </div>
+          <div class="detail-item">
+            <label>ISBN:</label>
+            <span>${isbn}</span>
+          </div>
+          <div class="detail-item">
+            <label>Genre:</label>
+            <span>${genre}</span>
+          </div>
+          <div class="detail-item">
+            <label>Status:</label>
+            <span class="status-available">Available</span>
+          </div>
+          <div class="detail-item">
+            <label>Category:</label>
+            <span>${genre} Literature</span>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('bookModal').style.display = 'block';
+    }
+    
+    // Close modal
+    function closeModal() {
+      document.getElementById('bookModal').style.display = 'none';
+    }
+    
+    // Auto-submit search form on Enter
+    document.querySelector('input[name="q"]').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        this.closest('form').submit();
+      }
+    });
+  </script>
+</body>
+</html>

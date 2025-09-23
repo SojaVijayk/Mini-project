@@ -4,160 +4,472 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Book Bot</title>
+    <!-- CSS removed since file doesn't exist -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f5f7;
+        :root {
+            --primary-color: #7c3aed;
+            --primary-light: #a855f7;
+            --primary-dark: #5b21b6;
+            --accent-color: #06d6a0;
+            --accent-light: #40e0d0;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --border-focus: #7c3aed;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+        }
+        
+        * {
             margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .container {
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #7c3aed 50%, #a855f7 75%, #06d6a0 100%);
+            min-height: 100vh;
             display: flex;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="%23fff" stop-opacity=".1"/><stop offset="100%" stop-color="%23fff" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/><circle cx="400" cy="700" r="120" fill="url(%23a)"/><circle cx="900" cy="800" r="80" fill="url(%23a)"/></svg>');
+            background-size: cover;
+            pointer-events: none;
+        }
+        
+        .auth-container {
+            width: 100%;
+            max-width: 1000px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .auth-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
             overflow: hidden;
-            width: 800px;
-            max-width: 95%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 600px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .left {
-            background-color: #2f80ed;
+        
+        .auth-left {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 50%, var(--accent-color) 100%);
             color: white;
-            padding: 50px 30px;
-            flex: 1;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-left::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="%23fff" opacity="0.1"/><circle cx="80" cy="40" r="1.5" fill="%23fff" opacity="0.15"/><circle cx="40" cy="80" r="1" fill="%23fff" opacity="0.1"/><circle cx="90" cy="90" r="2.5" fill="%23fff" opacity="0.08"/></svg>');
+            animation: float 20s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateX(-50px) translateY(-50px) rotate(0deg); }
+            100% { transform: translateX(-50px) translateY(-50px) rotate(360deg); }
+        }
+        
+        .auth-left-content {
             text-align: center;
+            position: relative;
+            z-index: 2;
         }
-        .left img {
-            width: 60px;
-            margin-bottom: 20px;
+        
+        .auth-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(45deg, #fff, #f0f9ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        .left h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-        .left p {
-            font-size: 14px;
+        
+        .auth-subtitle {
+            font-size: 1.1rem;
             opacity: 0.9;
+            line-height: 1.6;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        .right {
-            flex: 1;
-            padding: 50px 30px;
+        
+        .auth-right {
+            padding: 3rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
-        h2 {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        label {
-            font-size: 14px;
-            display: block;
-            margin-top: 15px;
-        }
-        input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            margin-top: 5px;
-            font-size: 14px;
-        }
-        .error {
-            font-size: 12px;
-            color: red;
-            margin-top: 3px;
-            display: none;
-        }
-        button {
-            width: 100%;
-            background-color: #2f80ed;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 20px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #1d6fd1;
-        }
-        .register {
-            margin-top: 15px;
+        
+        .auth-form-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 2rem;
             text-align: center;
-            font-size: 14px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        .register a {
-            color: #2f80ed;
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+            background: white;
+            transform: translateY(-1px);
+        }
+        
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
             text-decoration: none;
-            font-weight: bold;
+            display: inline-block;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 50%, var(--accent-color) 100%);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .btn-full {
+            width: 100%;
+        }
+        
+        .btn-lg {
+            padding: 1.25rem 2rem;
+            font-size: 1.1rem;
+        }
+        
+        .flash-messages {
+            margin-bottom: 1.5rem;
+        }
+        
+        .flash-message {
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .flash-error {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+        
+        .flash-success {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #059669;
+            border: 1px solid #6ee7b7;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .text-sm {
+            font-size: 0.875rem;
+        }
+        
+        .text-muted {
+            color: var(--text-muted);
+        }
+        
+        .font-medium {
+            font-weight: 500;
+        }
+        
+        .mt-4 {
+            margin-top: 1.5rem;
+        }
+        
+        .flex {
+            display: flex;
+        }
+        
+        .items-center {
+            align-items: center;
+        }
+        
+        .gap-2 {
+            gap: 0.5rem;
+        }
+        
+        .rounded {
+            border-radius: var(--radius-sm);
+        }
+        
+        input[type="checkbox"] {
+            width: 1rem;
+            height: 1rem;
+            accent-color: var(--primary-color);
+        }
+        
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+        
+        .book-icons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        .icon-large {
+            font-size: 3rem;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+        }
+        
+        .icon-medium {
+            font-size: 2rem;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+        
+        @media (max-width: 768px) {
+            .auth-card {
+                grid-template-columns: 1fr;
+                margin: 1rem;
+            }
+            
+            .auth-left {
+                padding: 2rem;
+                min-height: 200px;
+            }
+            
+            .auth-right {
+                padding: 2rem;
+            }
+            
+            .auth-title {
+                font-size: 2rem;
+            }
+            
+            .auth-form-title {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .auth-left,
+            .auth-right {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Left Section -->
-        <div class="left">
-            <img src="https://cdn-icons-png.flaticon.com/512/29/29302.png" alt="Book Icon">
-            <h1>Welcome to Book Bot</h1>
-            <p>Your personal assistant for discovering new reads.</p>
-        </div>
+    <div class="auth-container">
+        <div class="auth-card">
+            <!-- Left Section -->
+            <div class="auth-left">
+                <div class="auth-left-content">
+                    <div class="book-icons">
+                        <div class="icon-large">📚</div>
+                        <div class="icon-medium">🔑</div>
+                        <div class="icon-large">📖</div>
+                    </div>
+                    <h1 class="auth-title">Welcome Back!</h1>
+                    <p class="auth-subtitle">Sign in to access your personal library and continue your reading adventure with Book Bot.</p>
+                </div>
+            </div>
 
-        <!-- Right Section -->
-        <div class="right">
-            <h2>Login</h2>
-            <form method="POST" action="{{ url_for('login') }}" id="loginForm">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="Enter your email">
-                <div id="emailError" class="error">Please enter a valid email address.</div>
+            <!-- Right Section -->
+            <div class="auth-right">
+                <h2 class="auth-form-title">Sign In</h2>
+                
+                <!-- Flash messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    <div class="flash-messages">
+                      {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">
+                          {{ message }}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                {% endwith %}
+                
+                <form method="POST" action="{{ url_for('login') }}" id="loginForm" novalidate>
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" id="email" name="email" class="form-input" 
+                               placeholder="Enter your email address" 
+                               autocomplete="email">
+                    </div>
 
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Enter your password">
-                <div id="passwordError" class="error">Please enter your password.</div>
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" id="password" name="password" class="form-input" 
+                               placeholder="Enter your password" 
+                               autocomplete="current-password">
+                    </div>
 
-                <button type="submit">Login</button>
-            </form>
-            <div class="register">
-                New here? <a href="/register">Register</a>
+                    <div class="form-group">
+                        <label class="flex items-center gap-2 text-sm">
+                            <input type="checkbox" name="remember" class="rounded">
+                            Remember me
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full btn-lg">Sign In</button>
+                </form>
+                
+
+                
+                <div class="text-center mt-4">
+                    <p class="text-sm text-muted">
+                        New to Book Bot? 
+                        <a href="{{ url_for('register') }}" class="font-medium">Create an account</a>
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- JavaScript removed since file doesn't exist -->
     <script>
-        document.getElementById("loginForm").addEventListener("submit", function(event) {
-            let email = document.getElementById("email").value.trim();
-            let password = document.getElementById("password").value.trim();
-            let emailError = document.getElementById("emailError");
-            let passwordError = document.getElementById("passwordError");
-            let isValid = true;
-
-            emailError.style.display = "none";
-            passwordError.style.display = "none";
-
-            let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailPattern.test(email)) {
-                emailError.style.display = "block";
-                isValid = false;
+        // Simple form validation
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                e.preventDefault();
+                showError('Please fill in all fields');
             }
-
-            if (password === "") {
-                passwordError.style.display = "block";
-                isValid = false;
-            }
-
-            if (!isValid) {
-                event.preventDefault();
-            }
+        });
+        
+        // Add focus effects
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
         });
     </script>
 </body>
