@@ -548,7 +548,7 @@
 
     function confirmLogout() {
       document.querySelector('.logout-modal').remove();
-      showInfo('Logging out...');
+      // Removed toast notification per user preference
       setTimeout(() => {
         window.location.href = "{{ url_for('logout') }}";
       }, 1000);
@@ -618,7 +618,7 @@
             bookCard.style.opacity = '0.5';
             bookCard.style.transform = 'scale(0.9)';
             
-            showSuccess('Book removed from favorites successfully!');
+            // Removed toast notification per user preference
             
             setTimeout(() => {
               bookCard.remove();
@@ -630,12 +630,12 @@
               }
             }, 300);
           } else {
-            showError(data.message || 'Failed to remove from favorites. Please try again.');
+            // Removed toast notification per user preference
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          showError('An error occurred. Please try again.');
+          // Removed toast notification per user preference
         });
       }
 
@@ -647,14 +647,15 @@
       button.innerHTML = '📖 Opening...';
       button.style.opacity = '0.7';
       
-      setTimeout(() => {
-        button.innerHTML = originalText;
-        button.style.opacity = '';
-        showInfo('Opening book reader... (Feature coming soon)');
-      }, 1000);
+      // Show loading message
+      // Removed toast notification per user preference
       
-      // Future: Add actual book reading functionality
-      console.log('Opening book reader for:', bookId);
+      // Navigate to book description page after short delay
+      setTimeout(() => {
+        window.location.href = `/book_description/${bookId}`;
+      }, 500);
+      
+      console.log('Opening book description for:', bookId);
     }
   </script>
 </body>

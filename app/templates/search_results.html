@@ -629,7 +629,7 @@
           <li><a href="{{ url_for('user_home') }}" class="active">🏠 Home</a></li>
           <li><a href="#">🎯 Recommended</a></li>
           <li><a href="#">🧭 Explore Categories</a></li>
-          <li><a href="#">⭐ Recently Rated</a></li>
+          <li><a href="{{ url_for('user_home') }}#recently-rated-section">⭐ Recently Rated</a></li>
           <li><a href="#">❤️ Favorites</a></li>
           <li><a href="#">📖 Continue Reading</a></li>
         {% endif %}
@@ -810,6 +810,7 @@
         window.location.href = href;
       }, 1000);
     }
+    
   </script>
 
   <!-- User Details Modal -->

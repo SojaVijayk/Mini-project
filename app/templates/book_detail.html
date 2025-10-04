@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Bot - {{ book.title }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+  <style>
+    :root {
+      --primary-color: #7c3aed;
+      --primary-light: #a855f7;
+      --primary-dark: #5b21b6;
+      --accent-color: #06d6a0;
+      --accent-light: #40e0d0;
+      --accent-secondary: #f59e0b;
+      --accent-tertiary: #ef4444;
+      --accent-quaternary: #10b981;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-tertiary: #f1f5f9;
+      --bg-sidebar: #1e293b;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --text-white: #ffffff;
+      --border-color: #e2e8f0;
+      --border-light: #f1f5f9;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-2xl: 20px;
+      --radius-full: 9999px;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    /* Sidebar Styling */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 280px;
+      height: 100vh;
+      background: linear-gradient(180deg, var(--bg-sidebar) 0%, #334155 100%);
+      color: var(--text-white);
+      padding: 2rem;
+      z-index: 100;
+      box-shadow: var(--shadow-xl);
+    }
+    
+    .sidebar-brand {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 3rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+      background: linear-gradient(135deg, var(--primary-light), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .sidebar-nav {
+      list-style: none;
+    }
+    
+    .sidebar-nav li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .sidebar-nav a {
+      display: block;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-lg);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .sidebar-nav a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transform: translateX(4px);
+    }
+    
+    .sidebar-nav a.active {
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      color: white;
+      font-weight: 600;
+    }
+    
+    /* Main Content Styling */
+    .main-content {
+      margin-left: 280px;
+      min-height: 100vh;
+    }
+    
+    .navbar {
+      background: var(--bg-primary);
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    
+    .navbar-container {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+    
+    .navbar-nav {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .navbar-nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .navbar-nav a:hover {
+      color: var(--primary-color);
+      background: var(--bg-tertiary);
+    }
+    
+    /* Main Content */
+    .content {
+      padding: 2rem 0;
+    }
+    
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-md);
+      background: var(--bg-secondary);
+      transition: all 0.2s ease;
+      margin-bottom: 2rem;
+    }
+    
+    .back-link:hover {
+      background: var(--primary-color);
+      color: white;
+      transform: translateY(-1px);
+    }
+    
+    /* Book Header */
+    .book-header {
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+      position: relative;
+      border-radius: var(--radius-2xl);
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .book-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    }
+    
+    .book-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .book-author {
+      font-size: 1.25rem;
+      font-weight: 500;
+      opacity: 0.9;
+      margin-bottom: 0.5rem;
+    }
+    
+    .book-genre {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-full);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    /* Book Info Grid */
+    .book-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+    
+    .info-card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-color);
+    }
+    
+    .info-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .info-content {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+    
+    .isbn-code {
+      font-family: monospace;
+      background: var(--bg-secondary);
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+      margin-top: 0.5rem;
+    }
+    
+    /* Description Section */
+    .description-section {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+    }
+    
+    .description-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .description-text {
+      font-size: 1.125rem;
+      line-height: 1.8;
+      color: var(--text-primary);
+    }
+    
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding: 2rem 0;
+    }
+    
+    .btn {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+    
+    .btn-favorite {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 2px solid var(--border-color);
+    }
+    
+    .btn-favorite:hover {
+      background: var(--accent-tertiary);
+      color: white;
+      border-color: var(--accent-tertiary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .btn-read {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+      color: white;
+    }
+    
+    .btn-read:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 968px) {
+      .sidebar {
+        display: none;
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .book-title {
+        font-size: 2rem;
+      }
+      
+      .book-info-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .content {
+        padding: 1rem;
+      }
+      
+      .book-header {
+        padding: 2rem 1rem;
+      }
+      
+      .book-title {
+        font-size: 1.75rem;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      📖 Book Bot
+    </div>
+    <nav>
+      <ul class="sidebar-nav">
+        <li><a href="{{ url_for('user_home') }}">🏠 Dashboard</a></li>
+        <li><a href="{{ url_for('recommended_books') }}">🎯 Recommended For You</a></li>
+        <li><a href="{{ url_for('explore_books') }}">🧭 Explore Categories</a></li>
+        <li><a href="{{ url_for('user_home') }}#recently-rated-section">⭐ Recently Rated</a></li>
+        <li><a href="{{ url_for('favorites') }}">❤️ Favorites</a></li>
+        <li><a href="#">📖 Continue Reading</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Navigation -->
+  <div class="navbar">
+    <div class="container">
+      <div class="navbar-container">
+        <div class="navbar-brand mobile-only">
+          📖 Book Bot
+        </div>
+        <div class="navbar-nav">
+          <a href="{{ url_for('profile') }}">👤 Profile</a>
+          <a href="{{ url_for('logout') }}">🚪 Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="container">
+      <div class="content">
+        <!-- Back Link -->
+        <a href="javascript:history.back()" class="back-link">
+          ← Back to Previous Page
+        </a>
+        
+        <!-- Book Header -->
+        <div class="book-header">
+          <div class="book-icon">📚</div>
+          <h1 class="book-title">{{ book.title }}</h1>
+          <p class="book-author">by {{ book.author }}</p>
+          <span class="book-genre">{{ book.genre }}</span>
+        </div>
+        
+        <!-- Book Information Grid -->
+        <div class="book-info-grid">
+          <div class="info-card">
+            <h3 class="info-title">
+              <i class="fas fa-info-circle"></i>
+              Book Information
+            </h3>
+            <div class="info-content">
+              <p><strong>Title:</strong> {{ book.title }}</p>
+              <p><strong>Author:</strong> {{ book.author }}</p>
+              <p><strong>Genre:</strong> {{ book.genre }}</p>
+              <p><strong>ISBN:</strong> <span class="isbn-code">{{ book.isbn }}</span></p>
+            </div>
+          </div>
+          
+          <div class="info-card">
+            <h3 class="info-title">
+              <i class="fas fa-star"></i>
+              Reader Rating
+            </h3>
+            <div class="info-content">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <span style="color: var(--accent-secondary); font-size: 1.25rem;">★★★★☆</span>
+                <span style="font-weight: 600; font-size: 1.125rem;">4.2/5</span>
+              </div>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">Based on reader reviews</p>
+              <p style="margin-top: 0.5rem;">Highly rated for its engaging storyline and compelling characters.</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Book Description -->
+        <div class="description-section">
+          <h3 class="description-title">
+            <i class="fas fa-book-open"></i>
+            Book Description
+          </h3>
+          <div class="description-text">
+            {{ book.description }}
+          </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button class="btn btn-favorite" onclick="addToFavorites('{{ book.id }}')">
+            <i class="fas fa-heart"></i>
+            Add to Favorites
+          </button>
+          <button class="btn btn-read" onclick="startReading('{{ book.id }}')">
+            <i class="fas fa-book-reader"></i>
+            Start Reading
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Book interaction functions
+    function addToFavorites(bookId) {
+      // Add visual feedback
+      const button = event.target.closest('.btn-favorite');
+      const originalText = button.innerHTML;
+      
+      button.innerHTML = '<i class="fas fa-heart" style="color: #ef4444;"></i> Adding...';
+      button.style.opacity = '0.7';
+      
+      // In a real application, you would send an AJAX request to add to favorites
+      // For now, we'll just simulate the action
+      setTimeout(() => {
+        button.innerHTML = '<i class="fas fa-heart" style="color: #ef4444;"></i> Added to Favorites!';
+        button.style.background = '#fee2e2';
+        button.style.color = '#ef4444';
+        button.style.border = '2px solid #ef4444';
+        
+        if (typeof showSuccess === 'function') {
+          showSuccess('Book added to favorites successfully!');
+        }
+        
+        setTimeout(() => {
+          button.innerHTML = '<i class="fas fa-heart-broken"></i> Remove from Favorites';
+          button.style.background = '';
+          button.style.color = '';
+          button.style.border = '';
+          button.onclick = function() { removeFromFavorites(bookId); };
+        }, 2000);
+      }, 1000);
+    }
+    
+    function removeFromFavorites(bookId) {
+      const button = event.target.closest('.btn-favorite');
+      const originalText = button.innerHTML;
+      
+      button.innerHTML = '<i class="fas fa-heart-broken"></i> Removing...';
+      button.style.opacity = '0.7';
+      
+      // In a real application, you would send an AJAX request to remove from favorites
+      // For now, we'll just simulate the action
+      setTimeout(() => {
+        button.innerHTML = '<i class="fas fa-heart"></i> Add to Favorites';
+        button.style.opacity = '';
+        button.onclick = function() { addToFavorites(bookId); };
+        
+        if (typeof showSuccess === 'function') {
+          showSuccess('Book removed from favorites successfully!');
+        }
+      }, 1000);
+    }
+    
+    function startReading(bookId) {
+      // Add visual feedback
+      const button = event.target.closest('.btn-read');
+      const originalText = button.innerHTML;
+      
+      button.innerHTML = '<i class="fas fa-book-reader"></i> Opening...';
+      button.style.opacity = '0.7';
+      
+      // Navigate to book description page after short delay
+      setTimeout(() => {
+        window.location.href = `/book_description/${bookId}`;
+      }, 1000);
+      
+      if (typeof showInfo === 'function') {
+        showInfo('Loading book content...');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Bot - Recently Rated Books</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+  <style>
+    :root {
+      --primary-color: #7c3aed;
+      --primary-light: #a855f7;
+      --primary-dark: #5b21b6;
+      --accent-color: #06d6a0;
+      --accent-light: #40e0d0;
+      --accent-secondary: #f59e0b;
+      --accent-tertiary: #ef4444;
+      --accent-quaternary: #10b981;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-tertiary: #f1f5f9;
+      --bg-sidebar: #1e293b;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --text-white: #ffffff;
+      --border-color: #e2e8f0;
+      --border-light: #f1f5f9;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-2xl: 20px;
+      --radius-full: 9999px;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 280px;
+      height: 100vh;
+      background: linear-gradient(180deg, var(--bg-sidebar) 0%, #334155 100%);
+      color: var(--text-white);
+      padding: 2rem;
+      z-index: 100;
+      box-shadow: var(--shadow-xl);
+    }
+    
+    .sidebar-brand {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 3rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+      background: linear-gradient(135deg, var(--primary-light), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .sidebar-nav {
+      list-style: none;
+    }
+    
+    .sidebar-nav li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .sidebar-nav a {
+      display: block;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-lg);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .sidebar-nav a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transform: translateX(4px);
+    }
+
+    .sidebar-nav a.active {
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      color: white;
+      font-weight: 600;
+    }
+
+    /* Main Content Styling */
+    .main-content {
+      margin-left: 280px;
+      min-height: 100vh;
+    }
+    
+    .navbar {
+      background: var(--bg-primary);
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    
+    .navbar-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+    
+    .navbar-nav {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .navbar-nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .navbar-nav a:hover {
+      color: var(--primary-color);
+      background: var(--bg-tertiary);
+    }
+
+    /* Content Area Styling */
+    .content {
+      padding: 2rem 0;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .text-lg {
+      font-size: 1.125rem;
+    }
+    
+    .text-muted {
+      color: var(--text-muted);
+    }
+    
+    .mb-4 {
+      margin-bottom: 2rem;
+    }
+    
+    /* Book List Styling */
+    .book-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    
+    .book-card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-color);
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    .book-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary-color);
+    }
+    
+    .book-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    
+    .book-icon {
+      font-size: 2rem;
+      color: var(--primary-color);
+    }
+    
+    .book-rating {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .rating-stars {
+      color: var(--accent-secondary);
+      font-size: 1.2rem;
+    }
+    
+    .book-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+    }
+    
+    .book-author {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+    
+    .book-genre {
+      display: inline-block;
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-full);
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+    
+    .book-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-light);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    
+    .book-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .btn-outline {
+      background: transparent;
+      color: var(--primary-color);
+      border: 2px solid var(--primary-color);
+    }
+    
+    .btn-outline:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+    
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-color);
+      grid-column: 1 / -1;
+    }
+    
+    .empty-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      color: var(--text-muted);
+    }
+    
+    .empty-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+    }
+    
+    .empty-description {
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 968px) {
+      .sidebar {
+        display: none;
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .book-list {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .container {
+        padding: 0 1rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .book-list {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      📖 Book Bot
+    </div>
+    <nav>
+      <ul class="sidebar-nav">
+        <li><a href="{{ url_for('user_home') }}">🏠 Dashboard</a></li>
+        <li><a href="{{ url_for('recommended_books') }}">🎯 Recommended For You</a></li>
+        <li class="sidebar-dropdown" id="sidebarExploreDropdown">
+          <a href="javascript:void(0)" class="sidebar-dropdown-toggle" onclick="toggleUserSidebarDropdown('sidebarExploreDropdown'); return false;">
+            <span>🧭 Explore Categories</span>
+            <span class="sidebar-dropdown-arrow">▼</span>
+          </a>
+          <div class="sidebar-dropdown-content" id="sidebarExploreDropdownContent">
+            <a href="{{ url_for('explore_authors') }}" class="sidebar-dropdown-item">
+              <span class="sidebar-dropdown-item-icon">✍️</span>
+              Explore by author
+            </a>
+            <a href="{{ url_for('explore_genres') }}" class="sidebar-dropdown-item">
+              <span class="sidebar-dropdown-item-icon">🎭</span>
+              Explore by genre
+            </a>
+            <a href="{{ url_for('explore_books') }}" class="sidebar-dropdown-item">
+              <span class="sidebar-dropdown-item-icon">📚</span>
+              Explore by book
+            </a>
+          </div>
+        </li>
+        <li><a href="{{ url_for('recently_rated_page') }}" class="active">⭐ Recently Rated</a></li>
+        <li><a href="{{ url_for('favorites') }}">❤️ Favorites</a></li>
+        <li><a href="#">📖 Continue Reading</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Navigation Bar -->
+    <div class="navbar">
+      <div class="container">
+        <div class="navbar-container">
+          <div class="navbar-brand">
+            📖 Book Bot
+          </div>
+          <div class="navbar-nav">
+            <a href="{{ url_for('profile') }}">👤 Profile</a>
+            <a href="{{ url_for('logout') }}">🚪 Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="container">
+      <!-- Page Header -->
+      <div class="mb-4">
+        <h1>Recently Rated Books</h1>
+        <p class="text-lg text-muted">Books you've recently rated and reviewed</p>
+      </div>
+
+      <!-- Recently Rated Books List -->
+      <div class="book-list" id="recentlyRatedBooks">
+        <!-- Books will be loaded here dynamically -->
+        <div class="loading" style="text-align: center; padding: 2rem; grid-column: 1 / -1;">
+          <p>Loading recently rated books...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Load recently rated books when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      loadRecentlyRatedBooks();
+    });
+
+    // Function to load recently rated books
+    function loadRecentlyRatedBooks() {
+      const container = document.getElementById('recentlyRatedBooks');
+      
+      // Show loading message
+      container.innerHTML = '<div class="loading" style="text-align: center; padding: 2rem; grid-column: 1 / -1;"><p>Loading recently rated books...</p></div>';
+      
+      fetch('/recently_rated', {
+        credentials: 'same-origin' // Include cookies in the request
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success && data.recently_rated && data.recently_rated.length > 0) {
+            // Clear loading message
+            container.innerHTML = '';
+            
+            // Create list of recently rated books
+            data.recently_rated.forEach(book => {
+              const bookElement = document.createElement('div');
+              bookElement.className = 'book-card';
+              
+              // Format the rating with stars
+              let stars = '';
+              for (let i = 1; i <= 5; i++) {
+                if (i <= book.rating) {
+                  stars += '★';
+                } else {
+                  stars += '☆';
+                }
+              }
+              
+              bookElement.innerHTML = `
+                <div class="book-header">
+                  <div class="book-icon">📚</div>
+                  <div class="book-rating">
+                    <span class="rating-stars">${stars}</span>
+                    <span>${book.rating}/5</span>
+                  </div>
+                </div>
+                <h3 class="book-title">${book.title}</h3>
+                <p class="book-author">by ${book.author}</p>
+                <span class="book-genre">${book.genre}</span>
+                <div class="book-meta">
+                  <span>ISBN: ${book.isbn}</span>
+                  <span>${book.rated_at ? new Date(book.rated_at).toLocaleDateString() : 'N/A'}</span>
+                </div>
+                <div class="book-actions">
+                  <a href="/book_description/${book.book_id}" class="btn btn-primary">
+                    <i class="fas fa-book-open"></i> View Details
+                  </a>
+                </div>
+              `;
+              
+              container.appendChild(bookElement);
+            });
+          } else {
+            // Show empty state
+            container.innerHTML = `
+              <div class="empty-state">
+                <div class="empty-icon">⭐</div>
+                <h3 class="empty-title">No Rated Books Yet</h3>
+                <p class="empty-description">You haven't rated any books yet. Start exploring and rating books to see them here!</p>
+                <a href="{{ url_for('explore_books') }}" class="btn btn-primary">
+                  <i class="fas fa-compass"></i> Explore Books
+                </a>
+              </div>
+            `;
+          }
+        })
+        .catch(error => {
+          console.error('Error loading recently rated books:', error);
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">❌</div>
+              <h3 class="empty-title">Error Loading Books</h3>
+              <p class="empty-description">There was an error loading your recently rated books. Please try again later.</p>
+              <button class="btn btn-primary" onclick="loadRecentlyRatedBooks()">
+                <i class="fas fa-redo"></i> Retry
+              </button>
+            </div>
+          `;
+        });
+    }
+
+    // Sidebar Dropdown functionality
+    function toggleUserSidebarDropdown(dropdownId) {
+      try {
+        const dropdown = document.getElementById(dropdownId);
+        const content = document.getElementById(dropdownId + 'Content');
+        
+        if (!dropdown || !content) {
+          return false;
+        }
+        
+        // Close all other sidebar dropdowns first
+        document.querySelectorAll('.sidebar-dropdown').forEach(dd => {
+          if (dd.id !== dropdownId) {
+            dd.classList.remove('active');
+            const ddContent = dd.querySelector('.sidebar-dropdown-content');
+            if (ddContent) {
+              ddContent.classList.remove('show');
+            }
+          }
+        });
+        
+        // Toggle current dropdown
+        const isCurrentlyActive = dropdown.classList.contains('active');
+        
+        if (isCurrentlyActive) {
+          // Close dropdown
+          dropdown.classList.remove('active');
+          content.classList.remove('show');
+        } else {
+          // Open dropdown
+          dropdown.classList.add('active');
+          content.classList.add('show');
+        }
+        
+        return false;
+        
+      } catch (error) {
+        console.error('Error in toggleUserSidebarDropdown:', error);
+        return false;
+      }
+    }
+    
+    // Close sidebar dropdowns when clicking outside
+    document.addEventListener('click', function(event) {
+      // Close sidebar dropdowns
+      const sidebarDropdowns = document.querySelectorAll('.sidebar-dropdown');
+      sidebarDropdowns.forEach(dropdown => {
+        if (!dropdown.contains(event.target)) {
+          dropdown.classList.remove('active');
+          const content = dropdown.querySelector('.sidebar-dropdown-content');
+          if (content) {
+            content.classList.remove('show');
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

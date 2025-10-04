@@ -21,7 +21,9 @@ CREATE TABLE book_table (
     title VARCHAR(255) NOT NULL,
     author VARCHAR(255) NOT NULL,
     genre VARCHAR(100) NOT NULL,
-    isbn VARCHAR(20) NOT NULL,
+    isbn VARCHAR(50) NOT NULL,  -- Increased size to accommodate longer ISBNs
+    description TEXT DEFAULT NULL,
+    story_content LONGTEXT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (book_id),
@@ -60,11 +62,13 @@ class User:
         self.role = role
 
 class Book:
-    def __init__(self, book_id, title, author, genre, isbn, created_at=None, updated_at=None):
+    def __init__(self, book_id, title, author, genre, isbn, description=None, story_content=None, created_at=None, updated_at=None):
         self.book_id = book_id
         self.title = title
         self.author = author
         self.genre = genre
         self.isbn = isbn
+        self.description = description
+        self.story_content = story_content
         self.created_at = created_at
         self.updated_at = updated_at

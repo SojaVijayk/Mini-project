@@ -1,0 +1,1756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Bot - {{ book.title }}</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+  <style>
+    :root {
+      --primary-color: #7c3aed;
+      --primary-light: #a855f7;
+      --primary-dark: #5b21b6;
+      --accent-color: #06d6a0;
+      --accent-light: #40e0d0;
+      --accent-secondary: #f59e0b;
+      --accent-tertiary: #ef4444;
+      --accent-quaternary: #10b981;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-tertiary: #f1f5f9;
+      --bg-sidebar: #1e293b;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --text-white: #ffffff;
+      --border-color: #e2e8f0;
+      --border-light: #f1f5f9;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-2xl: 20px;
+      --radius-full: 9999px;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 280px;
+      height: 100vh;
+      background: linear-gradient(180deg, var(--bg-sidebar) 0%, #334155 100%);
+      color: var(--text-white);
+      padding: 2rem;
+      z-index: 100;
+      box-shadow: var(--shadow-xl);
+    }
+    
+    .sidebar-brand {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 3rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+      background: linear-gradient(135deg, var(--primary-light), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .sidebar-nav {
+      list-style: none;
+    }
+    
+    .sidebar-nav li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .sidebar-nav a {
+      display: block;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-lg);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .sidebar-nav a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transform: translateX(4px);
+    }
+
+    /* Main Content Styling */
+    .main-content {
+      margin-left: 280px;
+      min-height: 100vh;
+    }
+    
+    .navbar {
+      background: var(--bg-primary);
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    
+    .navbar-container {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+    
+    .navbar-nav {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .navbar-nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .navbar-nav a:hover {
+      color: var(--primary-color);
+      background: var(--bg-tertiary);
+    }
+
+    /* Main Content */
+    .content {
+      padding: 2rem 0;
+    }
+    
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-md);
+      background: var(--bg-secondary);
+      transition: all 0.2s ease;
+      margin-bottom: 2rem;
+    }
+    
+    .back-link:hover {
+      background: var(--primary-color);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    /* Book Container Styling */
+    .book-container {
+      background: var(--bg-primary);
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+    }
+    
+    /* Book Details Styling */
+    .book-details {
+      background: var(--bg-primary);
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+    
+    .book-header {
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+      position: relative;
+    }
+    
+    .book-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="rgba(255,255,255,0.1)"><polygon points="0,0 1000,0 1000,100 0,80"/></svg>');
+      pointer-events: none;
+    }
+    
+    .book-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    }
+    
+    .book-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .book-author {
+      font-size: 1.25rem;
+      font-weight: 500;
+      opacity: 0.9;
+      margin-bottom: 0.5rem;
+    }
+    
+    .book-genre {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-full);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .book-content {
+      padding: 3rem 2rem;
+    }
+    
+    /* These styles are no longer used but kept for reference */
+    /* Book Info Grid */
+    /* .book-info { */
+    /*   display: grid; */
+    /*   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); */
+    /*   gap: 2rem; */
+    /*   margin-bottom: 3rem; */
+    /* } */
+    
+    /* .book-info.hidden { */
+    /*   display: none; */
+    /* } */
+    
+    /* .info-section { */
+    /*   background: var(--bg-secondary); */
+    /*   padding: 2rem; */
+    /*   border-radius: var(--radius-xl); */
+    /*   border: 1px solid var(--border-color); */
+    /* } */
+    
+    /* .info-title { */
+    /*   font-size: 1.25rem; */
+    /*   font-weight: 600; */
+    /*   color: var(--primary-color); */
+    /*   margin-bottom: 1rem; */
+    /*   display: flex; */
+    /*   align-items: center; */
+    /*   gap: 0.5rem; */
+    /* } */
+    
+    /* .info-content { */
+    /*   color: var(--text-secondary); */
+    /*   font-size: 1rem; */
+    /*   line-height: 1.6; */
+    /* } */
+    
+    /* Description Section Styling */
+    /* .description-section { */
+    /*   background: var(--bg-tertiary); */
+    /*   padding: 3rem; */
+    /*   border-radius: var(--radius-xl); */
+    /*   border: 1px solid var(--border-color); */
+    /*   position: relative; */
+    /*   display: block; */
+    /* } */
+    
+    /* .description-section.hidden { */
+    /*   display: none; */
+    /* } */
+    
+    /* .description-section::before { */
+    /*   content: '"'; */
+    /*   position: absolute; */
+    /*   top: 1rem; */
+    /*   left: 1.5rem; */
+    /*   font-size: 6rem; */
+    /*   color: var(--primary-color); */
+    /*   opacity: 0.1; */
+    /*   font-family: serif; */
+    /*   line-height: 1; */
+    /* } */
+    
+    /* .description-title { */
+    /*   font-size: 1.5rem; */
+    /*   font-weight: 600; */
+    /*   color: var(--primary-color); */
+    /*   margin-bottom: 1.5rem; */
+    /*   display: flex; */
+    /*   align-items: center; */
+    /*   gap: 0.75rem; */
+    /* } */
+    
+    /* .description-text { */
+    /*   font-size: 1.125rem; */
+    /*   line-height: 1.8; */
+    /*   color: var(--text-primary); */
+    /*   position: relative; */
+    /*   z-index: 2; */
+    /* } */
+
+    /* Book Container Styling */
+    .book-container {
+      background: var(--bg-primary);
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+    }
+    
+    /* Book Content Box */
+    .book-content-box {
+      padding: 2rem;
+    }
+    
+    .content-section {
+      background: var(--bg-secondary);
+      padding: 1.5rem;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      margin-bottom: 1.5rem;
+    }
+    
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .section-content {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+    
+    .description-text {
+      white-space: pre-line;
+    }
+    
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding-top: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+      .action-buttons {
+        flex-direction: column;
+      }
+      
+      .action-btn {
+        width: 100%;
+      }
+    }
+    
+    /* Story Content Styling */
+    .story-section {
+      background: var(--bg-primary);
+      padding: 3rem;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border-color);
+      margin-top: 2rem;
+      display: none;
+    }
+    
+    .story-section.active {
+      display: block;
+    }
+    
+    .story-section.hidden {
+      display: none;
+    }
+    
+    .story-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 1.5rem;
+      text-align: center;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--border-color);
+    }
+    
+    .story-content {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: var(--text-primary);
+      white-space: pre-line;
+      position: relative;
+      overflow-y: auto;
+      max-height: 70vh;
+    }
+    
+    .story-chapter {
+      margin-bottom: 2rem;
+    }
+    
+    .story-chapter-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin-bottom: 1rem;
+    }
+    
+    /* Search highlight styles */
+    .search-highlight {
+      background-color: #7c3aed !important;
+      color: white !important;
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-weight: bold;
+      transition: all 0.2s ease;
+    }
+    
+    .search-highlight.current {
+      background-color: #5b21b6 !important;
+      box-shadow: 0 0 0 2px #a855f7, 0 0 10px rgba(124, 58, 237, 0.5);
+      transform: scale(1.05);
+    }
+    
+    /* Reading position highlight */
+    #reading-highlight {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background-color: #7c3aed;
+      box-shadow: 0 0 10px rgba(124, 58, 237, 0.8);
+      z-index: 1000;
+      pointer-events: none;
+      border-radius: 2px;
+    }
+    
+    #reading-highlight .highlight-label {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: -25px;
+      background-color: #7c3aed;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    
+    /* Persistent reading marker */
+    #reading-marker {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background-color: #7c3aed;
+      box-shadow: 0 0 15px rgba(124, 58, 237, 0.9);
+      z-index: 1000;
+      pointer-events: none;
+      border-radius: 3px;
+      opacity: 0.9;
+    }
+    
+    #reading-marker .marker-label {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: -30px;
+      background-color: #7c3aed;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+      white-space: nowrap;
+      box-shadow: 0 2px 10px rgba(124, 58, 237, 0.5);
+      border: 2px solid white;
+    }
+    
+    /* Pulse animation for marker */
+    @keyframes pulse {
+      0% { opacity: 0.7; }
+      50% { opacity: 1; }
+      100% { opacity: 0.7; }
+    }
+    
+    /* Action Buttons */
+    .book-actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      padding: 2rem;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+    }
+    
+    .action-btn {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      min-width: 180px;
+      justify-content: center;
+    }
+    
+    .btn-favorite {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 2px solid var(--border-color);
+    }
+    
+    .btn-favorite:hover {
+      background: var(--accent-tertiary);
+      color: white;
+      border-color: var(--accent-tertiary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .btn-read {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+      color: white;
+    }
+    
+    .btn-read:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .btn-back {
+      background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
+      color: white;
+    }
+    
+    .btn-back:hover {
+      background: linear-gradient(135deg, var(--accent-quaternary), var(--accent-color));
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Mobile Responsive */
+    .mobile-only {
+      display: none;
+    }
+    
+    @media (max-width: 968px) {
+      .sidebar {
+        display: none;
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .mobile-only {
+        display: block;
+      }
+      
+      .container {
+        padding: 0 1rem;
+      }
+      
+      .book-title {
+        font-size: 2rem;
+      }
+      
+      .book-actions {
+        flex-direction: column;
+      }
+      
+      .action-btn {
+        width: 100%;
+      }
+      
+      .story-section {
+        padding: 2rem 1rem;
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .book-header {
+        padding: 2rem 1rem;
+      }
+      
+      .book-content-box {
+        padding: 2rem 1rem;
+      }
+      
+      .book-title {
+        font-size: 1.75rem;
+      }
+      
+      .story-section {
+        padding: 1.5rem 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      📖 Book Bot
+    </div>
+    <nav>
+      <ul class="sidebar-nav">
+        <li><a href="{{ url_for('user_home') }}">🏠 Dashboard</a></li>
+        <li><a href="{{ url_for('recommended_books') }}">🎯 Recommended For You</a></li>
+        <li><a href="#">🧭 Explore Categories</a></li>
+        <li><a href="{{ url_for('user_home') }}#recently-rated-section">⭐ Recently Rated</a></li>
+        <li><a href="{{ url_for('favorites') }}">❤️ Favorites</a></li>
+        <li><a href="{{ url_for('continue_reading_page') }}">📖 Continue Reading</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Navigation -->
+  <div class="navbar">
+    <div class="container">
+      <div class="navbar-container">
+        <div class="navbar-brand mobile-only">
+          📖 Book Bot
+        </div>
+        <div class="navbar-nav">
+          <a href="{{ url_for('profile') }}">👤 Profile</a>
+          <a href="{{ url_for('logout') }}">🚪 Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="container">
+      <!-- Back Link -->
+      <a href="javascript:history.back()" class="back-link">
+        ← Back to Previous Page
+      </a>
+      
+      <!-- Unified Book Container -->
+      <div class="book-container">
+        <!-- Book Header -->
+        <div class="book-header">
+          <div class="book-icon">📚</div>
+          <h1 class="book-title">{{ book.title }}</h1>
+          <p class="book-author">by {{ book.author }}</p>
+          <span class="book-genre">{{ book.genre }}</span>
+        </div>
+        
+        <!-- Book Content Box -->
+        <div class="book-content-box">
+          <!-- Book Information Section -->
+          <div class="content-section">
+            <h3 class="section-title">
+              <i class="fas fa-info-circle"></i>
+              Book Information
+            </h3>
+            <div class="section-content">
+              <p><strong>Title:</strong> {{ book.title }}</p>
+              <p><strong>Author:</strong> {{ book.author }}</p>
+              <p><strong>Genre:</strong> {{ book.genre }}</p>
+              <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+            </div>
+          </div>
+          
+          <!-- Reader Rating Section -->
+          <div class="content-section">
+            <h3 class="section-title">
+              <i class="fas fa-star"></i>
+              Reader Rating
+            </h3>
+            <div class="section-content">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <span style="color: var(--accent-secondary); font-size: 1.25rem;">★★★★☆</span>
+                <span style="font-weight: 600; font-size: 1.125rem;">4.2/5</span>
+              </div>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">Based on reader reviews</p>
+              <p style="margin-top: 0.5rem;">Highly rated for its engaging storyline and compelling characters.</p>
+            </div>
+          </div>
+          
+          <!-- Book Description Section -->
+          <div class="content-section">
+            <h3 class="section-title">
+              <i class="fas fa-book-open"></i>
+              Book Description
+            </h3>
+            <div class="section-content description-text">
+              {{ book.description }}
+            </div>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <button class="action-btn btn-favorite" onclick="addToFavorites('{{ book.id }}')">
+              <i class="fas fa-heart"></i>
+              Add to Favorites
+            </button>
+            <button class="action-btn btn-read" onclick="startReadingWithTracking('{{ book.id }}')">
+              <i class="fas fa-book-reader"></i>
+              Start Reading
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Story Section (Hidden by default, outside the main container) -->
+      <div class="story-section" id="storySection">
+        <h2 class="story-title">
+          <i class="fas fa-book-reader"></i>
+          Full Story: {{ book.title }}
+        </h2>
+        
+        <!-- Reading Tools -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid var(--border-color); margin-bottom: 1rem;">
+          <!-- Page Info -->
+          <div style="font-size: 0.9rem; color: var(--text-secondary);">
+            <span id="pageInfo">Page 1 of 10</span>
+          </div>
+          
+          <!-- Search Bar -->
+          <div style="flex: 1; max-width: 300px; margin: 0 1rem;">
+            <div style="position: relative;">
+              <input type="text" id="storySearch" placeholder="Search in story..." 
+                     style="width: 100%; padding: 0.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); font-size: 0.9rem;">
+              <button onclick="searchInStory()" 
+                      style="position: absolute; right: 50px; top: 5px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer;"
+                      title="Search">
+                <i class="fas fa-search"></i>
+              </button>
+              <button onclick="clearSearchAndInput()" 
+                      style="position: absolute; right: 25px; top: 5px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer;"
+                      title="Clear search">
+                <i class="fas fa-times"></i>
+              </button>
+              <button onclick="nextSearchResult()" 
+                      style="position: absolute; right: 5px; top: 5px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer;"
+                      title="Next result">
+                <i class="fas fa-arrow-down"></i>
+              </button>
+            </div>
+            <div id="search-navigation" style="display: none; margin-top: 5px; text-align: center;">
+              <button onclick="prevSearchResult()" style="background: var(--primary-color); color: white; border: none; border-radius: 4px; padding: 2px 8px; margin-right: 5px; cursor: pointer;">
+                <i class="fas fa-arrow-up"></i>
+              </button>
+              <span id="search-position" style="font-size: 0.8rem; color: var(--text-secondary);">0 of 0</span>
+              <button onclick="nextSearchResult()" style="background: var(--primary-color); color: white; border: none; border-radius: 4px; padding: 2px 8px; margin-left: 5px; cursor: pointer;">
+                <i class="fas fa-arrow-down"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Zoom Controls -->
+          <div style="display: flex; gap: 0.5rem;">
+            <button onclick="zoomOut()" 
+                    style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.5rem; cursor: pointer; font-weight: bold; font-size: 1rem;"
+                    title="Zoom Out">
+              -
+            </button>
+            <button onclick="resetZoom()" 
+                    style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.5rem; cursor: pointer;"
+                    title="Reset Zoom">
+              <i class="fas fa-expand"></i>
+            </button>
+            <button onclick="zoomIn()" 
+                    style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.5rem; cursor: pointer; font-weight: bold; font-size: 1rem;"
+                    title="Zoom In">
+              +
+            </button>
+          </div>
+        </div>
+        
+        <div class="story-content" style="transform-origin: top left; transition: transform 0.2s ease; overflow-y: auto; max-height: 70vh; position: relative;" id="storyContent">
+          {{ book.story_content }}
+        </div>
+        
+        <div class="story-footer">
+          <div class="story-footer-content">
+            <div class="story-footer-buttons">
+              <button class="story-footer-button" @click="prevPage">Previous</button>
+              <button class="story-footer-button" @click="nextPage">Next</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Reading Controls -->
+        <div style="display: flex; justify-content: space-between; margin-top: 2rem; flex-wrap: wrap; gap: 2rem;">
+          <!-- Left Side: Rating and Feedback (Compact Design) -->
+          <div style="flex: 1; min-width: 300px;">
+            <!-- Rating Section (Compact) -->
+            <div style="background: var(--bg-secondary); padding: 0.5rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); margin-bottom: 0.5rem;">
+              <h3 style="margin-bottom: 0.25rem; color: var(--primary-color); font-size: 0.9rem;">
+                <i class="fas fa-star"></i> Rate This Book
+              </h3>
+              <div style="display: flex; justify-content: flex-start; gap: 0.1rem; margin-bottom: 0.25rem;">
+                <span class="rating-star" data-rating="1" style="font-size: 0.8rem; color: var(--text-muted); cursor: pointer;">★</span>
+                <span class="rating-star" data-rating="2" style="font-size: 0.8rem; color: var(--text-muted); cursor: pointer;">★</span>
+                <span class="rating-star" data-rating="3" style="font-size: 0.8rem; color: var(--text-muted); cursor: pointer;">★</span>
+                <span class="rating-star" data-rating="4" style="font-size: 0.8rem; color: var(--text-muted); cursor: pointer;">★</span>
+                <span class="rating-star" data-rating="5" style="font-size: 0.8rem; color: var(--text-muted); cursor: pointer;">★</span>
+              </div>
+              <div id="rating-message" style="font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: 0.25rem; min-height: 1rem;"></div>
+            </div>
+            
+            <!-- Feedback Section (Compact) -->
+            <div style="background: var(--bg-secondary); padding: 0.5rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); margin-bottom: 0.5rem;">
+              <h3 style="margin-bottom: 0.25rem; color: var(--primary-color); font-size: 0.9rem;">
+                <i class="fas fa-comment"></i> Share Feedback
+              </h3>
+              <textarea id="feedbackText" placeholder="Your feedback..." style="width: 100%; min-height: 60px; padding: 0.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 0.25rem; font-family: 'Inter', sans-serif; font-size: 0.8rem;"></textarea>
+              <div id="feedback-message" style="font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: 0.25rem; min-height: 1rem;"></div>
+            </div>
+            
+            <!-- Save Option (Compact) -->
+            <div style="margin-top: 0.5rem; text-align: center;">
+              <button class="action-btn" onclick="saveProgress()" style="background: linear-gradient(135deg, var(--accent-color), var(--accent-light)); color: white; padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                <i class="fas fa-save"></i> Save Progress
+              </button>
+            </div>
+          </div>
+          
+          <!-- Right Side: Reading Controls -->
+          <div style="flex: 1; min-width: 300px;">
+            <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+              <button class="action-btn" onclick="manualHighlightLine()" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; flex: 1;" id="highlightButton">
+                <i class="fas fa-highlighter"></i> Highlight Line
+              </button>
+              <button class="action-btn" onclick="pauseReading()" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; flex: 1;" id="pauseButton">
+                <i class="fas fa-pause"></i> Pause Reading
+              </button>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+              <button class="action-btn" onclick="continueReading()" style="background: linear-gradient(135deg, #06d6a0, #04a777); color: white; flex: 1;" id="continueButton">
+                <i class="fas fa-play"></i> Continue Reading
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Book interaction functions
+    function addToFavorites(bookId) {
+      // Add visual feedback
+      const button = event.target.closest('.btn-favorite');
+      const originalText = button.innerHTML;
+      
+      button.innerHTML = '<i class="fas fa-heart" style="color: #ef4444;"></i> Adding...';
+      button.style.opacity = '0.7';
+      
+      // Send AJAX request to add to favorites
+      fetch('/add_favorite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ book_id: bookId })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          button.innerHTML = '<i class="fas fa-heart" style="color: #ef4444;"></i> Added to Favorites!';
+          button.style.background = '#fee2e2';
+          button.style.color = '#ef4444';
+          button.style.border = '2px solid #ef4444';
+          
+          // Removed toast notification per user preference
+          
+          setTimeout(() => {
+            button.innerHTML = '<i class="fas fa-heart-broken"></i> Remove from Favorites';
+            button.onclick = function() { removeFromFavorites(bookId); };
+          }, 2000);
+        } else {
+          button.innerHTML = originalText;
+          button.style.opacity = '';
+          // Removed toast notification per user preference
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        button.innerHTML = originalText;
+        button.style.opacity = '';
+        // Removed toast notification per user preference
+      });
+    }
+    
+    function removeFromFavorites(bookId) {
+      const button = event.target.closest('.btn-favorite');
+      const originalText = button.innerHTML;
+      
+      button.innerHTML = '<i class="fas fa-heart-broken"></i> Removing...';
+      button.style.opacity = '0.7';
+      
+      // Send AJAX request to remove from favorites
+      fetch('/remove_favorite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ book_id: bookId })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          button.innerHTML = '<i class="fas fa-heart"></i> Add to Favorites';
+          button.style.background = '';
+          button.style.color = '';
+          button.style.border = '';
+          button.style.opacity = '';
+          button.onclick = function() { addToFavorites(bookId); };
+          
+          // Removed toast notification per user preference
+        } else {
+          button.innerHTML = originalText;
+          button.style.opacity = '';
+          // Removed toast notification per user preference
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        button.innerHTML = originalText;
+        button.style.opacity = '';
+        // Removed toast notification per user preference
+      });
+    }
+    
+    // Enhanced reading controls with improved highlighting functionality
+    let persistentMarker = null;
+    let isReadingPaused = false;
+    let readingPosition = 0;
+    let highlightedLine = null;
+    
+    // Function to save reading progress
+    function saveReadingProgress(bookId, progress) {
+      fetch('/save_reading_progress', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          book_id: bookId,
+          progress: progress
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          console.log(`Reading progress saved: ${progress}%`);
+        }
+      })
+      .catch(error => {
+        console.error('Error saving reading progress:', error);
+      });
+    }
+    
+    // Clean implementation of automatic scroll tracking for reading progress
+    function initScrollTracking() {
+      const storyContent = document.querySelector('.story-content');
+      if (!storyContent) return;
+      
+      let lastSavedProgress = 0;
+      let scrollTimeout;
+      
+      // Function to save reading progress
+      function saveProgress() {
+        const scrollTop = storyContent.scrollTop;
+        const scrollHeight = storyContent.scrollHeight - storyContent.clientHeight;
+        const progress = scrollHeight > 0 ? Math.round((scrollTop / scrollHeight) * 100) : 0;
+        
+        // Only save if progress has changed significantly (at least 2% difference)
+        if (Math.abs(progress - lastSavedProgress) >= 2 || progress === 100) {
+          const bookId = '{{ book.id }}';
+          saveReadingProgress(bookId, progress);
+          lastSavedProgress = progress;
+          console.log(`Reading progress automatically saved: ${progress}%`);
+        }
+      }
+      
+      // Add scroll event listener with debouncing
+      storyContent.addEventListener('scroll', function() {
+        // Clear previous timeout
+        if (scrollTimeout) {
+          clearTimeout(scrollTimeout);
+        }
+        
+        // Set new timeout to save progress after scrolling stops
+        scrollTimeout = setTimeout(saveProgress, 1000); // Save progress 1 second after scrolling stops
+      });
+    }
+    
+    // Initialize scroll tracking when story section is shown
+    function startReadingWithTracking(bookId) {
+      const button = event.target.closest('.btn-read');
+      const originalText = button.innerHTML;
+      
+      button.innerHTML = '<i class="fas fa-book-reader"></i> Opening...';
+      button.style.opacity = '0.7';
+      
+      // Show the story section and hide the book container
+      setTimeout(function() {
+        try {
+          // Hide the main book container
+          const bookContainer = document.querySelector('.book-container');
+          if (bookContainer) {
+            bookContainer.style.display = 'none';
+          }
+          
+          // Show story section
+          const storySection = document.getElementById('storySection');
+          if (storySection) {
+            storySection.style.display = 'block';
+            // Store original content for search functionality
+            const storyContent = storySection.querySelector('.story-content');
+            if (storyContent && !storyContent.dataset.originalContent) {
+              storyContent.dataset.originalContent = storyContent.innerHTML;
+            }
+          }
+          
+          // Update reading controls state
+          updateReadingControls(false); // Not paused initially
+          
+          button.innerHTML = '<i class="fas fa-book-reader"></i> Continue Reading';
+          button.style.opacity = '';
+          
+          // Scroll to the story section
+          if (storySection) {
+            storySection.scrollIntoView({ behavior: 'smooth' });
+          }
+          
+          // Load previous reading progress
+          loadReadingProgress(bookId);
+          
+          // Initialize scroll tracking after a short delay to ensure the story content is loaded
+          setTimeout(initScrollTracking, 1500);
+          
+          // Removed toast notification per user preference
+        } catch (error) {
+          console.error('Error in startReadingWithTracking:', error);
+          button.innerHTML = originalText;
+          button.style.opacity = '';
+          // Removed toast notification per user preference
+        }
+      }, 1000);
+      
+      // Future: Add actual book reading functionality
+      console.log('Opening book reader for:', bookId);
+    }
+    
+    function continueReading() {
+      // Simple navigation to continue reading page
+      console.log('Continue reading button clicked');
+      console.log('Attempting to navigate to: /continue_reading');
+      
+      // Try multiple methods to ensure navigation works
+      try {
+        // Method 1: Direct assignment
+        window.location.href = '/continue_reading';
+        console.log('Method 1: Navigation initiated successfully');
+      } catch (error) {
+        console.error('Method 1 failed:', error);
+        try {
+          // Method 2: Using window.location.assign
+          window.location.assign('/continue_reading');
+          console.log('Method 2: Navigation initiated successfully');
+        } catch (error2) {
+          console.error('Method 2 failed:', error2);
+          try {
+            // Method 3: Using window.open in the same window
+            window.open('/continue_reading', '_self');
+            console.log('Method 3: Navigation initiated successfully');
+          } catch (error3) {
+            console.error('Method 3 failed:', error3);
+            // Method 4: Create a link and click it
+            console.log('Method 4: Creating link element');
+            const link = document.createElement('a');
+            link.href = '/continue_reading';
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            console.log('Method 4: Link clicked');
+          }
+        }
+      }
+    }
+    
+    function pauseReading() {
+      isReadingPaused = true;
+      
+      // Save current reading position
+      const storyContent = document.querySelector('.story-content');
+      if (storyContent) {
+        readingPosition = storyContent.scrollTop;
+        
+        // Create a persistent marker at the current position
+        createPersistentMarker(storyContent);
+        
+        // Save the actual reading progress to the server
+        const scrollHeight = storyContent.scrollHeight - storyContent.clientHeight;
+        const progress = scrollHeight > 0 ? Math.round((readingPosition / scrollHeight) * 100) : 0;
+        // Ensure progress is at least 1% so it appears in continue reading
+        const savedProgress = Math.max(1, progress);
+        const bookId = '{{ book.id }}';
+        saveReadingProgress(bookId, savedProgress);
+      }
+      
+      // Update button text
+      const pauseButton = document.getElementById('pauseButton');
+      if (pauseButton) {
+        pauseButton.innerHTML = '<i class="fas fa-play"></i> Resume Reading';
+        pauseButton.onclick = function() {
+          resumeReading();
+        };
+      }
+      
+      // Removed toast notification per user preference
+    }
+    
+    function createPersistentMarker(storyContent) {
+      // Remove any existing markers
+      removePersistentMarker();
+      
+      // Get the current scroll position
+      const scrollTop = storyContent.scrollTop;
+      const clientHeight = storyContent.clientHeight;
+      
+      // Calculate the middle of the visible area
+      const middlePosition = scrollTop + (clientHeight / 2);
+      
+      // Create a persistent marker element
+      persistentMarker = document.createElement('div');
+      persistentMarker.id = 'reading-marker';
+      
+      // Add a more prominent label to the marker
+      const label = document.createElement('div');
+      label.className = 'marker-label';
+      label.textContent = '▶ YOUR READING POSITION ◀';
+      persistentMarker.appendChild(label);
+      
+      // Add animation
+      persistentMarker.style.animation = 'pulse 2s infinite';
+      
+      // Position the marker at the middle of the visible area
+      persistentMarker.style.top = `${middlePosition}px`;
+      
+      // Add the marker to the story content
+      storyContent.appendChild(persistentMarker);
+    }
+    
+    function removePersistentMarker() {
+      // Remove existing marker if it exists
+      if (persistentMarker) {
+        persistentMarker.remove();
+        persistentMarker = null;
+      }
+    }
+    
+    function resumeReading() {
+      isReadingPaused = false;
+      
+      // Remove highlight
+      removeHighlight();
+      
+      // Scroll to saved position
+      const storyContent = document.querySelector('.story-content');
+      if (storyContent && readingPosition > 0) {
+        storyContent.scrollTo({ top: readingPosition, behavior: 'smooth' });
+        
+        // Show the marker briefly to confirm the position, then remove it
+        if (persistentMarker) {
+          // Keep the marker visible for a moment to confirm position
+          setTimeout(() => {
+            removePersistentMarker();
+          }, 3000); // Remove after 3 seconds
+        }
+      }
+      
+      // Update button text
+      const pauseButton = document.getElementById('pauseButton');
+      if (pauseButton) {
+        pauseButton.innerHTML = '<i class="fas fa-pause"></i> Pause Reading';
+        pauseButton.onclick = pauseReading;
+      }
+      
+      // Removed toast notification per user preference
+    }
+    
+    function updateReadingControls(isPaused) {
+      const pauseButton = document.getElementById('pauseButton');
+      const continueButton = document.getElementById('continueButton');
+      
+      if (isPaused) {
+        if (pauseButton) {
+          pauseButton.innerHTML = '<i class="fas fa-play"></i> Resume Reading';
+          pauseButton.onclick = function() {
+            resumeReading();
+          };
+        }
+      } else {
+        if (pauseButton) {
+          pauseButton.innerHTML = '<i class="fas fa-pause"></i> Pause Reading';
+          pauseButton.onclick = pauseReading;
+        }
+      }
+      
+      // Continue button should always be available for navigation to continue reading page
+      if (continueButton) {
+        continueButton.innerHTML = '<i class="fas fa-play"></i> Continue Reading';
+        continueButton.onclick = continueReading;
+      }
+    }
+    
+    // Search functionality for story content
+    let currentSearchIndex = 0;
+    let searchResults = [];
+    
+    function searchInStory() {
+      const searchTerm = document.getElementById('storySearch').value.trim();
+      const storyContent = document.querySelector('.story-content');
+      
+      if (!searchTerm) {
+        // If search term is empty, clear highlights
+        clearSearchHighlights();
+        hideSearchNavigation();
+        return;
+      }
+      
+      if (storyContent) {
+        // First, clear any existing highlights
+        clearSearchHighlights();
+        
+        // Store original content if not already stored
+        if (!storyContent.dataset.originalContent) {
+          storyContent.dataset.originalContent = storyContent.innerHTML;
+        }
+        
+        // Get the original text content
+        const originalHTML = storyContent.dataset.originalContent;
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = originalHTML;
+        const originalText = tempDiv.textContent || tempDiv.innerText;
+        const lowerText = originalText.toLowerCase();
+        const lowerSearchTerm = searchTerm.toLowerCase();
+        
+        // Find all occurrences of the search term
+        searchResults = [];
+        let startIndex = 0;
+        while (startIndex < lowerText.length) {
+          const index = lowerText.indexOf(lowerSearchTerm, startIndex);
+          if (index === -1) break;
+          searchResults.push({ start: index, end: index + lowerSearchTerm.length });
+          startIndex = index + 1;
+        }
+        
+        if (searchResults.length > 0) {
+          // Create highlighted HTML
+          let highlightedHTML = '';
+          let lastIndex = 0;
+          
+          for (let i = 0; i < searchResults.length; i++) {
+            const { start, end } = searchResults[i];
+            // Add text before the match
+            highlightedHTML += originalText.substring(lastIndex, start);
+            // Add highlighted match
+            const highlightClass = i === 0 ? 'search-highlight current' : 'search-highlight';
+            highlightedHTML += `<span class="${highlightClass}" style="background-color: #7c3aed; color: white; padding: 2px 4px; border-radius: 4px; font-weight: bold;">${originalText.substring(start, end)}</span>`;
+            lastIndex = end;
+          }
+          
+          // Add remaining text
+          highlightedHTML += originalText.substring(lastIndex);
+          
+          // Replace content with highlighted version
+          storyContent.innerHTML = highlightedHTML;
+          
+          // Reset current search index
+          currentSearchIndex = 0;
+          
+          // Show search navigation
+          showSearchNavigation();
+          
+          // Scroll to first match
+          const firstMatch = storyContent.querySelector('.search-highlight.current');
+          if (firstMatch) {
+            firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          
+          updateSearchPosition();
+          
+          // Removed toast notification per user preference
+        } else {
+          hideSearchNavigation();
+          // Removed toast notification per user preference
+        }
+      }
+    }
+    
+    function clearSearchHighlights() {
+      const storyContent = document.querySelector('.story-content');
+      if (storyContent && storyContent.dataset.originalContent) {
+        storyContent.innerHTML = storyContent.dataset.originalContent;
+        // Clear the stored original content
+        delete storyContent.dataset.originalContent;
+      }
+      searchResults = [];
+      currentSearchIndex = 0;
+      hideSearchNavigation();
+    }
+    
+    function clearSearchAndInput() {
+      const searchInput = document.getElementById('storySearch');
+      if (searchInput) {
+        searchInput.value = '';
+      }
+      clearSearchHighlights();
+    }
+    
+    function showSearchNavigation() {
+      const nav = document.getElementById('search-navigation');
+      if (nav) {
+        nav.style.display = 'block';
+      }
+    }
+    
+    function hideSearchNavigation() {
+      const nav = document.getElementById('search-navigation');
+      if (nav) {
+        nav.style.display = 'none';
+      }
+      const position = document.getElementById('search-position');
+      if (position) {
+        position.textContent = '0 of 0';
+      }
+    }
+    
+    function updateSearchPosition() {
+      const position = document.getElementById('search-position');
+      if (position && searchResults.length > 0) {
+        position.textContent = `${currentSearchIndex + 1} of ${searchResults.length}`;
+      }
+    }
+    
+    function nextSearchResult() {
+      if (searchResults.length === 0) return;
+      
+      const storyContent = document.querySelector('.story-content');
+      if (!storyContent) return;
+      
+      // Remove current class from current highlight
+      const currentHighlight = storyContent.querySelector('.search-highlight.current');
+      if (currentHighlight) {
+        currentHighlight.classList.remove('current');
+      }
+      
+      // Move to next result (wrap around if needed)
+      currentSearchIndex = (currentSearchIndex + 1) % searchResults.length;
+      
+      // Add current class to new highlight
+      const highlights = storyContent.querySelectorAll('.search-highlight');
+      if (highlights[currentSearchIndex]) {
+        highlights[currentSearchIndex].classList.add('current');
+        highlights[currentSearchIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      
+      updateSearchPosition();
+    }
+    
+    // Manual line highlighting functionality
+    let highlightedElement = null;
+    let highlightedPosition = null;
+    
+    function manualHighlightLine() {
+      const storyContent = document.getElementById('storyContent');
+      if (!storyContent) return;
+      
+      // Add click event listener to the story content for manual highlighting
+      storyContent.addEventListener('click', handleLineClick, { once: true });
+      
+      // Removed toast notification per user preference
+    }
+    
+    function handleLineClick(event) {
+      // Remove existing highlight
+      removeManualHighlight();
+      
+      // Create a highlight element
+      highlightedElement = document.createElement('div');
+      highlightedElement.id = 'manual-highlight';
+      highlightedElement.style.position = 'absolute';
+      highlightedElement.style.left = '0';
+      highlightedElement.style.right = '0';
+      highlightedElement.style.height = '30px';
+      highlightedElement.style.backgroundColor = 'rgba(124, 58, 237, 0.4)';
+      highlightedElement.style.border = '2px solid #7c3aed';
+      highlightedElement.style.borderRadius = '6px';
+      highlightedElement.style.zIndex = '999';
+      highlightedElement.style.pointerEvents = 'none';
+      highlightedElement.style.boxShadow = '0 0 10px rgba(124, 58, 237, 0.6)';
+      
+      // Position the highlight at the click position
+      const rect = event.currentTarget.getBoundingClientRect();
+      const scrollTop = event.currentTarget.scrollTop;
+      const y = event.clientY - rect.top + scrollTop;
+      
+      highlightedElement.style.top = `${y - 15}px`; // Center the highlight on the click position
+      highlightedPosition = y - 15;
+      
+      // Add the highlight to the story content
+      event.currentTarget.appendChild(highlightedElement);
+      
+      // Removed toast notification per user preference
+    }
+    
+    function removeManualHighlight() {
+      if (highlightedElement) {
+        highlightedElement.remove();
+        highlightedElement = null;
+        highlightedPosition = null;
+      }
+    }
+    
+    function removeHighlight() {
+      // Remove any existing highlights
+      const highlight = document.getElementById('manual-highlight');
+      if (highlight) {
+        highlight.remove();
+      }
+    }
+    
+    function prevSearchResult() {
+      if (searchResults.length === 0) return;
+      
+      const storyContent = document.querySelector('.story-content');
+      if (!storyContent) return;
+      
+      // Remove current class from current highlight
+      const currentHighlight = storyContent.querySelector('.search-highlight.current');
+      if (currentHighlight) {
+        currentHighlight.classList.remove('current');
+      }
+      
+      // Move to previous result (wrap around if needed)
+      currentSearchIndex = (currentSearchIndex - 1 + searchResults.length) % searchResults.length;
+      
+      // Add current class to new highlight
+      const highlights = storyContent.querySelectorAll('.search-highlight');
+      if (highlights[currentSearchIndex]) {
+        highlights[currentSearchIndex].classList.add('current');
+        highlights[currentSearchIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      
+      updateSearchPosition();
+    }
+    
+    // Clear highlights when search input is cleared
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('storySearch');
+      if (searchInput) {
+        // Trigger search on Enter key
+        searchInput.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            searchInStory();
+          }
+        });
+        
+        // Clear highlights when input is cleared
+        searchInput.addEventListener('input', function() {
+          if (this.value.trim() === '') {
+            clearSearchHighlights();
+          }
+        });
+      }
+    });
+    
+    // Zoom functionality - only zoom the story content area
+    let currentZoom = 1;
+    
+    function zoomIn() {
+      currentZoom += 0.1;
+      updateZoom();
+    }
+    
+    function zoomOut() {
+      if (currentZoom > 0.5) { // Minimum zoom level
+        currentZoom -= 0.1;
+        updateZoom();
+      }
+    }
+    
+    function resetZoom() {
+      currentZoom = 1;
+      updateZoom();
+    }
+    
+    function updateZoom() {
+      const storyContent = document.querySelector('.story-content');
+      if (storyContent) {
+        // Reset any existing transforms
+        storyContent.style.transform = '';
+        storyContent.style.zoom = '';
+        
+        // Apply scaling only to the story content
+        storyContent.style.transform = `scale(${currentZoom})`;
+        storyContent.style.transformOrigin = 'top left';
+        
+        // Adjust the container to accommodate the scaled content
+        storyContent.style.width = `${100 / currentZoom}%`;
+        storyContent.style.margin = '0 auto';
+      }
+    }
+    
+    // Update page count based on content length
+    function updatePageCount() {
+      const storyContent = document.querySelector('.story-content');
+      const pageInfo = document.getElementById('pageInfo');
+      
+      if (storyContent && pageInfo) {
+        // Estimate pages based on content height and average page height
+        const contentHeight = storyContent.scrollHeight;
+        const estimatedPageHeight = 800; // Approximate height per page in pixels
+        const pageCount = Math.max(1, Math.ceil(contentHeight / estimatedPageHeight));
+        
+        // For demonstration, we'll show a minimum of 20 pages
+        const displayPages = Math.max(20, pageCount);
+        pageInfo.textContent = `Page 1 of ${displayPages}`;
+      }
+    }
+    
+    // Update page count when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      // Small delay to ensure content is fully loaded
+      setTimeout(updatePageCount, 500);
+      
+      // Ensure the story section is hidden by default
+      const storySection = document.getElementById('storySection');
+      if (storySection) {
+        storySection.style.display = 'none';
+      }
+      
+      // Removed toast notification per user preference
+    });
+
+    function saveProgress() {
+      console.log('=== SAVE PROGRESS FUNCTION CALLED ==='); // Debug log
+      
+      // Test if function is working
+      // Removed toast notification per user preference
+      
+      // Save rating first if selected
+      const stars = document.querySelectorAll('.rating-star');
+      let rating = 0;
+      
+      // Find the highest selected star
+      for (let i = stars.length - 1; i >= 0; i--) {
+        const starColor = stars[i].style.color;
+        // Check for both possible color values
+        if (starColor === 'var(--accent-secondary)' || starColor === '#f59e0b' || 
+            starColor === 'rgb(245, 158, 11)' || starColor === 'rgb(255, 215, 0)') {
+          rating = parseInt(stars[i].getAttribute('data-rating'));
+          break;
+        }
+      }
+      
+      console.log('Selected rating:', rating); // Debug log
+      
+      // Save rating to backend if a rating was selected
+      if (rating > 0) {
+        const bookId = '{{ book.id }}';
+        console.log('Saving rating for book:', bookId); // Debug log
+        
+        // Log the request details
+        const requestData = { book_id: bookId, rating: rating };
+        console.log('Making request to /save_rating with data:', requestData);
+        
+        fetch('/save_rating', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestData),
+          credentials: 'same-origin' // Include cookies in the request
+        })
+        .then(response => {
+          console.log('Rating save response status:', response.status); // Debug log
+          console.log('Rating save response headers:', [...response.headers.entries()]); // Debug log
+          console.log('Rating save response ok:', response.ok); // Debug log
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Rating save response data:', data); // Debug log
+          if (data.success) {
+            // Show success message
+            const messageElement = document.getElementById('rating-message');
+            if (messageElement) {
+              messageElement.textContent = `Rating saved: ${rating} stars!`;
+              messageElement.style.color = '#10b981';
+            }
+            
+            // Removed toast notification per user preference
+          } else {
+            console.error('Failed to save rating:', data.message); // Debug log
+            // Removed toast notification per user preference
+          }
+        })
+        .catch(error => {
+          console.error('Error saving rating:', error);
+          console.error('Error details:', error.message, error.stack); // More detailed error logging
+          // Removed toast notification per user preference
+        });
+      } else {
+        console.log('No rating selected, skipping rating save'); // Debug log
+      }
+      
+      // Save feedback if there's text in the feedback textarea
+      const feedbackText = document.getElementById('feedbackText').value.trim();
+      if (feedbackText) {
+        const bookId = '{{ book.id }}';
+        console.log('Saving feedback for book:', bookId); // Debug log
+        
+        // Log the request details
+        const requestData = { book_id: bookId, feedback: feedbackText };
+        console.log('Making request to /save_feedback with data:', requestData);
+        
+        fetch('/save_feedback', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestData),
+          credentials: 'same-origin' // Include cookies in the request
+        })
+        .then(response => {
+          console.log('Feedback save response status:', response.status); // Debug log
+          console.log('Feedback save response headers:', [...response.headers.entries()]); // Debug log
+          console.log('Feedback save response ok:', response.ok); // Debug log
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Feedback save response data:', data); // Debug log
+          if (data.success) {
+            // Clear the feedback textarea
+            document.getElementById('feedbackText').value = '';
+            
+            // Show success message
+            const messageElement = document.getElementById('feedback-message');
+            if (messageElement) {
+              messageElement.textContent = 'Feedback saved successfully!';
+              messageElement.style.color = '#10b981';
+            }
+            
+            // Removed toast notification per user preference
+          } else {
+            console.error('Failed to save feedback:', data.message); // Debug log
+            const messageElement = document.getElementById('feedback-message');
+            if (messageElement) {
+              messageElement.textContent = data.message || 'Failed to save feedback';
+              messageElement.style.color = '#ef4444';
+            }
+            // Removed toast notification per user preference
+          }
+        })
+        .catch(error => {
+          console.error('Error saving feedback:', error);
+          console.error('Error details:', error.message, error.stack); // More detailed error logging
+          const messageElement = document.getElementById('feedback-message');
+          if (messageElement) {
+            messageElement.textContent = 'Error saving feedback: ' + error.message;
+            messageElement.style.color = '#ef4444';
+          }
+          // Removed toast notification per user preference
+        });
+      } else {
+        console.log('No feedback text, skipping feedback save'); // Debug log
+      }
+      
+      // Save current reading position and any other progress
+      const storyContent = document.querySelector('.story-content');
+      let currentPosition = 0;
+      let progressPercentage = 0;
+      
+      if (storyContent) {
+        currentPosition = storyContent.scrollTop;
+        const scrollHeight = storyContent.scrollHeight - storyContent.clientHeight;
+        progressPercentage = scrollHeight > 0 ? Math.round((currentPosition / scrollHeight) * 100) : 0;
+      }
+      
+      console.log('Saving reading position:', currentPosition); // Debug log
+      console.log('Saving reading progress:', progressPercentage); // Debug log
+      
+      // Save reading progress
+      const bookId = '{{ book.id }}';
+      saveReadingProgress(bookId, progressPercentage);
+      
+      // Show success message for progress save
+      // Removed toast notification per user preference
+      
+      console.log('=== SAVE PROGRESS COMPLETED ===');
+    }
+  </script>
+</body>
+</html>

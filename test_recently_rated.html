@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Recently Rated</title>
+</head>
+<body>
+    <h1>Test Recently Rated Books</h1>
+    <div id="recently-rated-list">
+        <p>Loading recently rated books...</p>
+    </div>
+
+    <script>
+        // Test function to load recently rated books
+        function loadRecentlyRatedBooks() {
+            console.log('=== LOADING RECENTLY RATED BOOKS ===');
+            const container = document.getElementById('recently-rated-list');
+            
+            // Show loading message
+            if (container) {
+                container.innerHTML = '<p>Loading recently rated books...</p>';
+            }
+            
+            fetch('http://127.0.0.1:5000/recently_rated', {
+                credentials: 'include' // Include cookies in the request
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (container) {
+                    if (data.success && data.recently_rated && data.recently_rated.length > 0) {
+                        // Clear loading message
+                        container.innerHTML = '<h2>Recently Rated Books:</h2>';
+                        
+                        // Create list of recently rated books
+                        const list = document.createElement('ul');
+                        data.recently_rated.forEach(book => {
+                            const item = document.createElement('li');
+                            item.innerHTML = `
+                                <strong>${book.title}</strong> by ${book.author}<br>
+                                Rating: ${book.rating}/5<br>
+                                Genre: ${book.genre}<br>
+                                Rated at: ${book.rated_at}
+                            `;
+                            list.appendChild(item);
+                        });
+                        
+                        container.appendChild(list);
+                    } else {
+                        container.innerHTML = '<p>No ratings yet</p>';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error loading recently rated books:', error);
+                if (container) {
+                    container.innerHTML = '<p>Error loading ratings: ' + error.message + '</p>';
+                }
+            });
+        }
+
+        // Load recently rated books when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRecentlyRatedBooks();
+        });
+    </script>
+</body>
+</html>

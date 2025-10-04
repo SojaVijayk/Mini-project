@@ -1,7 +1,14 @@
 // Toast Notification System
 class ToastNotification {
     constructor() {
-        this.createToastContainer();
+        // Only create container if DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                this.createToastContainer();
+            });
+        } else {
+            this.createToastContainer();
+        }
     }
 
     createToastContainer() {
@@ -114,25 +121,44 @@ class ToastNotification {
 }
 
 // Global toast manager
-const toastManager = new ToastNotification();
+let toastManager;
+
+// Initialize toast manager when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        toastManager = new ToastNotification();
+    });
+} else {
+    toastManager = new ToastNotification();
+}
 
 // Global functions for easy access
 function showToast(message, type = 'info', duration = 4000) {
-    toastManager.show(message, type, duration);
+    if (toastManager) {
+        toastManager.show(message, type, duration);
+    }
 }
 
 function showSuccess(message, duration = 4000) {
-    toastManager.success(message, duration);
+    if (toastManager) {
+        toastManager.success(message, duration);
+    }
 }
 
 function showError(message, duration = 5000) {
-    toastManager.error(message, duration);
+    if (toastManager) {
+        toastManager.error(message, duration);
+    }
 }
 
 function showWarning(message, duration = 4500) {
-    toastManager.warning(message, duration);
+    if (toastManager) {
+        toastManager.warning(message, duration);
+    }
 }
 
 function showInfo(message, duration = 4000) {
-    toastManager.info(message, duration);
+    if (toastManager) {
+        toastManager.info(message, duration);
+    }
 }

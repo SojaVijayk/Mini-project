@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Bot - Continue Reading</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+  <style>
+    :root {
+      --primary-color: #7c3aed;
+      --primary-light: #a855f7;
+      --primary-dark: #5b21b6;
+      --accent-color: #06d6a0;
+      --accent-light: #40e0d0;
+      --accent-secondary: #f59e0b;
+      --accent-tertiary: #ef4444;
+      --accent-quaternary: #10b981;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-tertiary: #f1f5f9;
+      --bg-sidebar: #1e293b;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --text-white: #ffffff;
+      --border-color: #e2e8f0;
+      --border-light: #f1f5f9;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-2xl: 20px;
+      --radius-full: 9999px;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+    
+    /* Sidebar Styling */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 280px;
+      height: 100vh;
+      background: linear-gradient(180deg, var(--bg-sidebar) 0%, #334155 100%);
+      color: var(--text-white);
+      padding: 2rem;
+      z-index: 100;
+      box-shadow: var(--shadow-xl);
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    
+    .sidebar-brand {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 3rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+      background: linear-gradient(135deg, var(--primary-light), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .sidebar-nav {
+      list-style: none;
+    }
+    
+    .sidebar-nav li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .sidebar-nav a {
+      display: block;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-lg);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .sidebar-nav a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transform: translateX(4px);
+    }
+    
+    .sidebar-nav a.active {
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      color: white;
+      font-weight: 600;
+    }
+    
+    /* Main Content Styling */
+    .main-content {
+      margin-left: 280px;
+      min-height: 100vh;
+    }
+    
+    .navbar {
+      background: var(--bg-primary);
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    
+    .navbar-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+    
+    .navbar-nav {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .navbar-nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .navbar-nav a[href*='profile'] {
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      color: white;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      padding: 0.75rem 1.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .navbar-nav a[href*='profile']:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .navbar-nav a:hover {
+      color: var(--primary-color);
+      background: var(--bg-tertiary);
+    }
+    
+    /* Search Bar Styling */
+    .search-container {
+      position: relative;
+      width: 300px;
+    }
+    
+    .search-bar {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-full);
+      background: var(--bg-secondary);
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+    
+    .search-bar:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+      background: var(--bg-primary);
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+    
+    /* Content Area Styling */
+    .content {
+      padding: 2rem;
+    }
+    
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-md);
+      background: var(--bg-secondary);
+      transition: all 0.2s ease;
+      margin-bottom: 2rem;
+    }
+    
+    .back-link:hover {
+      background: var(--primary-color);
+      color: white;
+      transform: translateY(-1px);
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .subtitle {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+    
+    /* Header with search */
+    .header-with-search {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    
+    /* Book List Styling */
+    .book-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    
+    .book-card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+    
+    .book-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary-color);
+    }
+    
+    .book-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .book-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 0.25rem;
+    }
+    
+    .book-author {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+    
+    .book-content {
+      padding: 1.5rem;
+    }
+    
+    .progress-container {
+      margin-bottom: 1.5rem;
+    }
+    
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .progress-bar {
+      height: 10px;
+      background: var(--border-color);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 5px;
+      transition: width 0.3s ease;
+    }
+    
+    .last-read {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+    
+    .book-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+    
+    .btn {
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      flex: 1;
+      justify-content: center;
+    }
+    
+    .btn-resume {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+      color: white;
+    }
+    
+    .btn-resume:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .btn-remove {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+    }
+    
+    .btn-remove:hover {
+      background: var(--accent-tertiary);
+      color: white;
+      border-color: var(--accent-tertiary);
+      transform: translateY(-1px);
+    }
+    
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3rem;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-xl);
+      border: 2px dashed var(--border-color);
+    }
+    
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: var(--text-muted);
+    }
+    
+    .empty-state-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+    
+    .empty-state-text {
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-block;
+    }
+    
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 968px) {
+      .sidebar {
+        display: none;
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .book-list {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      }
+      
+      .header-with-search {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      
+      .search-container {
+        width: 100%;
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .content {
+        padding: 1rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .book-list {
+        grid-template-columns: 1fr;
+      }
+      
+      .book-actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      📖 Book Bot
+    </div>
+    <nav>
+      <ul class="sidebar-nav">
+        <li><a href="{{ url_for('user_home') }}">🏠 Dashboard</a></li>
+        <li><a href="{{ url_for('recommended_books') }}">🎯 Recommended For You</a></li>
+        <li><a href="{{ url_for('explore_books') }}">🧭 Explore Categories</a></li>
+        <li><a href="{{ url_for('recently_rated_page') }}">⭐ Recently Rated</a></li>
+        <li><a href="{{ url_for('favorites') }}">❤️ Favorites</a></li>
+        <li><a href="{{ url_for('continue_reading_page') }}" class="active">📖 Continue Reading</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Navigation Bar -->
+    <div class="navbar">
+      <div class="container">
+        <div class="navbar-container">
+          <div class="navbar-brand">
+            📖 Book Bot
+          </div>
+          <div class="navbar-nav">
+            <a href="{{ url_for('profile') }}">👤 Profile</a>
+            <a href="{{ url_for('logout') }}">🚪 Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="content">
+      <a href="{{ url_for('user_home') }}" class="back-link">
+        ← Back to Dashboard
+      </a>
+      
+      <div class="header-with-search">
+        <div>
+          <h1>Welcome What will you read today?</h1>
+          <p class="subtitle">Pick up where you left off in your books</p>
+        </div>
+        <div class="search-container">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="search-bar" placeholder="Search for books...">
+        </div>
+      </div>
+      
+      <div class="book-list" id="bookList">
+        <!-- Books will be populated here dynamically -->
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      loadContinueReadingBooks();
+    });
+    
+    // Function to fetch and display "Continue Reading" books
+    function loadContinueReadingBooks() {
+      const bookList = document.getElementById('bookList');
+      
+      // Show loading message
+      bookList.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
+          <p>Loading your reading progress...</p>
+        </div>
+      `;
+      
+      // Fetch data from server
+      fetch('/continue_reading_books')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.continue_reading && data.continue_reading.length > 0) {
+            displayContinueReadingBooks(data.continue_reading);
+          } else {
+            bookList.innerHTML = `
+              <div class="empty-state">
+                <div class="empty-state-icon">📖</div>
+                <h3 class="empty-state-title">No Books in Progress</h3>
+                <p class="empty-state-text">You don't have any books in progress right now.</p>
+                <a href="{{ url_for('recommended_books') }}" class="btn-primary">Find Your Next Book</a>
+              </div>
+            `;
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching continue reading books:', error);
+          bookList.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">❌</div>
+              <h3 class="empty-state-title">Error Loading Books</h3>
+              <p class="empty-state-text">There was an error loading your reading progress. Please try again later.</p>
+              <button class="btn-primary" onclick="loadContinueReadingBooks()">Retry</button>
+            </div>
+          `;
+        });
+    }
+    
+    // Function to display "Continue Reading" books
+    function displayContinueReadingBooks(books) {
+      const bookList = document.getElementById('bookList');
+      
+      let html = '';
+      
+      books.forEach(book => {
+        // Format last read date
+        let lastReadText = '';
+        if (book.last_read) {
+          const lastReadDate = new Date(book.last_read);
+          const now = new Date();
+          const diffTime = Math.abs(now - lastReadDate);
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          
+          if (diffDays === 1) {
+            lastReadText = 'Yesterday';
+          } else if (diffDays < 7) {
+            lastReadText = `${diffDays} days ago`;
+          } else {
+            lastReadText = lastReadDate.toLocaleDateString();
+          }
+        }
+        
+        html += `
+          <div class="book-card">
+            <div class="book-header">
+              <h3 class="book-title">${book.title}</h3>
+              <div class="book-author">by ${book.author}</div>
+            </div>
+            <div class="book-content">
+              <div class="progress-container">
+                <div class="progress-label">
+                  <span>Progress</span>
+                  <span>${book.progress_percentage}%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${book.progress_percentage}%"></div>
+                </div>
+                ${lastReadText ? `<div class="last-read">Last read: ${lastReadText}</div>` : ''}
+              </div>
+              <div class="book-actions">
+                <button class="btn btn-resume" onclick="resumeReading(${book.book_id})">
+                  <i class="fas fa-play"></i> Resume
+                </button>
+                <button class="btn btn-remove" onclick="removeFromContinueReading(${book.book_id}, this)">
+                  <i class="fas fa-trash"></i> Remove
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      
+      bookList.innerHTML = html;
+    }
+    
+    // Function to resume reading a book
+    function resumeReading(bookId) {
+      // Redirect to book description page
+      window.location.href = `/book_description/${bookId}`;
+    }
+    
+    // Function to remove a book from continue reading
+    function removeFromContinueReading(bookId, buttonElement) {
+      console.log('Remove button clicked for book ID:', bookId);
+      
+      // Create custom confirmation modal
+      showCustomConfirm('Are you sure you want to remove this book from your reading progress?', () => {
+        console.log('User confirmed removal for book ID:', bookId);
+        
+        // Show loading state on the button
+        let originalText = '';
+        if (buttonElement) {
+          originalText = buttonElement.innerHTML;
+          buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Removing...';
+          buttonElement.disabled = true;
+          console.log('Button state updated for book ID:', bookId);
+        }
+        
+        // Reset progress to 0 to effectively remove it from continue reading list
+        console.log('Sending request to remove book ID:', bookId);
+        fetch('/save_reading_progress', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            book_id: bookId,
+            progress: 0
+          })
+        })
+        .then(response => {
+          console.log('Received response for book ID:', bookId, response);
+          return response.json();
+        })
+        .then(data => {
+          console.log('Parsed response data for book ID:', bookId, data);
+          if (data.success) {
+            console.log('Successfully removed book ID:', bookId);
+            // Remove the book card from the DOM immediately for better UX
+            if (buttonElement) {
+              const bookCard = buttonElement.closest('.book-card');
+              if (bookCard) {
+                bookCard.style.opacity = '0';
+                bookCard.style.transform = 'translateX(100px)';
+                bookCard.style.transition = 'all 0.3s ease';
+                setTimeout(() => {
+                  bookCard.remove();
+                  // Check if there are any books left
+                  const bookList = document.getElementById('bookList');
+                  if (bookList.children.length === 0) {
+                    bookList.innerHTML = `
+                      <div class="empty-state">
+                        <div class="empty-state-icon">📖</div>
+                        <h3 class="empty-state-title">No Books in Progress</h3>
+                        <p class="empty-state-text">You don't have any books in progress right now.</p>
+                        <a href="{{ url_for('recommended_books') }}" class="btn-primary">Find Your Next Book</a>
+                      </div>
+                    `;
+                  }
+                }, 300);
+              }
+            }
+            // Show success message with toast
+            if (typeof showSuccess === 'function') {
+              showSuccess('Book removed from reading progress');
+            } else {
+              console.log('Success: Book removed from reading progress');
+            }
+          } else {
+            console.log('Failed to remove book ID:', bookId, data.message);
+            // Restore button state if the operation failed
+            if (buttonElement) {
+              buttonElement.innerHTML = originalText;
+              buttonElement.disabled = false;
+            }
+            // Show error message with toast
+            if (typeof showError === 'function') {
+              showError(data.message || 'Failed to remove book from reading progress');
+            } else {
+              console.error('Error:', data.message || 'Failed to remove book from reading progress');
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error removing book from reading progress:', error);
+          // Restore button state if the operation failed
+          if (buttonElement) {
+            buttonElement.innerHTML = originalText;
+            buttonElement.disabled = false;
+          }
+          // Show error message with toast
+          if (typeof showError === 'function') {
+            showError('Error removing book from reading progress: ' + error.message);
+          } else {
+            alert('Error removing book from reading progress: ' + error.message);
+          }
+        });
+      });
+    }
+    
+    // Custom confirmation dialog function
+    function showCustomConfirm(message, callback) {
+      // Create modal overlay
+      const overlay = document.createElement('div');
+      overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      `;
+
+      // Create modal dialog
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        background: #1a1a1a;
+        color: #ffffff;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        text-align: center;
+        min-width: 300px;
+        max-width: 400px;
+        border: 2px solid #333;
+      `;
+
+      // Create message
+      const messageElement = document.createElement('p');
+      messageElement.textContent = message;
+      messageElement.style.cssText = `
+        margin: 0 0 1.5rem 0;
+        font-size: 1.1rem;
+        line-height: 1.5;
+      `;
+
+      // Create buttons container
+      const buttonsContainer = document.createElement('div');
+      buttonsContainer.style.cssText = `
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+      `;
+
+      // Create Cancel button
+      const cancelButton = document.createElement('button');
+      cancelButton.textContent = 'Cancel';
+      cancelButton.style.cssText = `
+        padding: 0.75rem 1.5rem;
+        border: 2px solid #666;
+        background: transparent;
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s ease;
+      `;
+      
+      cancelButton.addEventListener('mouseenter', () => {
+        cancelButton.style.backgroundColor = '#333';
+      });
+      
+      cancelButton.addEventListener('mouseleave', () => {
+        cancelButton.style.backgroundColor = 'transparent';
+      });
+
+      // Create Confirm button
+      const confirmButton = document.createElement('button');
+      confirmButton.textContent = 'Remove';
+      confirmButton.style.cssText = `
+        padding: 0.75rem 1.5rem;
+        border: none;
+        background: #ef4444;
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s ease;
+      `;
+      
+      confirmButton.addEventListener('mouseenter', () => {
+        confirmButton.style.background = '#dc2626';
+        confirmButton.style.transform = 'translateY(-2px)';
+      });
+      
+      confirmButton.addEventListener('mouseleave', () => {
+        confirmButton.style.background = '#ef4444';
+        confirmButton.style.transform = 'translateY(0)';
+      });
+
+      // Add event listeners
+      cancelButton.addEventListener('click', function() {
+        document.body.removeChild(overlay);
+      });
+
+      confirmButton.addEventListener('click', function() {
+        document.body.removeChild(overlay);
+        if (callback) callback();
+      });
+
+      // Assemble the modal
+      buttonsContainer.appendChild(cancelButton);
+      buttonsContainer.appendChild(confirmButton);
+      modal.appendChild(messageElement);
+      modal.appendChild(buttonsContainer);
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+    }
+  </script>
+</body>
+</html>

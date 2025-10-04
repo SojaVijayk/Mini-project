@@ -414,6 +414,22 @@
       transform: translateY(-2px);
       box-shadow: var(--shadow-md);
     }
+    
+    /* Style links with read-btn class to look like buttons */
+    a.read-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      border: none;
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
     /* Responsive Design */
     @media (max-width: 1200px) {
       .book-list {
@@ -508,11 +524,11 @@
     <h2><i class="fa-solid fa-book"></i> Book Bot</h2>
     <ul>
       <li data-href="{{ url_for('user_home') }}"><i class="fa fa-home"></i> Home</li>
-      <li class="active"><i class="fa fa-clock"></i> Recommended for you</li>
-      <li><i class="fa fa-compass"></i> Explore by category</li>
-      <li><i class="fa fa-star"></i> Recently rated</li>
+      <li data-href="{{ url_for('recommended_books') }}" class="active"><i class="fa fa-clock"></i> Recommended for you</li>
+      <li data-href="{{ url_for('explore_books') }}"><i class="fa fa-compass"></i> Explore by category</li>
+      <li data-href="{{ url_for('recently_rated_page') }}"><i class="fa fa-star"></i> Recently rated</li>
       <li data-href="{{ url_for('favorites') }}"><i class="fa fa-heart"></i> Favorites</li>
-      <li><i class="fa fa-play-circle"></i> Continue Reading</li>
+      <li data-href="{{ url_for('continue_reading_page') }}"><i class="fa fa-play-circle"></i> Continue Reading</li>
     </ul>
   </div>
 
@@ -549,11 +565,11 @@
       </div>
     </div>
 
-    <h2>Recommended Books Based on Your Preferences</h2>
+    <h2>Recommended Books For You</h2>
     {% if user.preferred_author or user.preferred_genre %}
       <div style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-tertiary); border-radius: var(--radius-lg); border-left: 4px solid var(--primary-color);">
         <p style="color: var(--text-secondary); font-weight: 500;">
-          📚 Showing recommendations based on your preferences: 
+          📚 Showing personalized recommendations based on your preferences: 
           {% if user.preferred_author %}<strong style="color: var(--primary-color);">{{ user.preferred_author }}</strong>{% endif %}
           {% if user.preferred_author and user.preferred_genre %} • {% endif %}
           {% if user.preferred_genre %}<strong style="color: var(--accent-color);">{{ user.preferred_genre }}</strong>{% endif %}
@@ -561,9 +577,13 @@
       </div>
     {% endif %}
 
-    <div class="book-list">
-      {% if recommended_books %}
-        {% for book in recommended_books %}
+    <!-- Top Trending Books Section -->
+    <h2>Top Trending</h2>
+    <div class="book-list" id="top-trending-books">
+      {% set top_trending_books = recommended_books | selectattr('recommendation_type', 'equalto', 'Top Trending') | list %}
+      {% if top_trending_books %}
+        {% for book in top_trending_books %}
+          {% if loop.index <= 5 %}  <!-- Limit to top 5 books -->
           <div class="book-card">
             <img src="{{ url_for('static', filename='images/default-book.jpg') }}" alt="{{ book.title }} Cover" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDI4MCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjI4MCIgaGVpZ2h0PSIyNTAiIGZpbGw9IiNmMWY1ZjkiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzY0NzQ4YiIgZm9udC1zaXplPSI0MHB4Ij7wn5OWPC90ZXh0Pjwvc3ZnPg=='">
             <div class="details">
@@ -571,35 +591,67 @@
               <p><strong>Author:</strong> {{ book.author }}</p>
               <p><strong>Genre:</strong> {{ book.genre }}</p>
               <p><strong>ISBN:</strong> {{ book.isbn }}</p>
-              <div>
-                <span class="stars">★★★★☆</span>
-                <span class="rating">4.2</span>
-              </div>
+              {% if book.avg_rating %}
+                <div>
+                  <span class="stars">{{ '★' * book.avg_rating|int }}{{ '☆' * (5 - book.avg_rating|int) }}</span>
+                  <span class="rating">{{ "%.1f"|format(book.avg_rating) }} ({{ book.rating_count }} ratings)</span>
+                </div>
+              {% else %}
+                <div>
+                  <span class="stars">★★★★☆</span>
+                  <span class="rating">4.2</span>
+                </div>
+              {% endif %}
             </div>
             <div class="actions">
               <button class="fav-btn" onclick="addToFavorites('{{ book.id }}')">
                 <i class="fa fa-heart"></i> Add to Favorites
               </button>
-              <button class="read-btn" onclick="readBook('{{ book.id }}')">
+              <a href="{{ url_for('book_description', book_id=book.id) }}" class="read-btn">
                 📖 Read Now
+              </a>
+            </div>
+          </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Based on Your Preferences Section -->
+    <h2>Based on Your Preferences</h2>
+    <div class="book-list" id="preference-books">
+      {% set preference_books = recommended_books | selectattr('recommendation_type', 'equalto', 'Based on Your Preferences') | list %}
+      {% if preference_books %}
+        {% for book in preference_books %}
+          <div class="book-card">
+            <img src="{{ url_for('static', filename='images/default-book.jpg') }}" alt="{{ book.title }} Cover" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDI4MCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjI4MCIgaGVpZ2h0PSIyNTAiIGZpbGw9IiNmMWY1ZjkiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzY0NzQ4YiIgZm9udC1zaXplPSI0MHB4Ij7wn5OWPC90ZXh0Pjwvc3ZnPg=='">
+            <div class="details">
+              <h3>{{ book.title }}</h3>
+              <p><strong>Author:</strong> {{ book.author }}</p>
+              <p><strong>Genre:</strong> {{ book.genre }}</p>
+              <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+              {% if book.avg_rating %}
+                <div>
+                  <span class="stars">{{ '★' * book.avg_rating|int }}{{ '☆' * (5 - book.avg_rating|int) }}</span>
+                  <span class="rating">{{ "%.1f"|format(book.avg_rating) }} ({{ book.rating_count }} ratings)</span>
+                </div>
+              {% else %}
+                <div>
+                  <span class="stars">★★★★☆</span>
+                  <span class="rating">4.2</span>
+                </div>
+              {% endif %}
+            </div>
+            <div class="actions">
+              <button class="fav-btn" onclick="addToFavorites('{{ book.id }}')">
+                <i class="fa fa-heart"></i> Add to Favorites
               </button>
+              <a href="{{ url_for('book_description', book_id=book.id) }}" class="read-btn">
+                📖 Read Now
+              </a>
             </div>
           </div>
         {% endfor %}
-      {% else %}
-        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: var(--bg-primary); border-radius: var(--radius-2xl); border: 2px dashed var(--border-color);">
-          <div style="font-size: 4rem; margin-bottom: 1rem;">📚</div>
-          <h3 style="color: var(--text-primary); margin-bottom: 1rem;">No Recommendations Yet</h3>
-          <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-            We're working on finding books based on your preferences. 
-            {% if not user.preferred_author and not user.preferred_genre %}
-              Please update your profile with preferred authors and genres to get personalized recommendations.
-            {% endif %}
-          </p>
-          <a href="{{ url_for('edit_profile') }}" style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); color: white; padding: 0.75rem 1.5rem; border-radius: var(--radius-lg); text-decoration: none; font-weight: 600;">
-            ✏️ Update Preferences
-          </a>
-        </div>
       {% endif %}
     </div>
   </div>
@@ -845,21 +897,31 @@
       }
 
     function readBook(bookId) {
-      // Add visual feedback
-      const button = event.target.closest('.read-btn');
-      const originalText = button.innerHTML;
+      // Debugging: Log the bookId to see what's being passed
+      console.log('Book ID received:', bookId);
+      console.log('Book ID type:', typeof bookId);
       
-      button.innerHTML = '📖 Opening...';
-      button.style.opacity = '0.7';
+      // Show loading message
+      if (typeof showInfo === 'function') {
+        showInfo('Loading book description...');
+      }
       
-      setTimeout(() => {
-        button.innerHTML = originalText;
-        button.style.opacity = '';
-        showInfo('Opening book reader... (Feature coming soon)');
-      }, 1000);
+      // Ensure bookId is a valid integer
+      const bookIdInt = parseInt(bookId);
+      console.log('Parsed book ID:', bookIdInt);
       
-      // Future: Add actual book reading functionality
-      console.log('Opening book reader for:', bookId);
+      if (isNaN(bookIdInt) || bookIdInt <= 0) {
+        console.error('Invalid book ID:', bookId);
+        if (typeof showError === 'function') {
+          showError('Invalid book ID. Please try again.');
+        }
+        return;
+      }
+      
+      // Navigate to book description page immediately
+      const url = `/book_description/${bookIdInt}`;
+      console.log('Navigating to URL:', url);
+      window.location.href = url;
     }
   </script>
 </body>

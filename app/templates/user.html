@@ -64,6 +64,8 @@
       padding: 2rem;
       z-index: 100;
       box-shadow: var(--shadow-xl);
+      overflow-y: auto;
+      overflow-x: hidden;
     }
     
     .sidebar-brand {
@@ -108,6 +110,109 @@
       font-weight: 600;
     }
     
+    /* Sidebar Dropdown Styling */
+    .sidebar-dropdown {
+      position: relative;
+      overflow: visible !important;
+    }
+    
+    .sidebar-dropdown-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      cursor: pointer;
+      position: relative;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-lg);
+      transition: all 0.2s ease;
+      background: transparent;
+    }
+    
+    .sidebar-dropdown-toggle:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar-dropdown.active .sidebar-dropdown-toggle {
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      color: white;
+      box-shadow: 0 0 15px rgba(124, 58, 237, 0.5);
+    }
+    
+    .sidebar-dropdown-arrow {
+      font-size: 0.8rem;
+      transition: transform 0.3s ease;
+      color: rgba(255, 255, 255, 0.7);
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    
+    .sidebar-dropdown.active .sidebar-dropdown-arrow {
+      transform: rotate(180deg);
+      color: var(--accent-color);
+      animation: none;
+    }
+    
+    .sidebar-dropdown-content {
+      display: none;
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.9), rgba(6, 214, 160, 0.9));
+      border: 2px solid var(--accent-color);
+      border-radius: var(--radius-md);
+      margin-top: 0.5rem;
+      overflow: visible !important;
+      z-index: 1000 !important;
+      position: relative;
+      min-width: 200px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+    }
+    
+    .sidebar-dropdown-content.show {
+      display: block !important;
+      overflow: visible !important;
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }
+    
+    .sidebar-dropdown-item {
+      display: block;
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: none;
+      padding: 0.75rem 1.5rem;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      border-left: 3px solid transparent;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      background: transparent;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .sidebar-dropdown-item:last-child {
+      border-bottom: none;
+    }
+    
+    .sidebar-dropdown-item:hover {
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color)) !important;
+      color: white !important;
+      border-left-color: var(--accent-color);
+      transform: translateX(4px);
+    }
+    
+    .sidebar-dropdown-item-icon {
+      margin-right: 0.5rem;
+      font-size: 1rem;
+    }
+    
     /* Main Content Styling */
     .main-content {
       margin-left: 280px;
@@ -131,12 +236,18 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      overflow: hidden;
+      position: relative;
     }
     
     .navbar-brand {
       font-size: 1.5rem;
       font-weight: 700;
       color: var(--primary-color);
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      max-width: 200px;
     }
     
     .navbar-nav {
@@ -277,6 +388,8 @@
     .grid {
       display: grid;
       gap: 1.5rem;
+      overflow: visible;
+      position: relative;
     }
     
     .md\:grid-cols-2 {
@@ -505,45 +618,130 @@
       font-style: italic;
     }
     
-    /* Quick Search Categories */
-    .quick-search-categories {
-      margin-top: 1.5rem;
+    /* Dropdown Menu Styling */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+    }
+    
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      min-width: 220px;
+      box-shadow: var(--shadow-xl);
+      z-index: 9999;
+      border-radius: var(--radius-lg);
+      border: 2px solid white;
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+    
+    .dropdown-content.show {
+      display: block !important;
+    }
+    
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      text-decoration: none;
+      color: white;
+      font-weight: 500;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: transparent;
+    }
+    
+    .dropdown-item:last-child {
+      border-bottom: none;
+    }
+    
+    .dropdown-item:hover {
+      background: rgba(255, 255, 255, 0.2) !important;
+      color: white !important;
+      transform: translateX(5px);
+    }
+    
+    .dropdown-item-icon {
+      margin-right: 0.75rem;
+      font-size: 1.2rem;
+      width: 20px;
       text-align: center;
     }
     
-    .category-label {
-      display: inline-block;
-      margin-bottom: 1rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-    }
-    
-    .category-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
-    
-    .category-btn {
-      padding: 0.5rem 1rem;
-      background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
-      border: 2px solid var(--border-color);
-      border-radius: var(--radius-full);
-      color: var(--text-secondary);
-      font-weight: 500;
-      font-size: 0.875rem;
+    .dropdown-toggle {
+      position: relative;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      width: 100%;
+      height: 100%;
+      display: block;
     }
     
-    .category-btn:hover {
-      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    .dropdown-arrow {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 1.4rem;
+      transition: transform 0.3s ease;
+      color: var(--text-secondary);
+      z-index: 3;
+      font-weight: bold;
+    }
+    
+    .dropdown.active .dropdown-arrow {
+      transform: rotate(180deg);
+      color: var(--primary-color);
+    }
+    
+    /* Ensure dropdown card doesn't interfere with other cards */
+    .card.dropdown {
+      overflow: visible;
+    }
+    
+    /* Simple bounce animation for dropdown indicator */
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-3px);
+      }
+      60% {
+        transform: translateY(-1px);
+      }
+    }
+    
+    /* Visual indicator badge for dropdown */
+    .dropdown-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: linear-gradient(135deg, var(--accent-secondary), var(--accent-tertiary));
       color: white;
-      border-color: var(--primary-color);
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 0.2rem 0.4rem;
+      border-radius: var(--radius-full);
+      z-index: 4;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      animation: bounce 2s infinite;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .dropdown:hover .dropdown-badge {
+      animation: none;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    }
+    
+    .dropdown.active .dropdown-badge {
+      display: none;
     }
 
     /* Mobile Responsive */
@@ -562,6 +760,12 @@
       
       .mobile-only {
         display: block;
+      }
+      
+      .navbar-brand {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
       
       .lg\:grid-cols-3 {
@@ -655,12 +859,31 @@
     </div>
     <nav>
       <ul class="sidebar-nav">
-        <li><a href="#" class="active">🏠 Dashboard</a></li>
+        <li><a href="{{ url_for('user_home') }}">🏠 Dashboard</a></li>
         <li><a href="{{ url_for('recommended_books') }}">🎯 Recommended For You</a></li>
-        <li><a href="#">🧭 Explore Categories</a></li>
-        <li><a href="#">⭐ Recently Rated</a></li>
+        <li class="sidebar-dropdown" id="sidebarExploreDropdown">
+          <a href="javascript:void(0)" class="sidebar-dropdown-toggle" onclick="toggleUserSidebarDropdown('sidebarExploreDropdown'); return false;">
+            <span>🧭 Explore Categories</span>
+            <span class="sidebar-dropdown-arrow">▼</span>
+          </a>
+          <div class="sidebar-dropdown-content" id="sidebarExploreDropdownContent">
+            <a href="{{ url_for('explore_authors') }}" class="sidebar-dropdown-item">
+              <span class="sidebar-dropdown-item-icon">✍️</span>
+              Explore by author
+            </a>
+            <a href="{{ url_for('explore_genres') }}" class="sidebar-dropdown-item">
+              <span class="sidebar-dropdown-item-icon">🎭</span>
+              Explore by genre
+            </a>
+            <a href="{{ url_for('explore_books') }}" class="sidebar-dropdown-item">
+              <span class="sidebar-dropdown-item-icon">📚</span>
+              Explore by book
+            </a>
+          </div>
+        </li>
+        <li><a href="{{ url_for('recently_rated_page') }}">⭐ Recently Rated</a></li>
         <li><a href="{{ url_for('favorites') }}">❤️ Favorites</a></li>
-        <li><a href="#">📖 Continue Reading</a></li>
+        <li><a href="{{ url_for('continue_reading_page') }}">📖 Continue Reading</a></li>
       </ul>
     </nav>
   </aside>
@@ -748,23 +971,26 @@
       </div>
 
       <!-- Action Cards -->
-      <div class="grid md:grid-cols-2 lg:grid-cols-3">
+      <div class="grid md:grid-cols-2 lg:grid-cols-3" style="position: relative; overflow: visible; z-index: 1;">
         <div class="card" data-href="{{ url_for('recommended_books') }}">
           <div class="card-icon">🎯</div>
           <h3>Recommended For You</h3>
           <p>Discover books tailored to your taste</p>
         </div>
-        
-        <div class="card">
+      
+        <div class="card" data-href="{{ url_for('explore_books') }}">
           <div class="card-icon">🧭</div>
           <h3>Explore Categories</h3>
           <p>Browse books by genre and topic</p>
         </div>
-        
-        <div class="card">
+      
+        <div class="card" data-href="{{ url_for('recently_rated_page') }}">
           <div class="card-icon">⭐</div>
           <h3>Recently Rated</h3>
           <p>See books you've recently reviewed</p>
+          <div id="recently-rated-list" style="margin-top: 1rem; text-align: center; padding: 1rem; color: var(--text-muted); display: none;">
+            <!-- Content hidden - click to view rated books -->
+          </div>
         </div>
         
         <div class="card" data-href="{{ url_for('favorites') }}">
@@ -773,7 +999,7 @@
           <p>Revisit your most loved books</p>
         </div>
         
-        <div class="card">
+        <div class="card" data-href="{{ url_for('continue_reading_page') }}">
           <div class="card-icon">📖</div>
           <h3>Continue Reading</h3>
           <p>Pick up where you left off</p>
@@ -812,6 +1038,80 @@
       } else {
         console.error('Logout button not found!'); // Debug log
       }
+      
+      // Test sidebar dropdown elements exist
+      const testSidebarExploreDropdown = document.getElementById('sidebarExploreDropdown');
+      const testSidebarExploreDropdownContent = document.getElementById('sidebarExploreDropdownContent');
+      if (testSidebarExploreDropdown && testSidebarExploreDropdownContent) {
+        console.log('✅ Sidebar dropdown elements found successfully');
+      } else {
+        console.error('❌ Sidebar dropdown elements NOT found!', {testSidebarExploreDropdown, testSidebarExploreDropdownContent});
+      }
+      
+      // Initialize sidebar dropdown functionality
+      function toggleUserSidebarDropdown(dropdownId) {
+        console.log('toggleUserSidebarDropdown called for:', dropdownId);
+        
+        const dropdown = document.getElementById(dropdownId);
+        const content = document.getElementById(dropdownId + 'Content');
+        
+        if (!dropdown || !content) {
+          console.error('Sidebar dropdown elements not found:', {dropdown, content});
+          return;
+        }
+        
+        // Close all other sidebar dropdowns first
+        const allSidebarDropdowns = document.querySelectorAll('.sidebar-dropdown');
+        allSidebarDropdowns.forEach(function(dd) {
+          if (dd.id !== dropdownId) {
+            dd.classList.remove('active');
+            const ddContent = dd.querySelector('.sidebar-dropdown-content');
+            if (ddContent) {
+              ddContent.classList.remove('show');
+            }
+          }
+        });
+        
+        // Toggle current dropdown
+        const isCurrentlyActive = dropdown.classList.contains('active');
+        
+        if (isCurrentlyActive) {
+          // Close dropdown
+          dropdown.classList.remove('active');
+          content.classList.remove('show');
+          console.log('Sidebar dropdown closed');
+        } else {
+          // Open dropdown
+          dropdown.classList.add('active');
+          content.classList.add('show');
+          console.log('Sidebar dropdown opened');
+        }
+      }
+      
+      // Make function globally available
+      window.toggleUserSidebarDropdown = toggleUserSidebarDropdown;
+      
+      // Handle card clicks for navigation
+      const cards = document.querySelectorAll('.card[data-href]');
+      cards.forEach(card => {
+        card.addEventListener('click', function() {
+          window.location.href = this.getAttribute('data-href');
+        });
+      });
+      
+      // Add click events to dropdown items to navigate
+      const dropdownItems = document.querySelectorAll('.dropdown-item');
+      dropdownItems.forEach(function(item) {
+        item.addEventListener('click', function(e) {
+          e.preventDefault();
+          const href = this.getAttribute('href');
+          if (href) {
+            window.location.href = href;
+          }
+        });
+      });
+      
+      // Search functionality
       const searchInput = document.getElementById('searchInput');
       const searchSuggestions = document.getElementById('searchSuggestions');
       const suggestionsList = document.getElementById('suggestionsList');
@@ -823,61 +1123,63 @@
       // Confirmation dialog for logout - Simplified approach
       // No need for event listeners since we're using direct onclick
       console.log('Logout functionality initialized'); // Debug log
-
-      // Handle card clicks for navigation
-      const cards = document.querySelectorAll('.card[data-href]');
-      cards.forEach(card => {
-        card.addEventListener('click', function() {
-          window.location.href = this.getAttribute('data-href');
-        });
-      });
-
-      // Search input event listeners
-      if (searchInput) {
-        searchInput.addEventListener('input', function() {
-          clearTimeout(debounceTimer);
-          debounceTimer = setTimeout(() => {
-            handleSearchInput(this.value.trim());
-          }, 300);
-        });
-
-        searchInput.addEventListener('focus', function() {
-          if (this.value.trim()) {
-            handleSearchInput(this.value.trim());
-          }
-        });
-
-        searchInput.addEventListener('keydown', function(e) {
-          const suggestions = suggestionsList.querySelectorAll('.suggestion-item');
+      
+      // Initialize sidebar dropdown functionality
+      const sidebarExploreDropdown = document.getElementById('sidebarExploreDropdown');
+      const sidebarExploreDropdownContent = document.getElementById('sidebarExploreDropdownContent');
+      
+      if (sidebarExploreDropdown && sidebarExploreDropdownContent) {
+        console.log('Sidebar dropdown elements found successfully');
+        console.log('Sidebar Dropdown:', sidebarExploreDropdown);
+        console.log('Sidebar Dropdown Content:', sidebarExploreDropdownContent);
+        
+        // Add hover effects to sidebar dropdown items
+        const sidebarDropdownItems = sidebarExploreDropdownContent.querySelectorAll('.sidebar-dropdown-item');
+        sidebarDropdownItems.forEach(item => {
+          item.addEventListener('mouseenter', function() {
+            this.style.background = 'linear-gradient(135deg, var(--primary-color), var(--accent-color))';
+            this.style.color = 'white';
+            this.style.borderLeftColor = '#06d6a0';
+          });
           
-          if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            currentFocus++;
-            if (currentFocus >= suggestions.length) currentFocus = 0;
-            updateFocus(suggestions);
-          } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            currentFocus--;
-            if (currentFocus < 0) currentFocus = suggestions.length - 1;
-            updateFocus(suggestions);
-          } else if (e.key === 'Enter') {
-            if (currentFocus > -1 && suggestions[currentFocus]) {
-              e.preventDefault();
-              suggestions[currentFocus].click();
-            }
-          } else if (e.key === 'Escape') {
-            hideSuggestions();
-          }
+          item.addEventListener('mouseleave', function() {
+            this.style.background = 'transparent';
+            this.style.color = 'rgba(255, 255, 255, 0.9)';
+            this.style.borderLeftColor = 'transparent';
+          });
         });
+        
+        // Test dropdown toggle function immediately
+        setTimeout(() => {
+          console.log('Testing dropdown toggle function...');
+          if (typeof toggleUserSidebarDropdown === 'function') {
+            console.log('toggleUserSidebarDropdown function is available');
+            // Test if dropdown elements are accessible
+            const testDropdown = document.getElementById('sidebarExploreDropdown');
+            const testContent = document.getElementById('sidebarExploreDropdownContent');
+            if (testDropdown && testContent) {
+              console.log('✅ Dropdown ready! Elements found:', {testDropdown, testContent});
+            } else {
+              console.error('❌ Dropdown elements missing after initialization');
+            }
+          } else {
+            console.error('toggleUserSidebarDropdown function is NOT available');
+          }
+        }, 1000);
+        
+      } else {
+        console.error('Sidebar dropdown elements not found!', {
+          sidebarExploreDropdown, 
+          sidebarExploreDropdownContent
+        });
+        
+        // Force show error after delay
+        setTimeout(() => {
+          alert('Sidebar dropdown initialization failed! Elements not found.');
+        }, 2000);
       }
 
-      // Hide suggestions when clicking outside
-      document.addEventListener('click', function(e) {
-        if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
-          hideSuggestions();
-        }
-      });
-
+      // Search functionality
       function handleSearchInput(query) {
         if (query.length < 2) {
           hideSuggestions();
@@ -959,118 +1261,245 @@
         searchSuggestions.classList.remove('show');
         currentFocus = -1;
       }
+      
+      // Event listeners for search
+      if (searchInput) {
+        searchInput.addEventListener('input', function() {
+          clearTimeout(this.debounce);
+          this.debounce = setTimeout(() => {
+            handleSearchInput(this.value.trim());
+          }, 300);
+        });
+
+        searchInput.addEventListener('focus', function() {
+          if (this.value.trim()) {
+            handleSearchInput(this.value.trim());
+          }
+        });
+
+        searchInput.addEventListener('keydown', function(e) {
+          const suggestions = suggestionsList.querySelectorAll('.suggestion-item');
+          
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            currentFocus++;
+            if (currentFocus >= suggestions.length) currentFocus = 0;
+            updateFocus(suggestions);
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            currentFocus--;
+            if (currentFocus < 0) currentFocus = suggestions.length - 1;
+            updateFocus(suggestions);
+          } else if (e.key === 'Enter') {
+            if (currentFocus > -1 && suggestions[currentFocus]) {
+              e.preventDefault();
+              suggestions[currentFocus].click();
+            }
+          } else if (e.key === 'Escape') {
+            hideSuggestions();
+          }
+        });
+      }
+
+      // Hide suggestions when clicking outside
+      document.addEventListener('click', function(e) {
+        if (searchInput && searchSuggestions && !searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
+          hideSuggestions();
+        }
+      });
+      
+      // Add event listener for recently rated link
+      const recentlyRatedLink = document.getElementById('recently-rated-link');
+      if (recentlyRatedLink) {
+        recentlyRatedLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = "{{ url_for('recently_rated_page') }}";
+        });
+      }
+      
+      // Load recently rated books on page load
+      // Removed loading recently rated books on dashboard as per user request
+      
+      // Load "Continue Reading" books
+      loadContinueReadingBooks();
     });
 
-    // Logout confirmation function - called directly from onclick
-    function handleLogout(event) {
-      event.preventDefault();
-      console.log('handleLogout called'); // Debug log
+    // Function to load "Continue Reading" books
+    function loadContinueReadingBooks() {
+      const continueReadingCard = document.getElementById('continue-reading-card');
+      const continueReadingContent = document.getElementById('continue-reading-content');
       
-      // Show confirmation modal with black styling
-      showLogoutConfirmation();
-    }
-    
-    // Handle logout via keyboard (Enter or Space)
-    function handleLogoutKeypress(event) {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        handleLogout(event);
+      if (!continueReadingCard || !continueReadingContent) {
+        console.error('Continue reading elements not found');
+        return;
       }
+      
+      // Add click event to the card to toggle content
+      continueReadingCard.addEventListener('click', function(e) {
+        // Don't toggle if clicking on a button within the content
+        if (e.target.tagName === 'BUTTON') return;
+        
+        if (continueReadingContent.style.display === 'none') {
+          // Show content
+          continueReadingContent.style.display = 'block';
+          // Load content if not already loaded
+          if (continueReadingContent.innerHTML.trim() === '') {
+            fetchContinueReadingBooks();
+          }
+        } else {
+          // Hide content
+          continueReadingContent.style.display = 'none';
+        }
+      });
     }
     
-    function showLogoutConfirmation() {
-      // Create confirmation modal
-      const modal = document.createElement('div');
-      modal.className = 'logout-modal';
-      modal.innerHTML = `
-          <div class="modal-content">
-              <h3>Confirm Logout</h3>
-              <p>Are you sure you want to logout?</p>
-              <div class="modal-buttons">
-                  <button class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
-                  <button class="btn-confirm" onclick="confirmLogout()">Logout</button>
+    // Function to fetch and display "Continue Reading" books
+    function fetchContinueReadingBooks() {
+      const continueReadingContent = document.getElementById('continue-reading-content');
+      
+      // Show loading message
+      continueReadingContent.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Loading your reading progress...</p>';
+      
+      // Fetch data from server
+      fetch('/continue_reading_books')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.continue_reading && data.continue_reading.length > 0) {
+            displayContinueReadingBooks(data.continue_reading);
+          } else {
+            continueReadingContent.innerHTML = `
+              <div style="text-align: center; padding: 1rem; color: var(--text-muted);">
+                <p>You don't have any books in progress.</p>
+                <p style="margin-top: 0.5rem;"><a href="{{ url_for('recommended_books') }}" style="color: var(--primary-color); text-decoration: none;">Find your next book to read</a></p>
               </div>
+            `;
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching continue reading books:', error);
+          continueReadingContent.innerHTML = `
+            <div style="text-align: center; padding: 1rem; color: var(--accent-tertiary);">
+              <p>Error loading reading progress. Please try again later.</p>
+            </div>
+          `;
+        });
+    }
+    
+    // Function to display "Continue Reading" books
+    function displayContinueReadingBooks(books) {
+      const continueReadingContent = document.getElementById('continue-reading-content');
+      
+      let html = `
+        <div style="max-height: 400px; overflow-y: auto; padding: 0.5rem;">
+          <h4 style="margin-bottom: 1rem; color: var(--primary-color); text-align: center;">Your Reading Progress</h4>
+      `;
+      
+      books.forEach(book => {
+        // Format last read date
+        let lastReadText = '';
+        if (book.last_read) {
+          const lastReadDate = new Date(book.last_read);
+          const now = new Date();
+          const diffTime = Math.abs(now - lastReadDate);
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          
+          if (diffDays === 1) {
+            lastReadText = 'Yesterday';
+          } else if (diffDays < 7) {
+            lastReadText = `${diffDays} days ago`;
+          } else {
+            lastReadText = lastReadDate.toLocaleDateString();
+          }
+        }
+        
+        html += `
+          <div style="display: flex; align-items: center; padding: 1rem; border-bottom: 1px solid var(--border-color); background: var(--bg-secondary); border-radius: var(--radius-md); margin-bottom: 0.5rem;">
+            <div style="flex: 1;">
+              <div style="font-weight: 600; margin-bottom: 0.25rem;">${book.title}</div>
+              <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">by ${book.author}</div>
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div style="flex: 1; height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden;">
+                  <div style="height: 100%; width: ${book.progress_percentage}%; background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); border-radius: 4px;"></div>
+                </div>
+                <div style="font-size: 0.8rem; font-weight: 600; color: var(--primary-color);">${book.progress_percentage}%</div>
+              </div>
+              ${lastReadText ? `<div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Last read: ${lastReadText}</div>` : ''}
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-left: 1rem;">
+              <button onclick="resumeReading(${book.book_id})" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white; border: none; border-radius: var(--radius-md); padding: 0.5rem 1rem; font-size: 0.9rem; cursor: pointer; font-weight: 500;">
+                Resume
+              </button>
+              <button onclick="removeFromContinueReading(${book.book_id})" style="background: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.5rem 1rem; font-size: 0.9rem; cursor: pointer;">
+                Remove
+              </button>
+            </div>
           </div>
-      `;
-      
-      // Add modal styles with click-outside-to-close
-      modal.style.cssText = `
-          position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7);
-          display: flex; align-items: center; justify-content: center; z-index: 10000;
-      `;
-      
-      // Close modal when clicking outside
-      modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-          closeLogoutModal();
-        }
+        `;
       });
       
-      // Close modal with Escape key
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-          closeLogoutModal();
-        }
-      });
-      
-      const content = modal.querySelector('.modal-content');
-      content.style.cssText = `
-          background: #1a1a1a; color: white; padding: 2rem; border-radius: 12px;
-          text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 400px; width: 90%;
-      `;
-      
-      const buttons = modal.querySelector('.modal-buttons');
-      buttons.style.cssText = 'display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: center;';
-      
-      const btnCancel = modal.querySelector('.btn-cancel');
-      btnCancel.style.cssText = `
-          padding: 0.75rem 1.5rem; border: 2px solid #666; background: transparent;
-          color: white; border-radius: 8px; cursor: pointer; font-weight: 600;
-      `;
-      
-      const btnConfirm = modal.querySelector('.btn-confirm');
-      btnConfirm.style.cssText = `
-          padding: 0.75rem 1.5rem; border: none; background: #ef4444;
-          color: white; border-radius: 8px; cursor: pointer; font-weight: 600;
-      `;
-      
-      document.body.appendChild(modal);
+      html += '</div>';
+      continueReadingContent.innerHTML = html;
     }
     
-    function closeLogoutModal() {
-      const modal = document.querySelector('.logout-modal');
-      if (modal) {
-        modal.remove();
-      }
+    // Function to resume reading a book
+    function resumeReading(bookId) {
+      // Redirect to book description page
+      window.location.href = `/book_description/${bookId}`;
     }
     
-    function confirmLogout() {
-      // Close modal first
-      closeLogoutModal();
-      
-      // Show toast notification (with fallback)
-      if (typeof showInfo === 'function') {
-        showInfo('Logging out...');
-      } else {
-        console.log('Logging out...'); // Fallback if toast.js not loaded
+    // Function to remove a book from continue reading
+    function removeFromContinueReading(bookId) {
+      if (confirm('Are you sure you want to remove this book from your reading progress?')) {
+        // Reset progress to 0 to effectively remove it from continue reading list
+        fetch('/save_reading_progress', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            book_id: bookId,
+            progress: 0
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Reload the continue reading section
+            fetchContinueReadingBooks();
+            if (typeof showSuccess === 'function') {
+              showSuccess('Book removed from reading progress');
+            }
+          } else {
+            if (typeof showError === 'function') {
+              showError(data.message || 'Failed to remove book from reading progress');
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error removing book from reading progress:', error);
+          if (typeof showError === 'function') {
+            showError('Error removing book from reading progress');
+          }
+        });
       }
-      
-      // Redirect to logout
-      setTimeout(() => {
-        window.location.href = "{{ url_for('logout') }}";
-      }, 1000);
     }
 
-    // Quick search function
-    function quickSearch(category) {
-      const searchInput = document.getElementById('searchInput');
-      const searchForm = document.getElementById('searchForm');
-      
-      if (searchInput && searchForm) {
-        searchInput.value = category;
-        searchForm.submit();
-      }
-    }
+    // Close sidebar dropdowns when clicking outside
+    document.addEventListener('click', function(event) {
+      // Close sidebar dropdowns
+      const sidebarDropdowns = document.querySelectorAll('.sidebar-dropdown');
+      sidebarDropdowns.forEach(dropdown => {
+        if (!dropdown.contains(event.target)) {
+          dropdown.classList.remove('active');
+          const content = dropdown.querySelector('.sidebar-dropdown-content');
+          if (content) {
+            content.classList.remove('show');
+          }
+        }
+      });
+    });
+    
+
   </script>
 
 </body>
