@@ -162,3 +162,67 @@ function showInfo(message, duration = 4000) {
         toastManager.info(message, duration);
     }
 }
+
+// Logout confirmation modal
+function showLogoutConfirmation(event) {
+    event.preventDefault();
+    
+    // Create confirmation modal
+    const modal = document.createElement('div');
+    modal.className = 'logout-modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h3>Confirm Logout</h3>
+            <p>Are you sure you want to logout?</p>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="this.closest('.logout-modal').remove()">Cancel</button>
+                <button class="btn-confirm" onclick="confirmLogout(); this.closest('.logout-modal').remove();">OK</button>
+            </div>
+        </div>
+    `;
+    
+    // Add modal styles
+    modal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7);
+        display: flex; align-items: center; justify-content: center; z-index: 10000;
+    `;
+    
+    const content = modal.querySelector('.modal-content');
+    content.style.cssText = `
+        background: #1a1a1a; color: white; padding: 2rem; border-radius: 12px;
+        text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 400px; width: 90%;
+    `;
+    
+    const buttons = modal.querySelector('.modal-buttons');
+    buttons.style.cssText = 'display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: center;';
+    
+    const btnCancel = modal.querySelector('.btn-cancel');
+    btnCancel.style.cssText = `
+        padding: 0.75rem 1.5rem; border: 2px solid #666; background: transparent;
+        color: white; border-radius: 8px; cursor: pointer; font-weight: 600;
+    `;
+    
+    const btnConfirm = modal.querySelector('.btn-confirm');
+    btnConfirm.style.cssText = `
+        padding: 0.75rem 1.5rem; border: none; background: #ef4444;
+        color: white; border-radius: 8px; cursor: pointer; font-weight: 600;
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+function confirmLogout() {
+    // Redirect to logout
+    window.location.href = '/logout';
+}
+
+// Add event listeners to all logout links when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Select all logout links
+    const logoutLinks = document.querySelectorAll('a[href*="logout"]');
+    
+    // Add click event listener to each logout link
+    logoutLinks.forEach(function(link) {
+        link.addEventListener('click', showLogoutConfirmation);
+    });
+});

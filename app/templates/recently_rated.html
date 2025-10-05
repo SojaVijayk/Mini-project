@@ -501,6 +501,7 @@
                   <span>${book.rated_at ? new Date(book.rated_at).toLocaleDateString() : 'N/A'}</span>
                 </div>
                 <div class="book-actions">
+                  <!-- Use the CSV serial_number for the URL since that's what the route expects -->
                   <a href="/book_description/${book.book_id}" class="btn btn-primary">
                     <i class="fas fa-book-open"></i> View Details
                   </a>

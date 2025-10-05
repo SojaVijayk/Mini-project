@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Bot - View Ratings</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #7c3aed;
+      --primary-light: #a855f7;
+      --primary-dark: #5b21b6;
+      --accent-color: #06d6a0;
+      --accent-light: #40e0d0;
+      --accent-secondary: #f59e0b;
+      --accent-tertiary: #ef4444;
+      --accent-quaternary: #10b981;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-muted: #f1f5f9;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --border-color: #e2e8f0;
+      --border-focus: #7c3aed;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-2xl: 20px;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: var(--text-primary);
+    }
+    
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 280px;
+      height: 100vh;
+      background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      padding: 2rem 0;
+      z-index: 1000;
+      box-shadow: var(--shadow-xl);
+    }
+    
+    .sidebar-brand {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: white;
+      text-align: center;
+      margin-bottom: 3rem;
+      padding: 0 1.5rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .sidebar-nav {
+      list-style: none;
+    }
+    
+    .sidebar-nav li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .sidebar-nav a {
+      display: block;
+      padding: 1rem 1.5rem;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      font-weight: 500;
+      border-left: 4px solid transparent;
+    }
+    
+    .sidebar-nav a:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-left-color: var(--accent-color);
+    }
+    
+    .sidebar-nav a.active {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: white;
+      border-left-color: var(--accent-color);
+      font-weight: 600;
+    }
+    
+    .main-content {
+      margin-left: 280px;
+      min-height: 100vh;
+      background: var(--bg-secondary);
+    }
+    
+    .navbar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 0;
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    
+    .navbar-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+    
+    .navbar-nav {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: var(--radius-lg);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+    }
+    
+    .btn-outline:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+    
+    .main-content .container {
+      padding: 3rem 2rem;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+      text-shadow: 0 2px 4px rgba(124, 58, 237, 0.1);
+    }
+    
+    .text-lg {
+      font-size: 1.125rem;
+      line-height: 1.6;
+    }
+    
+    .text-muted {
+      color: var(--text-secondary);
+    }
+    
+    .mb-4 {
+      margin-bottom: 2rem;
+    }
+    
+    .card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: 2.5rem;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+    }
+    
+    .table-container {
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-color);
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-primary);
+    }
+    
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    th {
+      background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.875rem;
+      letter-spacing: 0.05em;
+    }
+    
+    tr:last-child td {
+      border-bottom: none;
+    }
+    
+    tr:hover {
+      background-color: var(--bg-muted);
+    }
+    
+    .rating-stars {
+      color: var(--accent-secondary);
+      font-size: 1.2rem;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+    }
+    
+    .empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+    
+    .mobile-only {
+      display: none;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 968px) {
+      .container {
+        padding: 0 1.5rem;
+      }
+      
+      .main-content .container {
+        padding: 2rem 1.5rem;
+      }
+      
+      .card {
+        padding: 2rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      th, td {
+        padding: 0.75rem;
+        font-size: 0.875rem;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .mobile-only {
+        display: block;
+      }
+    }
+    /* Histogram Styles */
+    .histogram-container {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: 2rem;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+    }
+    
+    .histogram-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    
+    .histogram-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+    
+    .histogram-chart-container {
+      width: 100%;
+      max-width: 800px;
+      height: 350px;
+      position: relative;
+      margin: 2rem 0;
+      background: linear-gradient(to bottom, rgba(124, 58, 237, 0.02) 0%, transparent 100%);
+      border-radius: var(--radius-lg);
+    }
+    
+    .histogram-chart {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      padding: 30px 40px 50px 60px;
+      box-sizing: border-box;
+    }
+    
+    /* Grid lines */
+    .histogram-grid {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(to top, rgba(226, 232, 240, 0.5) 1px, transparent 1px),
+        linear-gradient(to right, rgba(226, 232, 240, 0.5) 1px, transparent 1px);
+      background-size: 20% 20%;
+      background-position: 0 0;
+      pointer-events: none;
+    }
+    
+    /* Axes */
+    .histogram-x-axis, .histogram-y-axis {
+      position: absolute;
+      background: var(--text-primary);
+      z-index: 2;
+    }
+    
+    .histogram-x-axis {
+      bottom: 0;
+      left: 60px;
+      width: calc(100% - 100px);
+      height: 3px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .histogram-y-axis {
+      left: 60px;
+      top: 0;
+      width: 3px;
+      height: calc(100% - 50px);
+      box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Axis labels */
+    .histogram-y-labels {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 50px;
+      width: 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: right;
+      padding-right: 10px;
+      box-sizing: border-box;
+    }
+    
+    .histogram-x-labels {
+      position: absolute;
+      bottom: 0;
+      left: 60px;
+      width: calc(100% - 100px);
+      height: 40px;
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-start;
+      font-size: 1rem;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    
+    .histogram-bar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 70px;
+      position: relative;
+      z-index: 3;
+    }
+    
+    .bar-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      position: relative;
+    }
+    
+    .bar {
+      width: 80%;
+      background: linear-gradient(to top, var(--primary-color), var(--primary-light));
+      border-radius: 6px 6px 0 0;
+      transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
+      position: relative;
+      box-shadow: 0 4px 6px rgba(124, 58, 237, 0.3);
+      min-height: 8px;
+      position: relative;
+      border: 1px solid var(--primary-light);
+    }
+    
+    .bar:hover {
+      background: linear-gradient(to top, var(--primary-dark), var(--primary-color));
+      transform: scale(1.05);
+      z-index: 10;
+      box-shadow: 0 6px 12px rgba(124, 58, 237, 0.4);
+    }
+    
+    .bar-value {
+      position: absolute;
+      top: -30px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.95);
+      padding: 0.3rem 0.6rem;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-md);
+      z-index: 5;
+      transform: translateX(-50%);
+      left: 50%;
+      min-width: 35px;
+      text-align: center;
+      border: 1px solid var(--border-color);
+    }
+    
+    .rating-label {
+      font-size: 1.2rem;
+      color: var(--accent-secondary);
+      font-weight: 800;
+      margin-top: 15px;
+      text-align: center;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Chart title */
+    .histogram-chart-title {
+      text-align: center;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-top: 1.5rem;
+      font-size: 1.1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-color);
+    }
+    
+    /* Enhanced bar intensity visualization */
+    .bar-intensity-indicator {
+      position: absolute;
+      top: -25px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-weight: bold;
+      color: var(--primary-color);
+      font-size: 0.8rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    /* Search Form Styles */
+    .search-form {
+      background: var(--bg-primary);
+      padding: 2rem;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+    }
+    
+    .form-group {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .form-input {
+      flex: 1;
+      padding: 1rem 1.5rem;
+      border: 2px solid var(--border-color);
+      border-radius: 50px;
+      font-size: 1rem;
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+    }
+    
+    .form-input::placeholder {
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      🛠️ Admin Panel
+    </div>
+    <nav>
+      <ul class="sidebar-nav">
+        <li><a href="{{ url_for('admin_home') }}">📋 Dashboard</a></li>
+        <li><a href="{{ url_for('view_registered_users') }}">👤 View User Profile</a></li>
+        <li><a href="{{ url_for('view_books') }}">📚 View Books</a></li>
+        <li><a href="{{ url_for('view_ratings') }}" class="active">⭐ View Ratings</a></li>
+        <li><a href="{{ url_for('view_feedback') }}">💬 View Feedback</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Navigation Bar -->
+    <div class="navbar">
+      <div class="container">
+        <div class="navbar-container">
+          <div class="navbar-brand mobile-only">
+            🛠️ Admin Panel
+          </div>
+          <div class="navbar-nav">
+            <a href="{{ url_for('logout') }}" class="btn btn-outline">🚪 Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="container">
+      <!-- Page Header -->
+      <div class="mb-4">
+        <h1>Book Ratings</h1>
+        {% if search_query %}
+          <p class="text-lg text-muted">Search results for "{{ search_query }}" - {{ ratings|length }} ratings found</p>
+        {% else %}
+          <p class="text-lg text-muted">View all user ratings for books in the system</p>
+        {% endif %}
+      </div>
+
+      <!-- Search Bar -->
+      <div class="mb-4">
+        <form method="GET" action="{{ url_for('view_ratings') }}" class="search-form">
+          <div class="form-group" style="display: flex; gap: 0.5rem;">
+            <input type="text" name="search" class="form-input" placeholder="Search by book title, ISBN, or book ID..." value="{{ search_query or '' }}" style="border-radius: 50px; padding-left: 1.5rem; flex: 1;" onkeypress="if(event.key==='Enter') this.form.submit();">
+            <button type="submit" class="btn btn-primary" style="border-radius: 50px; padding: 0.5rem 1.5rem;">🔍 Search</button>
+            {% if search_query %}
+              <a href="{{ url_for('view_ratings') }}" class="btn btn-outline" style="border-radius: 50px; padding: 0.5rem 1.5rem;">Clear</a>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+
+      <!-- Histogram Visualization -->
+      <div class="histogram-container">
+        <h2 class="histogram-title">Rating Distribution</h2>
+        {% if histogram %}
+          {% if search_query %}
+            <!-- Single Book Histogram (when searching for a specific book) -->
+            <div style="padding: 1rem 0;">
+              <h3 style="color: var(--primary-color); margin-bottom: 1rem; text-align: center;">Ratings for "{{ ratings[0].title }}"</h3>
+              <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">by {{ ratings[0].author }} (ISBN: {{ ratings[0].isbn }})</p>
+              
+              <!-- Small Histogram for Single Book -->
+              <div style="height: 200px; position: relative; margin: 1rem auto; background: linear-gradient(to bottom, rgba(124, 58, 237, 0.03) 0%, transparent 100%); border-radius: 8px; padding: 15px; max-width: 600px;">
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+                     background-image: linear-gradient(to top, rgba(226, 232, 240, 0.4) 1px, transparent 1px),
+                     linear-gradient(to right, rgba(226, 232, 240, 0.4) 1px, transparent 1px); 
+                     background-size: 20% 20%; pointer-events: none;"></div>
+                
+                <div style="position: absolute; bottom: 0; left: 50px; width: calc(100% - 60px); height: 3px; background: var(--text-primary); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);"></div>
+                <div style="position: absolute; left: 50px; top: 0; width: 3px; height: calc(100% - 30px); background: var(--text-primary); box-shadow: 1px 0 2px rgba(0, 0, 0, 0.1);"></div>
+                
+                <div style="position: absolute; left: 0; top: 0; bottom: 30px; width: 45px; 
+                     display: flex; flex-direction: column; justify-content: space-between; 
+                     font-size: 0.7rem; color: var(--text-muted); text-align: right; padding-right: 8px; box-sizing: border-box;">
+                  <div>100%</div>
+                  <div>75%</div>
+                  <div>50%</div>
+                  <div>25%</div>
+                  <div>0%</div>
+                </div>
+                
+                <div style="position: absolute; bottom: 0; left: 50px; width: calc(100% - 60px); height: 25px; 
+                     display: flex; justify-content: space-around; align-items: flex-start; 
+                     font-size: 1rem; color: var(--text-primary); font-weight: 600;">
+                  <div>1★</div>
+                  <div>2★</div>
+                  <div>3★</div>
+                  <div>4★</div>
+                  <div>5★</div>
+                </div>
+                
+                <div style="position: absolute; top: 0; left: 50px; width: calc(100% - 60px); height: calc(100% - 30px); 
+                     display: flex; align-items: flex-end; justify-content: space-around; padding-top: 20px; box-sizing: border-box;" id="single-book-histogram">
+                  {% for rating in range(1, 6) %}
+                    <div style="display: flex; flex-direction: column; align-items: center; width: 50px; position: relative; z-index: 3;">
+                      <div style="font-size: 0.9rem; color: var(--text-primary); margin-bottom: 8px; font-weight: 700; background: rgba(255, 255, 255, 0.95); padding: 0.3rem 0.5rem; border-radius: 5px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); z-index: 5; min-width: 30px; text-align: center; border: 1px solid var(--border-color);">{{ histogram[rating] or 0 }}</div>
+                      <div style="width: 85%; background: linear-gradient(to top, var(--primary-color), var(--primary-light)); 
+                           border-radius: 6px 6px 0 0; min-height: 8px; 
+                           transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 6px rgba(124, 58, 237, 0.3); border: 1px solid var(--primary-light); position: relative;" class="single-bar" data-rating="{{ rating }}" data-count="{{ histogram[rating] or 0 }}">
+                        <div style="position: absolute; top: -25px; left: 0; right: 0; text-align: center; font-weight: bold; color: var(--primary-color); font-size: 0.8rem; opacity: 1; transition: opacity 0.3s;">{{ histogram[rating] or 0 }}</div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+              
+              <div style="text-align: center; font-size: 1rem; color: var(--text-secondary); margin-top: 0.5rem; font-weight: 500;">
+                Distribution of ratings for this specific book
+              </div>
+            </div>
+          {% else %}
+            <!-- Show empty state or message when no specific book is selected -->
+            <div class="empty-state">
+              <div class="empty-state-icon">📊</div>
+              <h3>Search for a Specific Book</h3>
+              <p>Use the search bar above to find ratings for a specific book. The rating distribution will be displayed here as a small graph.</p>
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="empty-state">
+            <div class="empty-state-icon">📊</div>
+            <h3>No Rating Data Available</h3>
+            <p>There is no rating data to display in the histogram.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Ratings Table -->
+      <div class="card">
+        {% if ratings and ratings|length > 0 %}
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Book Title</th>
+                  <th>Author</th>
+                  <th>ISBN</th>
+                  <th>Rating</th>
+                  <th>Date Rated</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for rating in ratings %}
+                <tr>
+                  <td>{{ rating.username }}</td>
+                  <td>{{ rating.title }}</td>
+                  <td>{{ rating.author }}</td>
+                  <td>{{ rating.isbn }}</td>
+                  <td>
+                    <span class="rating-stars">
+                      {% for i in range(1, 6) %}
+                        {% if i <= rating.rating %}
+                          ★
+                        {% else %}
+                          ☆
+                        {% endif %}
+                      {% endfor %}
+                    </span>
+                    ({{ rating.rating }}/5)
+                  </td>
+                  <td>{{ rating.rated_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="empty-state">
+            <div class="empty-state-icon">⭐</div>
+            <h3>No Ratings Found</h3>
+            <p>There are no book ratings in the system yet.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </main>
+  <script>
+    // Set histogram bar heights dynamically
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if we're showing single book histogram
+      const singleBookHistogram = document.getElementById('single-book-histogram');
+      
+      if (singleBookHistogram) {
+        // Handle single book histogram
+        const singleBars = document.querySelectorAll('.single-bar');
+        let singleMaxCount = 0;
+        
+        // Find the maximum count for single book histogram
+        singleBars.forEach(bar => {
+          const count = parseInt(bar.getAttribute('data-count'));
+          if (count > singleMaxCount) singleMaxCount = count;
+        });
+        
+        // Set bar heights for single book histogram
+        singleBars.forEach(bar => {
+          const count = parseInt(bar.getAttribute('data-count'));
+          const height = singleMaxCount > 0 ? (count / singleMaxCount) * 100 : 0;
+          bar.style.height = Math.max(height, 5) + '%'; // Minimum height of 5% for visibility
+          
+          // Add color intensity based on count
+          const intensity = singleMaxCount > 0 ? (count / singleMaxCount) : 0;
+          const hue = 240; // Blue hue
+          const saturation = 50 + (intensity * 50); // 50-100% saturation
+          const lightness = 70 - (intensity * 30); // 70-40% lightness
+          bar.style.background = `linear-gradient(to top, hsl(${hue}, ${saturation}%, ${lightness}%), hsl(${hue}, ${saturation}%, ${lightness + 10}%))`;
+        });
+      } else {
+        // Handle main histogram
+        const bars = document.querySelectorAll('.bar');
+        let maxCount = 0;
+        
+        // Find the maximum count to scale the bars properly
+        bars.forEach(bar => {
+          const count = parseInt(bar.getAttribute('data-count'));
+          if (count > maxCount) maxCount = count;
+        });
+        
+        // Set bar heights based on percentage of maximum
+        bars.forEach(bar => {
+          const count = parseInt(bar.getAttribute('data-count'));
+          const height = maxCount > 0 ? (count / maxCount) * 100 : 0;
+          bar.style.height = Math.max(height, 5) + '%'; // Minimum height of 5% for visibility
+          
+          // Add color intensity based on count
+          const intensity = maxCount > 0 ? (count / maxCount) : 0;
+          const hue = 240; // Blue hue
+          const saturation = 50 + (intensity * 50); // 50-100% saturation
+          const lightness = 70 - (intensity * 30); // 70-40% lightness
+          bar.style.background = `linear-gradient(to top, hsl(${hue}, ${saturation}%, ${lightness}%), hsl(${hue}, ${saturation}%, ${lightness + 10}%))`;
+        });
+      }
+      
+      // Add click functionality to bars for more details
+      const allBars = document.querySelectorAll('.bar, .single-bar');
+      allBars.forEach(bar => {
+        bar.addEventListener('click', function() {
+          const rating = this.getAttribute('data-rating');
+          const count = this.getAttribute('data-count');
+          alert(`Rating: ${rating} stars\nCount: ${count} ratings`); // Show alert with rating details
+        });
+      });
+    });
+  </script>
+</body>
+</html>

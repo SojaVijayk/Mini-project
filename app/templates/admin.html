@@ -337,12 +337,32 @@
       left: 0;
       right: 0;
       background-color: var(--bg-primary);
-      border: 1px solid var(--border-color);
+      border: 2px solid var(--primary-color);
       border-radius: var(--radius-md);
       box-shadow: var(--shadow-xl);
       z-index: 1000;
       margin-top: 0.5rem;
       overflow: hidden;
+      min-width: 200px;
+      transform: translateY(0);
+      opacity: 1;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      color: white;
     }
     
     .dropdown-item {
@@ -445,8 +465,8 @@
             <li><a href="{{ url_for('add_book') }}">➕ Add Books</a></li>
           </ul>
         </li>
-        <li><a href="#">⭐ View Ratings</a></li>
-        <li><a href="#">💬 View Feedback</a></li>
+        <li><a href="{{ url_for('view_ratings') }}">⭐ View Ratings</a></li>
+        <li><a href="{{ url_for('view_feedback') }}">💬 View Feedback</a></li>
       </ul>
     </nav>
   </aside>
@@ -495,39 +515,37 @@
           </div>
         </a>
         
-        <div class="card dropdown-card" style="cursor: pointer; position: relative;" onclick="toggleDropdown(event)">
+        <div class="card" style="cursor: pointer; position: relative;">
           <div style="font-size: 3rem; margin-bottom: 1rem;">📚</div>
-          <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">Manage Books ▼</h3>
+          <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">Manage Books</h3>
           <p style="color: var(--text-secondary); font-size: 0.875rem;">Add, edit, and organize the book catalog effectively</p>
           
-          <!-- Dropdown Menu -->
-          <div class="dropdown-menu" id="booksDropdown">
-            <a href="{{ url_for('view_books') }}" class="dropdown-item">
-              👁️ View Books
-            </a>
-            <a href="{{ url_for('add_book') }}" class="dropdown-item">
-              ➕ Add Books
-            </a>
+          <!-- Direct Links -->
+          <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <a href="{{ url_for('view_books') }}" class="btn btn-primary" style="flex: 1; min-width: 120px; text-align: center; text-decoration: none; padding: 0.5rem; border-radius: var(--radius-sm);">👁️ View Books</a>
+            <a href="{{ url_for('add_book') }}" class="btn btn-primary" style="flex: 1; min-width: 120px; text-align: center; text-decoration: none; padding: 0.5rem; border-radius: var(--radius-sm); background-color: var(--accent-color);">➕ Add Books</a>
           </div>
         </div>
         
-        <div class="card" style="cursor: pointer;">
-          <div style="font-size: 3rem; margin-bottom: 1rem;">⭐</div>
-          <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">View Ratings</h3>
-          <p style="color: var(--text-secondary); font-size: 0.875rem;">Monitor and analyze all user ratings and reviews</p>
-        </div>
+        <a href="{{ url_for('view_ratings') }}" style="text-decoration: none; color: inherit;">
+          <div class="card" style="cursor: pointer;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">⭐</div>
+            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">View Ratings</h3>
+            <p style="color: var(--text-secondary); font-size: 0.875rem;">Monitor and analyze all user ratings and reviews</p>
+          </div>
+        </a>
         
-        <div class="card" style="cursor: pointer;">
-          <div style="font-size: 3rem; margin-bottom: 1rem;">💬</div>
-          <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">View Feedback</h3>
-          <p style="color: var(--text-secondary); font-size: 0.875rem;">Review and respond to user feedback and suggestions</p>
-        </div>
+        <a href="{{ url_for('view_feedback') }}" style="text-decoration: none; color: inherit;">
+          <div class="card" style="cursor: pointer;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">💬</div>
+            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">View Feedback</h3>
+            <p style="color: var(--text-secondary); font-size: 0.875rem;">Review and respond to user feedback and suggestions</p>
+          </div>
+        </a>
       </div>
     </div>
   </main>
 
-  <script src="{{ url_for('static', filename='js/validation.js') }}"></script>
-  
   <script>
     function toggleSidebarDropdown(event) {
       event.preventDefault();
@@ -544,34 +562,22 @@
       dropdown.style.display = isVisible ? 'none' : 'block';
     }
     
-    function toggleDropdown(event) {
-      event.stopPropagation();
-      const dropdown = document.getElementById('booksDropdown');
-      const isVisible = dropdown.style.display === 'block';
-      
-      // Close all other dropdowns
-      document.querySelectorAll('.dropdown-menu').forEach(menu => {
-        menu.style.display = 'none';
-      });
-      
-      // Toggle current dropdown
-      dropdown.style.display = isVisible ? 'none' : 'block';
-    }
+    // Removed unused dropdown functions
     
     // Close dropdown when clicking outside
     document.addEventListener('click', function(event) {
       if (!event.target.closest('.dropdown-card')) {
-        document.querySelectorAll('.dropdown-menu').forEach(menu => {
-          menu.style.display = 'none';
-        });
+        const dropdown = document.getElementById('booksDropdown');
+        if (dropdown) {
+          dropdown.style.display = 'none';
+        }
+        
+        // Also close sidebar dropdown if open
+        const sidebarDropdown = document.getElementById('sidebarBooksDropdown');
+        if (sidebarDropdown) {
+          sidebarDropdown.style.display = 'none';
+        }
       }
-    });
-    
-    // Prevent dropdown items from closing the dropdown
-    document.querySelectorAll('.dropdown-item').forEach(item => {
-      item.addEventListener('click', function(event) {
-        event.stopPropagation();
-      });
     });
   </script>
 

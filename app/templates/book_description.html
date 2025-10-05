@@ -656,7 +656,7 @@
         <li><a href="#">🧭 Explore Categories</a></li>
         <li><a href="{{ url_for('user_home') }}#recently-rated-section">⭐ Recently Rated</a></li>
         <li><a href="{{ url_for('favorites') }}">❤️ Favorites</a></li>
-        <li><a href="{{ url_for('continue_reading_page') }}">📖 Continue Reading</a></li>
+        <li><a href="{{ url_for('continue_reading_main_page') }}">📖 Continue Reading</a></li>
       </ul>
     </nav>
   </aside>
@@ -739,11 +739,11 @@
           
           <!-- Action Buttons -->
           <div class="action-buttons">
-            <button class="action-btn btn-favorite" onclick="addToFavorites('{{ book.id }}')">
+            <button class="action-btn btn-favorite" onclick="addToFavorites('{{ book.db_id }}')">
               <i class="fas fa-heart"></i>
               Add to Favorites
             </button>
-            <button class="action-btn btn-read" onclick="startReadingWithTracking('{{ book.id }}')">
+            <button class="action-btn btn-read" onclick="startReadingWithTracking('{{ book.db_id }}')">
               <i class="fas fa-book-reader"></i>
               Start Reading
             </button>
@@ -823,10 +823,7 @@
         
         <div class="story-footer">
           <div class="story-footer-content">
-            <div class="story-footer-buttons">
-              <button class="story-footer-button" @click="prevPage">Previous</button>
-              <button class="story-footer-button" @click="nextPage">Next</button>
-            </div>
+            <!-- Removed Previous and Next buttons as per user request -->
           </div>
         </div>
         
@@ -894,6 +891,9 @@
       const button = event.target.closest('.btn-favorite');
       const originalText = button.innerHTML;
       
+      // Use the database book_id
+      const dbBookId = '{{ book.db_id }}';
+      
       button.innerHTML = '<i class="fas fa-heart" style="color: #ef4444;"></i> Adding...';
       button.style.opacity = '0.7';
       
@@ -903,7 +903,7 @@
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ book_id: bookId })
+        body: JSON.stringify({ book_id: dbBookId })
       })
       .then(response => response.json())
       .then(data => {
@@ -917,7 +917,7 @@
           
           setTimeout(() => {
             button.innerHTML = '<i class="fas fa-heart-broken"></i> Remove from Favorites';
-            button.onclick = function() { removeFromFavorites(bookId); };
+            button.onclick = function() { removeFromFavorites(dbBookId); };
           }, 2000);
         } else {
           button.innerHTML = originalText;
@@ -937,6 +937,9 @@
       const button = event.target.closest('.btn-favorite');
       const originalText = button.innerHTML;
       
+      // Use the database book_id
+      const dbBookId = '{{ book.db_id }}';
+      
       button.innerHTML = '<i class="fas fa-heart-broken"></i> Removing...';
       button.style.opacity = '0.7';
       
@@ -946,7 +949,7 @@
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ book_id: bookId })
+        body: JSON.stringify({ book_id: dbBookId })
       })
       .then(response => response.json())
       .then(data => {
@@ -956,7 +959,7 @@
           button.style.color = '';
           button.style.border = '';
           button.style.opacity = '';
-          button.onclick = function() { addToFavorites(bookId); };
+          button.onclick = function() { addToFavorites(dbBookId); };
           
           // Removed toast notification per user preference
         } else {
@@ -981,7 +984,7 @@
     
     // Function to save reading progress
     function saveReadingProgress(bookId, progress) {
-      fetch('/save_reading_progress', {
+      return fetch('/save_reading_progress', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -996,10 +999,34 @@
         if (data.success) {
           console.log(`Reading progress saved: ${progress}%`);
         }
+        return data;
       })
       .catch(error => {
         console.error('Error saving reading progress:', error);
+        throw error;
       });
+    }
+    
+    // Function to load reading progress
+    function loadReadingProgress(bookId) {
+      fetch(`/get_reading_progress/${bookId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.progress !== null) {
+            // Scroll to the saved position when the page loads
+            const storyContent = document.querySelector('.story-content');
+            if (storyContent) {
+              // Calculate scroll position based on progress percentage
+              const scrollHeight = storyContent.scrollHeight - storyContent.clientHeight;
+              const scrollTop = (data.progress / 100) * scrollHeight;
+              storyContent.scrollTop = scrollTop;
+              console.log(`Reading position loaded: ${data.progress}%`);
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error loading reading progress:', error);
+        });
     }
     
     // Clean implementation of automatic scroll tracking for reading progress
@@ -1018,7 +1045,8 @@
         
         // Only save if progress has changed significantly (at least 2% difference)
         if (Math.abs(progress - lastSavedProgress) >= 2 || progress === 100) {
-          const bookId = '{{ book.id }}';
+          // Use the database book_id for reading progress
+          const bookId = '{{ book.db_id }}';  // Use database book_id
           saveReadingProgress(bookId, progress);
           lastSavedProgress = progress;
           console.log(`Reading progress automatically saved: ${progress}%`);
@@ -1076,8 +1104,9 @@
             storySection.scrollIntoView({ behavior: 'smooth' });
           }
           
-          // Load previous reading progress
-          loadReadingProgress(bookId);
+          // Load previous reading progress using the database book_id
+          const dbBookId = '{{ book.db_id }}';  // Use database book_id
+          loadReadingProgress(dbBookId);
           
           // Initialize scroll tracking after a short delay to ensure the story content is loaded
           setTimeout(initScrollTracking, 1500);
@@ -1096,40 +1125,33 @@
     }
     
     function continueReading() {
-      // Simple navigation to continue reading page
-      console.log('Continue reading button clicked');
-      console.log('Attempting to navigate to: /continue_reading');
-      
-      // Try multiple methods to ensure navigation works
-      try {
-        // Method 1: Direct assignment
+      // Save current reading progress before navigating
+      const storyContent = document.querySelector('.story-content');
+      if (storyContent) {
+        const scrollTop = storyContent.scrollTop;
+        const scrollHeight = storyContent.scrollHeight - storyContent.clientHeight;
+        const progress = scrollHeight > 0 ? Math.round((scrollTop / scrollHeight) * 100) : 0;
+        
+        // Ensure progress is at least 1% so it appears in continue reading
+        const savedProgress = Math.max(1, progress);
+        
+        // Use the database book_id
+        const bookId = '{{ book.db_id }}';
+        
+        // Save progress to server and wait for response before navigating
+        saveReadingProgress(bookId, savedProgress)
+          .then(() => {
+            // Navigate to continue reading page after saving progress
+            window.location.href = '/continue_reading';
+          })
+          .catch((error) => {
+            console.error('Error saving reading progress:', error);
+            // Still navigate to continue reading page even if save fails
+            window.location.href = '/continue_reading';
+          });
+      } else {
+        // If not in reading mode, just navigate to continue reading page
         window.location.href = '/continue_reading';
-        console.log('Method 1: Navigation initiated successfully');
-      } catch (error) {
-        console.error('Method 1 failed:', error);
-        try {
-          // Method 2: Using window.location.assign
-          window.location.assign('/continue_reading');
-          console.log('Method 2: Navigation initiated successfully');
-        } catch (error2) {
-          console.error('Method 2 failed:', error2);
-          try {
-            // Method 3: Using window.open in the same window
-            window.open('/continue_reading', '_self');
-            console.log('Method 3: Navigation initiated successfully');
-          } catch (error3) {
-            console.error('Method 3 failed:', error3);
-            // Method 4: Create a link and click it
-            console.log('Method 4: Creating link element');
-            const link = document.createElement('a');
-            link.href = '/continue_reading';
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            console.log('Method 4: Link clicked');
-          }
-        }
       }
     }
     
@@ -1149,7 +1171,8 @@
         const progress = scrollHeight > 0 ? Math.round((readingPosition / scrollHeight) * 100) : 0;
         // Ensure progress is at least 1% so it appears in continue reading
         const savedProgress = Math.max(1, progress);
-        const bookId = '{{ book.id }}';
+        // Use the database book_id
+        const bookId = '{{ book.db_id }}';
         saveReadingProgress(bookId, savedProgress);
       }
       
@@ -1613,8 +1636,9 @@
       console.log('Selected rating:', rating); // Debug log
       
       // Save rating to backend if a rating was selected
+      // Use the database book_id instead of the CSV serial_number
       if (rating > 0) {
-        const bookId = '{{ book.id }}';
+        const bookId = '{{ book.db_id }}';  // Use database book_id
         console.log('Saving rating for book:', bookId); // Debug log
         
         // Log the request details
@@ -1648,7 +1672,10 @@
               messageElement.style.color = '#10b981';
             }
             
-            // Removed toast notification per user preference
+            // Redirect to recently rated page after a short delay
+            setTimeout(() => {
+              window.location.href = '/recently_rated_page';
+            }, 1000);
           } else {
             console.error('Failed to save rating:', data.message); // Debug log
             // Removed toast notification per user preference
@@ -1666,7 +1693,8 @@
       // Save feedback if there's text in the feedback textarea
       const feedbackText = document.getElementById('feedbackText').value.trim();
       if (feedbackText) {
-        const bookId = '{{ book.id }}';
+        // Use the database book_id for feedback as well
+        const bookId = '{{ book.db_id }}';  // Use database book_id
         console.log('Saving feedback for book:', bookId); // Debug log
         
         // Log the request details
@@ -1742,8 +1770,8 @@
       console.log('Saving reading position:', currentPosition); // Debug log
       console.log('Saving reading progress:', progressPercentage); // Debug log
       
-      // Save reading progress
-      const bookId = '{{ book.id }}';
+      // Save reading progress using the database book_id
+      const bookId = '{{ book.db_id }}';  // Use database book_id
       saveReadingProgress(bookId, progressPercentage);
       
       // Show success message for progress save
@@ -1751,6 +1779,32 @@
       
       console.log('=== SAVE PROGRESS COMPLETED ===');
     }
+    
+    // Add event listeners to rating stars
+    document.addEventListener('DOMContentLoaded', function() {
+      const stars = document.querySelectorAll('.rating-star');
+      stars.forEach(star => {
+        star.addEventListener('click', function() {
+          const rating = parseInt(this.getAttribute('data-rating'));
+          
+          // Update star colors
+          stars.forEach((s, index) => {
+            if (index < rating) {
+              s.style.color = 'var(--accent-secondary)'; // or '#f59e0b'
+            } else {
+              s.style.color = 'var(--text-muted)';
+            }
+          });
+          
+          // Update rating message
+          const messageElement = document.getElementById('rating-message');
+          if (messageElement) {
+            messageElement.textContent = `You rated this book ${rating} star${rating > 1 ? 's' : ''}`;
+            messageElement.style.color = 'var(--accent-secondary)';
+          }
+        });
+      });
+    });
   </script>
 </body>
 </html>

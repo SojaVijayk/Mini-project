@@ -1465,7 +1465,7 @@ def save_reading_progress():
                 )
             else:
                 # Insert new progress record
-                print(f"Inserting new progress record for user_id: {session['user_id']}, book_id: {book_id}, progress: {progress}")  # Debug log
+                print(f"Inserting new progress record")  # Debug log
                 cur.execute(
                     "INSERT INTO reading_progress (user_id, book_id, progress_percentage) VALUES (%s, %s, %s)",
                     (session['user_id'], book_id, progress)
@@ -1589,14 +1589,11 @@ def continue_reading_books():
         return jsonify({'success': True, 'continue_reading_books': continue_reading_books})
         
     except Exception as e:
-        print(f"Error in continue_reading_books route: {str(e)}")  # Debug log
-        import traceback
-        traceback.print_exc()  # Print full traceback
         return jsonify({'success': False, 'message': 'An error occurred: ' + str(e)})
 
 # Route to serve the continue reading page
 @app.route("/continue_reading_page")
-def continue_reading_page_route():
+def continue_reading_page():
     if 'loggedin' not in session:
         flash("Please log in to view your continue reading books.", "error")
         return redirect(url_for('login'))
@@ -1605,14 +1602,14 @@ def continue_reading_page_route():
 
 # Route to serve the recently rated page
 @app.route("/recently_rated_page")
-def recently_rated_page_route():
+def recently_rated_page():
     if 'loggedin' not in session:
         flash("Please log in to view your recently rated books.", "error")
         return redirect(url_for('login'))
     
     return render_template('recently_rated.html', username=session.get('username', 'User'))
 
-# Route to get reading history for a user (including ratings and feedback)
+# Route to get reading history for a user
 @app.route("/reading_history")
 def reading_history():
     if 'loggedin' not in session:
@@ -1621,26 +1618,23 @@ def reading_history():
     try:
         cur = mysql.connection.cursor()
         
-        # Get all books with reading progress for this user
-        print(f"Fetching reading history for user_id: {session['user_id']}")  # Debug log
-        reading_history_books = []
-        
-        # Get books with reading progress
+        # Get all books with reading progress for this user, ordered by last read date
         cur.execute(
             """SELECT bt.book_id, bt.title, bt.author, bt.genre, bt.ISBN,
                       rp.progress_percentage,
                       rp.last_read
                FROM book_table bt
                JOIN reading_progress rp ON bt.book_id = rp.book_id
-               WHERE rp.user_id = %s AND rp.progress_percentage > 0
+               WHERE rp.user_id = %s 
+               AND rp.progress_percentage > 0
                ORDER BY rp.last_read DESC""",
             (session['user_id'],)
         )
-        reading_progress_data = cur.fetchall()
-        print(f"Found {len(reading_progress_data)} books with reading progress")  # Debug log
+        books_data = cur.fetchall()
+        cur.close()
         
-        # Add reading progress books to the list
-        for book in reading_progress_data:
+        reading_history_books = []
+        for book in books_data:
             book_info = {
                 'book_id': book[0],
                 'title': book[1],
@@ -1648,117 +1642,14 @@ def reading_history():
                 'genre': book[3],
                 'isbn': book[4],
                 'progress_percentage': book[5],
-                'last_read': book[6].isoformat() if book[6] else None,
-                'rating': None,
-                'feedback': None,
-                'feedback_date': None
+                'last_read': book[6].isoformat() if book[6] else None
             }
             reading_history_books.append(book_info)
-        
-        # Get books with ratings
-        cur.execute(
-            """SELECT bt.book_id, bt.title, bt.author, bt.genre, bt.ISBN,
-                      br.rating,
-                      br.rated_at
-               FROM book_table bt
-               JOIN book_ratings br ON bt.book_id = br.book_id
-               WHERE br.user_id = %s
-               ORDER BY br.rated_at DESC""",
-            (session['user_id'],)
-        )
-        ratings_data = cur.fetchall()
-        print(f"Found {len(ratings_data)} books with ratings")  # Debug log
-        
-        # Add ratings to existing books or create new entries
-        for book in ratings_data:
-            # Check if book already exists in reading_history_books
-            existing_book = None
-            for existing in reading_history_books:
-                if existing['book_id'] == book[0]:
-                    existing_book = existing
-                    break
-            
-            if existing_book:
-                # Update existing book with rating info
-                existing_book['rating'] = book[5]
-                existing_book['last_read'] = book[6].isoformat() if book[6] else existing_book['last_read']
-            else:
-                # Add new book with rating info
-                book_info = {
-                    'book_id': book[0],
-                    'title': book[1],
-                    'author': book[2],
-                    'genre': book[3],
-                    'isbn': book[4],
-                    'progress_percentage': 0,
-                    'last_read': book[6].isoformat() if book[6] else None,
-                    'rating': book[5],
-                    'feedback': None,
-                    'feedback_date': None
-                }
-                reading_history_books.append(book_info)
-        
-        # Get books with feedback
-        cur.execute(
-            """SELECT bt.book_id, bt.title, bt.author, bt.genre, bt.ISBN,
-                      bf.feedback_text,
-                      bf.submitted_at
-               FROM book_table bt
-               JOIN book_feedback bf ON bt.book_id = bf.book_id
-               WHERE bf.user_id = %s
-               ORDER BY bf.submitted_at DESC""",
-            (session['user_id'],)
-        )
-        feedback_data = cur.fetchall()
-        print(f"Found {len(feedback_data)} books with feedback")  # Debug log
-        cur.close()
-        
-        # Add feedback to existing books or create new entries
-        for book in feedback_data:
-            # Check if book already exists in reading_history_books
-            existing_book = None
-            for existing in reading_history_books:
-                if existing['book_id'] == book[0]:
-                    existing_book = existing
-                    break
-            
-            if existing_book:
-                # Update existing book with feedback info
-                existing_book['feedback'] = book[5]
-                existing_book['feedback_date'] = book[6].isoformat() if book[6] else existing_book['feedback_date']
-                if not existing_book['last_read']:
-                    existing_book['last_read'] = book[6].isoformat() if book[6] else None
-            else:
-                # Add new book with feedback info
-                book_info = {
-                    'book_id': book[0],
-                    'title': book[1],
-                    'author': book[2],
-                    'genre': book[3],
-                    'isbn': book[4],
-                    'progress_percentage': 0,
-                    'last_read': book[6].isoformat() if book[6] else None,
-                    'rating': None,
-                    'feedback': book[5],
-                    'feedback_date': book[6].isoformat() if book[6] else None
-                }
-                reading_history_books.append(book_info)
-        
-        # Sort by last_read date
-        reading_history_books.sort(key=lambda x: x['last_read'] if x['last_read'] else '', reverse=True)
-        
-        # Print debug info
-        for book in reading_history_books:
-            print(f"Book: {book['title']} (ID: {book['book_id']}) - Progress: {book['progress_percentage']}%, Rating: {book['rating']}, Feedback: {book['feedback']}")  # Debug log
         
         return jsonify({'success': True, 'reading_history': reading_history_books})
         
     except Exception as e:
-        print(f"Error in reading_history route: {str(e)}")  # Debug log
-        import traceback
-        traceback.print_exc()  # Print full traceback
         return jsonify({'success': False, 'message': 'An error occurred: ' + str(e)})
-
 
 # Route to serve the reading history page
 @app.route("/reading_history_page")
@@ -1768,9 +1659,23 @@ def reading_history_page():
         return redirect(url_for('login'))
     
     return render_template('reading_history.html', username=session.get('username', 'User'))
+
+# Route to save reading position
+                }
+                print(f"Additional book with position: {book_info['title']} (ID: {book_info['book_id']}) - Progress: {book_info['progress_percentage']}%")  # Debug log
+                continue_reading_books.append(book_info)
+        
+        return jsonify({'success': True, 'continue_reading': continue_reading_books})
+        
+    except Exception as e:
+        print(f"Error in continue_reading_books: {str(e)}")  # Debug log
+        import traceback
+        traceback.print_exc()  # Print full traceback
+        return jsonify({'success': False, 'message': 'An error occurred: ' + str(e)})
+
 # Route to serve the continue reading page
 @app.route("/continue_reading")
-def continue_reading_main_page():
+def continue_reading_page():
     if 'loggedin' not in session:
         flash("Please log in to view your reading progress.", "error")
         return redirect(url_for('login'))

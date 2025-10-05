@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Book Bot - Continue Reading</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Bot - Reading History</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
   <style>
@@ -50,7 +51,7 @@
       color: var(--text-primary);
       line-height: 1.6;
     }
-    
+
     /* Sidebar Styling */
     .sidebar {
       position: fixed;
@@ -63,8 +64,6 @@
       padding: 2rem;
       z-index: 100;
       box-shadow: var(--shadow-xl);
-      overflow-y: auto;
-      overflow-x: hidden;
     }
     
     .sidebar-brand {
@@ -102,13 +101,13 @@
       color: white;
       transform: translateX(4px);
     }
-    
+
     .sidebar-nav a.active {
       background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
       color: white;
       font-weight: 600;
     }
-    
+
     /* Main Content Styling */
     .main-content {
       margin-left: 280px;
@@ -154,80 +153,15 @@
       font-weight: 500;
       transition: all 0.2s ease;
     }
-
-    .navbar-nav a[href*='profile'] {
-      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-      color: white;
-      font-weight: 600;
-      border-radius: var(--radius-md);
-      padding: 0.75rem 1.5rem;
-      transition: all 0.2s ease;
-    }
-
-    .navbar-nav a[href*='profile']:hover {
-      filter: brightness(1.1);
-      transform: translateY(-1px);
-    }
-
+    
     .navbar-nav a:hover {
       color: var(--primary-color);
       background: var(--bg-tertiary);
     }
-    
-    /* Search Bar Styling */
-    .search-container {
-      position: relative;
-      width: 300px;
-    }
-    
-    .search-bar {
-      width: 100%;
-      padding: 0.75rem 1rem 0.75rem 2.5rem;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-full);
-      background: var(--bg-secondary);
-      font-size: 0.9rem;
-      transition: all 0.2s ease;
-    }
-    
-    .search-bar:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
-      background: var(--bg-primary);
-    }
-    
-    .search-icon {
-      position: absolute;
-      left: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-    }
-    
+
     /* Content Area Styling */
     .content {
-      padding: 2rem;
-    }
-    
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--primary-color);
-      text-decoration: none;
-      font-weight: 500;
-      padding: 0.75rem 1.5rem;
-      border-radius: var(--radius-md);
-      background: var(--bg-secondary);
-      transition: all 0.2s ease;
-      margin-bottom: 2rem;
-    }
-    
-    .back-link:hover {
-      background: var(--primary-color);
-      color: white;
-      transform: translateY(-1px);
+      padding: 2rem 0;
     }
     
     h1 {
@@ -241,17 +175,15 @@
       background-clip: text;
     }
     
-    .subtitle {
+    .text-lg {
       font-size: 1.125rem;
-      color: var(--text-secondary);
-      margin-bottom: 2rem;
     }
     
-    /* Header with search */
-    .header-with-search {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .text-muted {
+      color: var(--text-muted);
+    }
+    
+    .mb-4 {
       margin-bottom: 2rem;
     }
     
@@ -260,16 +192,19 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 1.5rem;
-      margin-top: 1rem;
+      margin-top: 2rem;
     }
     
     .book-card {
       background: var(--bg-primary);
       border-radius: var(--radius-xl);
+      padding: 1.5rem;
       box-shadow: var(--shadow-md);
       border: 1px solid var(--border-color);
-      overflow: hidden;
       transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
     }
     
     .book-card:hover {
@@ -279,29 +214,44 @@
     }
     
     .book-header {
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    
+    .book-icon {
+      font-size: 2rem;
+      color: var(--primary-color);
     }
     
     .book-title {
       font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--primary-color);
-      margin-bottom: 0.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
     }
     
     .book-author {
-      font-size: 0.9rem;
+      font-size: 1rem;
       color: var(--text-secondary);
       margin-bottom: 0.5rem;
     }
     
-    .book-content {
-      padding: 1.5rem;
+    .book-genre {
+      display: inline-block;
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-full);
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
     }
     
+    /* Progress Container */
     .progress-container {
-      margin-bottom: 1.5rem;
+      margin: 1.5rem 0;
     }
     
     .progress-label {
@@ -309,6 +259,7 @@
       justify-content: space-between;
       margin-bottom: 0.5rem;
       font-size: 0.9rem;
+      color: var(--text-secondary);
     }
     
     .progress-bar {
@@ -329,15 +280,27 @@
       font-size: 0.8rem;
       color: var(--text-muted);
       margin-top: 0.5rem;
+      text-align: right;
+    }
+    
+    .book-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-light);
+      color: var(--text-muted);
+      font-size: 0.9rem;
     }
     
     .book-actions {
       display: flex;
-      gap: 0.75rem;
+      gap: 0.5rem;
+      margin-top: 1rem;
     }
     
     .btn {
-      padding: 0.75rem 1rem;
+      padding: 0.5rem 1rem;
       border: none;
       border-radius: var(--radius-md);
       font-size: 0.9rem;
@@ -348,75 +311,68 @@
       align-items: center;
       gap: 0.5rem;
       transition: all 0.2s ease;
-      flex: 1;
-      justify-content: center;
     }
     
-    .btn-resume {
+    .btn-primary {
       background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
       color: white;
     }
     
-    .btn-resume:hover {
+    .btn-primary:hover {
       background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
       transform: translateY(-1px);
       box-shadow: var(--shadow-md);
     }
     
+    .btn-outline {
+      background: transparent;
+      color: var(--primary-color);
+      border: 2px solid var(--primary-color);
+    }
+    
+    .btn-outline:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+    
     .btn-remove {
       background: transparent;
-      color: var(--text-secondary);
-      border: 1px solid var(--border-color);
+      color: var(--accent-tertiary);
+      border: 2px solid var(--accent-tertiary);
     }
     
     .btn-remove:hover {
       background: var(--accent-tertiary);
       color: white;
-      border-color: var(--accent-tertiary);
-      transform: translateY(-1px);
     }
     
+    /* Empty State */
     .empty-state {
-      grid-column: 1 / -1;
       text-align: center;
       padding: 3rem;
-      background: var(--bg-secondary);
+      background: var(--bg-primary);
       border-radius: var(--radius-xl);
-      border: 2px dashed var(--border-color);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-color);
+      grid-column: 1 / -1;
     }
     
-    .empty-state-icon {
-      font-size: 3rem;
+    .empty-icon {
+      font-size: 4rem;
       margin-bottom: 1rem;
       color: var(--text-muted);
     }
     
-    .empty-state-title {
+    .empty-title {
       font-size: 1.5rem;
       font-weight: 600;
-      color: var(--text-primary);
       margin-bottom: 0.5rem;
+      color: var(--text-primary);
     }
     
-    .empty-state-text {
+    .empty-description {
       color: var(--text-secondary);
       margin-bottom: 1.5rem;
-    }
-    
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border-radius: var(--radius-md);
-      text-decoration: none;
-      font-weight: 600;
-      display: inline-block;
-    }
-    
-    .btn-primary:hover {
-      filter: brightness(1.1);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-md);
     }
     
     /* Mobile Responsive */
@@ -432,21 +388,11 @@
       .book-list {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       }
-      
-      .header-with-search {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-      }
-      
-      .search-container {
-        width: 100%;
-      }
     }
     
     @media (max-width: 640px) {
-      .content {
-        padding: 1rem;
+      .container {
+        padding: 0 1rem;
       }
       
       h1 {
@@ -455,10 +401,6 @@
       
       .book-list {
         grid-template-columns: 1fr;
-      }
-      
-      .book-actions {
-        flex-direction: column;
       }
     }
   </style>
@@ -473,10 +415,29 @@
       <ul class="sidebar-nav">
         <li><a href="{{ url_for('user_home') }}">🏠 Dashboard</a></li>
         <li><a href="{{ url_for('recommended_books') }}">🎯 Recommended For You</a></li>
-        <li><a href="{{ url_for('explore_books') }}">🧭 Explore Categories</a></li>
+        <li class="sidebar-dropdown" id="sidebarExploreDropdown">
+          <a href="javascript:void(0)" class="sidebar-dropdown-toggle" onclick="toggleUserSidebarDropdown('sidebarExploreDropdown'); return false;">
+            <span>🧭 Explore Categories</span>
+            <span class="sidebar-dropdown-arrow">▼</span>
+          </a>
+          <div class="sidebar-dropdown-content" id="sidebarExploreDropdownContent">
+            <a href="{{ url_for('explore_authors') }}" class="sidebar-dropdown-item">
+              <span class="sidebar-dropdown-item-icon">✍️</span>
+              Explore by author
+            </a>
+            <a href="{{ url_for('explore_genres') }}" class="sidebar-dropdown-item">
+              <span class="sidebar-dropdown-item-icon">🎭</span>
+              Explore by genre
+            </a>
+            <a href="{{ url_for('explore_books') }}" class="sidebar-dropdown-item">
+              <span class="sidebar-dropdown-item-icon">📚</span>
+              Explore by book
+            </a>
+          </div>
+        </li>
         <li><a href="{{ url_for('recently_rated_page') }}">⭐ Recently Rated</a></li>
         <li><a href="{{ url_for('favorites') }}">❤️ Favorites</a></li>
-        <li><a href="{{ url_for('continue_reading_main_page') }}" class="active">📖 Continue Reading</a></li>
+        <li><a href="{{ url_for('continue_reading_main_page') }}">📖 Continue Reading</a></li>
       </ul>
     </nav>
   </aside>
@@ -498,157 +459,165 @@
       </div>
     </div>
 
-    <!-- Content Area -->
-    <div class="content">
-      <a href="{{ url_for('user_home') }}" class="back-link">
-        ← Back to Dashboard
-      </a>
-      
-      <div class="header-with-search">
-        <div>
-          <h1>Welcome What will you read today?</h1>
-          <p class="subtitle">Pick up where you left off in your books</p>
-        </div>
-        <div class="search-container">
-          <span class="search-icon">🔍</span>
-          <input type="text" class="search-bar" placeholder="Search for books...">
-        </div>
+    <!-- Main Content Area -->
+    <div class="container">
+      <!-- Page Header -->
+      <div class="mb-4">
+        <h1>Reading History</h1>
+        <p class="text-lg text-muted">Your reading progress and history</p>
       </div>
-      
-      <div class="book-list" id="bookList">
-        <!-- Books will be populated here dynamically -->
+
+      <!-- Reading History Books List -->
+      <div class="book-list" id="readingHistoryBooks">
+        <!-- Books will be loaded here dynamically -->
+        <div class="loading" style="text-align: center; padding: 2rem; grid-column: 1 / -1;">
+          <p>Loading reading history...</p>
+        </div>
       </div>
     </div>
   </main>
 
   <script>
+    // Load reading history books when page loads
     document.addEventListener('DOMContentLoaded', function() {
-      loadContinueReadingBooks();
+      loadReadingHistoryBooks();
     });
-    
-    // Function to fetch and display "Continue Reading" books
-    function loadContinueReadingBooks() {
-      const bookList = document.getElementById('bookList');
+
+    // Function to load reading history books
+    function loadReadingHistoryBooks() {
+      const container = document.getElementById('readingHistoryBooks');
       
       // Show loading message
-      bookList.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
-          <p>Loading your reading progress...</p>
-        </div>
-      `;
+      container.innerHTML = '<div class="loading" style="text-align: center; padding: 2rem; grid-column: 1 / -1;"><p>Loading reading history...</p></div>';
       
-      // Fetch data from server
-      fetch('/continue_reading_books')
-        .then(response => response.json())
+      fetch('/reading_history', {
+        credentials: 'same-origin' // Include cookies in the request
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
         .then(data => {
-          if (data.success && data.continue_reading_books && data.continue_reading_books.length > 0) {
-            displayContinueReadingBooks(data.continue_reading_books);
+          if (data.success && data.reading_history && data.reading_history.length > 0) {
+            // Clear loading message
+            container.innerHTML = '';
+            
+            // Create list of reading history books
+            data.reading_history.forEach(book => {
+              const bookElement = document.createElement('div');
+              bookElement.className = 'book-card';
+              
+              // Format last read date
+              let lastReadText = '';
+              if (book.last_read) {
+                const lastReadDate = new Date(book.last_read);
+                lastReadText = lastReadDate.toLocaleDateString();
+              }
+              
+              // Format rating with stars
+              let ratingStars = '';
+              if (book.rating) {
+                for (let i = 1; i <= 5; i++) {
+                  if (i <= book.rating) {
+                    ratingStars += '★';
+                  } else {
+                    ratingStars += '☆';
+                  }
+                }
+              }
+              
+              // Format feedback date
+              let feedbackDateText = '';
+              if (book.feedback_date) {
+                const feedbackDate = new Date(book.feedback_date);
+                feedbackDateText = feedbackDate.toLocaleDateString();
+              }
+              
+              bookElement.innerHTML = `
+                <div class="book-header">
+                  <div class="book-icon">📚</div>
+                </div>
+                <h3 class="book-title">${book.title}</h3>
+                <p class="book-author">by ${book.author}</p>
+                <span class="book-genre">${book.genre}</span>
+                
+                ${book.rating ? `
+                <div style="margin: 1rem 0;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="font-weight: 600; color: var(--text-primary);">Your Rating</span>
+                    <span style="color: var(--accent-secondary); font-weight: 600;">${ratingStars} (${book.rating}/5)</span>
+                  </div>
+                </div>
+                ` : ''}
+                
+                ${book.feedback ? `
+                <div style="margin: 1rem 0; padding: 1rem; background: var(--bg-tertiary); border-radius: var(--radius-md);">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="font-weight: 600; color: var(--text-primary);">Your Feedback</span>
+                    ${feedbackDateText ? `<span style="color: var(--text-muted); font-size: 0.8rem;">${feedbackDateText}</span>` : ''}
+                  </div>
+                  <p style="margin: 0; color: var(--text-secondary); font-style: italic;">"${book.feedback}"</p>
+                </div>
+                ` : ''}
+                
+                ${lastReadText ? `<div class="last-read" style="text-align: right; font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem;">Finished: ${lastReadText}</div>` : ''}
+                
+                <div class="book-actions">
+                  <a href="/book_description/${book.book_id}" class="btn btn-primary">
+                    <i class="fas fa-book-open"></i> View Details
+                  </a>
+                  <button class="btn btn-remove" onclick="removeFromReadingHistory(${book.book_id}, this)">
+                    <i class="fas fa-trash"></i> Remove
+                  </button>
+                </div>
+              `;
+              
+              container.appendChild(bookElement);
+            });
           } else {
-            bookList.innerHTML = `
+            // Show empty state
+            container.innerHTML = `
               <div class="empty-state">
-                <div class="empty-state-icon">📖</div>
-                <h3 class="empty-state-title">No Books in Progress</h3>
-                <p class="empty-state-text">You don't have any books in progress right now.</p>
-                <a href="{{ url_for('recommended_books') }}" class="btn-primary">Find Your Next Book</a>
+                <div class="empty-icon">📖</div>
+                <h3 class="empty-title">No Reading History</h3>
+                <p class="empty-description">You haven't started reading any books yet. Start exploring and reading books to see them here!</p>
+                <a href="{{ url_for('explore_books') }}" class="btn btn-primary">
+                  <i class="fas fa-compass"></i> Explore Books
+                </a>
               </div>
             `;
           }
         })
         .catch(error => {
-          console.error('Error fetching continue reading books:', error);
-          bookList.innerHTML = `
+          console.error('Error loading reading history:', error);
+          container.innerHTML = `
             <div class="empty-state">
-              <div class="empty-state-icon">❌</div>
-              <h3 class="empty-state-title">Error Loading Books</h3>
-              <p class="empty-state-text">There was an error loading your reading progress. Please try again later.</p>
-              <button class="btn-primary" onclick="loadContinueReadingBooks()">Retry</button>
+              <div class="empty-icon">❌</div>
+              <h3 class="empty-title">Error Loading Reading History</h3>
+              <p class="empty-description">There was an error loading your reading history. Please try again later.</p>
+              <button class="btn btn-primary" onclick="loadReadingHistoryBooks()">
+                <i class="fas fa-redo"></i> Retry
+              </button>
             </div>
           `;
         });
     }
     
-    // Function to display "Continue Reading" books
-    function displayContinueReadingBooks(books) {
-      const bookList = document.getElementById('bookList');
-      
-      let html = '';
-      
-      books.forEach(book => {
-        // Format last read date
-        let lastReadText = '';
-        if (book.last_read) {
-          const lastReadDate = new Date(book.last_read);
-          const now = new Date();
-          const diffTime = Math.abs(now - lastReadDate);
-          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-          
-          if (diffDays === 1) {
-            lastReadText = 'Yesterday';
-          } else if (diffDays < 7) {
-            lastReadText = `${diffDays} days ago`;
-          } else {
-            lastReadText = lastReadDate.toLocaleDateString();
-          }
-        }
-        
-        html += `
-          <div class="book-card">
-            <div class="book-header">
-              <h3 class="book-title">${book.title}</h3>
-              <div class="book-author">by ${book.author}</div>
-            </div>
-            <div class="book-content">
-              <div class="progress-container">
-                <div class="progress-label">
-                  <span>Progress</span>
-                  <span>${book.progress_percentage}%</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill" style="width: ${book.progress_percentage}%"></div>
-                </div>
-                ${lastReadText ? `<div class="last-read">Last read: ${lastReadText}</div>` : ''}
-              </div>
-              <div class="book-actions">
-                <button class="btn btn-resume" onclick="resumeReading(${book.book_id})">
-                  <i class="fas fa-play"></i> Resume
-                </button>
-                <button class="btn btn-remove" onclick="removeFromContinueReading(${book.book_id}, this)">
-                  <i class="fas fa-trash"></i> Remove
-                </button>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-      
-      bookList.innerHTML = html;
-    }
-    
-    // Function to resume reading a book
-    function resumeReading(bookId) {
-      // Redirect to book description page
-      window.location.href = `/book_description/${bookId}`;
-    }
-    
-    // Function to remove a book from continue reading
-    function removeFromContinueReading(bookId, buttonElement) {
-      console.log('Remove button clicked for book ID:', bookId);
-      
+    // Function to remove a book from reading history
+    function removeFromReadingHistory(bookId, buttonElement) {
       // Create custom confirmation modal
-      showCustomConfirm('Are you sure you want to remove this book from your reading progress?', () => {
-        console.log('User confirmed removal for book ID:', bookId);
-        
+      showCustomConfirm('Are you sure you want to remove this book from your reading history?', () => {
         // Show loading state on the button
         let originalText = '';
         if (buttonElement) {
           originalText = buttonElement.innerHTML;
           buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Removing...';
           buttonElement.disabled = true;
-          console.log('Button state updated for book ID:', bookId);
         }
         
-        // Reset progress to 0 to effectively remove it from continue reading list
-        console.log('Sending request to remove book ID:', bookId);
+        // Reset progress to 0 to effectively remove it from reading history
         fetch('/save_reading_progress', {
           method: 'POST',
           headers: {
@@ -660,13 +629,10 @@
           })
         })
         .then(response => {
-          console.log('Received response for book ID:', bookId, response);
           return response.json();
         })
         .then(data => {
-          console.log('Parsed response data for book ID:', bookId, data);
           if (data.success) {
-            console.log('Successfully removed book ID:', bookId);
             // Remove the book card from the DOM immediately for better UX
             if (buttonElement) {
               const bookCard = buttonElement.closest('.book-card');
@@ -677,14 +643,16 @@
                 setTimeout(() => {
                   bookCard.remove();
                   // Check if there are any books left
-                  const bookList = document.getElementById('bookList');
-                  if (bookList.children.length === 0) {
+                  const bookList = document.getElementById('readingHistoryBooks');
+                  if (bookList.children.length === 0 || bookList.children.length === 1 && bookList.children[0].classList.contains('loading')) {
                     bookList.innerHTML = `
                       <div class="empty-state">
-                        <div class="empty-state-icon">📖</div>
-                        <h3 class="empty-state-title">No Books in Progress</h3>
-                        <p class="empty-state-text">You don't have any books in progress right now.</p>
-                        <a href="{{ url_for('recommended_books') }}" class="btn-primary">Find Your Next Book</a>
+                        <div class="empty-icon">📖</div>
+                        <h3 class="empty-title">No Reading History</h3>
+                        <p class="empty-description">You haven't started reading any books yet. Start exploring and reading books to see them here!</p>
+                        <a href="{{ url_for('explore_books') }}" class="btn btn-primary">
+                          <i class="fas fa-compass"></i> Explore Books
+                        </a>
                       </div>
                     `;
                   }
@@ -693,12 +661,11 @@
             }
             // Show success message with toast
             if (typeof showSuccess === 'function') {
-              showSuccess('Book removed from reading progress');
+              showSuccess('Book removed from reading history');
             } else {
-              console.log('Success: Book removed from reading progress');
+              console.log('Success: Book removed from reading history');
             }
           } else {
-            console.log('Failed to remove book ID:', bookId, data.message);
             // Restore button state if the operation failed
             if (buttonElement) {
               buttonElement.innerHTML = originalText;
@@ -706,14 +673,14 @@
             }
             // Show error message with toast
             if (typeof showError === 'function') {
-              showError(data.message || 'Failed to remove book from reading progress');
+              showError(data.message || 'Failed to remove book from reading history');
             } else {
-              console.error('Error:', data.message || 'Failed to remove book from reading progress');
+              console.error('Error:', data.message || 'Failed to remove book from reading history');
             }
           }
         })
         .catch(error => {
-          console.error('Error removing book from reading progress:', error);
+          console.error('Error removing book from reading history:', error);
           // Restore button state if the operation failed
           if (buttonElement) {
             buttonElement.innerHTML = originalText;
@@ -721,9 +688,9 @@
           }
           // Show error message with toast
           if (typeof showError === 'function') {
-            showError('Error removing book from reading progress: ' + error.message);
+            showError('Error removing book from reading history: ' + error.message);
           } else {
-            alert('Error removing book from reading progress: ' + error.message);
+            alert('Error removing book from reading history: ' + error.message);
           }
         });
       });
@@ -841,6 +808,63 @@
       overlay.appendChild(modal);
       document.body.appendChild(overlay);
     }
+
+    // Sidebar Dropdown functionality
+    function toggleUserSidebarDropdown(dropdownId) {
+      try {
+        const dropdown = document.getElementById(dropdownId);
+        const content = document.getElementById(dropdownId + 'Content');
+        
+        if (!dropdown || !content) {
+          return false;
+        }
+        
+        // Close all other sidebar dropdowns first
+        document.querySelectorAll('.sidebar-dropdown').forEach(dd => {
+          if (dd.id !== dropdownId) {
+            dd.classList.remove('active');
+            const ddContent = dd.querySelector('.sidebar-dropdown-content');
+            if (ddContent) {
+              ddContent.classList.remove('show');
+            }
+          }
+        });
+        
+        // Toggle current dropdown
+        const isCurrentlyActive = dropdown.classList.contains('active');
+        
+        if (isCurrentlyActive) {
+          // Close dropdown
+          dropdown.classList.remove('active');
+          content.classList.remove('show');
+        } else {
+          // Open dropdown
+          dropdown.classList.add('active');
+          content.classList.add('show');
+        }
+        
+        return false;
+        
+      } catch (error) {
+        console.error('Error in toggleUserSidebarDropdown:', error);
+        return false;
+      }
+    }
+    
+    // Close sidebar dropdowns when clicking outside
+    document.addEventListener('click', function(event) {
+      // Close sidebar dropdowns
+      const sidebarDropdowns = document.querySelectorAll('.sidebar-dropdown');
+      sidebarDropdowns.forEach(dropdown => {
+        if (!dropdown.contains(event.target)) {
+          dropdown.classList.remove('active');
+          const content = dropdown.querySelector('.sidebar-dropdown-content');
+          if (content) {
+            content.classList.remove('show');
+          }
+        }
+      });
+    });
   </script>
 </body>
 </html>

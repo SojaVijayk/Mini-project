@@ -883,7 +883,7 @@
         </li>
         <li><a href="{{ url_for('recently_rated_page') }}">⭐ Recently Rated</a></li>
         <li><a href="{{ url_for('favorites') }}">❤️ Favorites</a></li>
-        <li><a href="{{ url_for('continue_reading_page') }}">📖 Continue Reading</a></li>
+        <li><a href="{{ url_for('continue_reading_main_page') }}">📖 Continue Reading</a></li>
       </ul>
     </nav>
   </aside>
@@ -899,7 +899,7 @@
           </div>
           <div class="navbar-nav">
             <a href="{{ url_for('profile') }}">👤 Profile</a>
-            <button type="button" onclick="handleLogout(event)" onkeypress="handleLogoutKeypress(event)" class="btn btn-outline logout-btn" style="background: transparent; border: 2px solid var(--primary-color); color: var(--primary-color); text-decoration: none; cursor: pointer;">🚪 Logout</button>
+            <a href="/logout" class="btn btn-outline logout-btn" style="background: transparent; border: 2px solid var(--primary-color); color: var(--primary-color); text-decoration: none; cursor: pointer;">🚪 Logout</a>
           </div>
         </div>
       </div>
@@ -999,7 +999,7 @@
           <p>Revisit your most loved books</p>
         </div>
         
-        <div class="card" data-href="{{ url_for('continue_reading_page') }}">
+        <div class="card" data-href="{{ url_for('continue_reading_main_page') }}">
           <div class="card-icon">📖</div>
           <h3>Continue Reading</h3>
           <p>Pick up where you left off</p>
@@ -1028,16 +1028,10 @@
       { type: 'genre', title: 'Fantasy', meta: 'Magical & Mythical Stories' }
     ];
 
+
     document.addEventListener('DOMContentLoaded', function() {
       console.log('DOM loaded, initializing user.html'); // Debug log
       
-      // Test logout button exists
-      const logoutBtn = document.querySelector('.logout-btn');
-      if (logoutBtn) {
-        console.log('Logout button found:', logoutBtn); // Debug log
-      } else {
-        console.error('Logout button not found!'); // Debug log
-      }
       
       // Test sidebar dropdown elements exist
       const testSidebarExploreDropdown = document.getElementById('sidebarExploreDropdown');
