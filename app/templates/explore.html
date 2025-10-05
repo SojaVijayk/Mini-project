@@ -817,10 +817,10 @@
               <p class="book-genre">{{ book.genre }}</p>
               <span class="book-isbn">ISBN: {{ book.isbn }}</span>
               <div class="book-actions" style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <button class="btn-favorite" onclick="addToFavorites('{{ book.id }}')" style="flex: 1; padding: 0.5rem; font-size: 0.9rem; min-width: 120px;">
+                <button class="btn-favorite" onclick="addToFavorites('{{ book.db_id if book.db_id else book.id }}')" style="flex: 1; padding: 0.5rem; font-size: 0.9rem; min-width: 120px;">
                   <i class="fas fa-heart"></i> Add to Favorites
                 </button>
-                <button class="btn-read" onclick="readBook('{{ book.id }}')" style="flex: 1; padding: 0.5rem; font-size: 0.9rem; min-width: 120px;">
+                <button class="btn-read" onclick="readBook('{{ book.db_id if book.db_id else book.id }}')" style="flex: 1; padding: 0.5rem; font-size: 0.9rem; min-width: 120px;">
                   <i class="fas fa-book-reader"></i> Read Now
                 </button>
               </div>
@@ -950,6 +950,13 @@
       const button = event.target.tagName === 'I' ? event.target.parentElement : event.target;
       const originalText = button.innerHTML;
       
+      // Check if bookId is valid
+      if (!bookId || bookId === 'None') {
+        console.error('Invalid book ID:', bookId);
+        // Removed toast notification per user preference
+        return;
+      }
+      
       button.innerHTML = '<i class="fas fa-heart" style="color: #ef4444;"></i> Adding...';
       button.style.opacity = '0.7';
       
@@ -995,6 +1002,13 @@
       const button = event.target.tagName === 'I' ? event.target.parentElement : event.target;
       const originalText = button.innerHTML;
       
+      // Check if bookId is valid
+      if (!bookId || bookId === 'None') {
+        console.error('Invalid book ID:', bookId);
+        // Removed toast notification per user preference
+        return;
+      }
+      
       button.innerHTML = '<i class="fas fa-book-reader"></i> Opening...';
       button.style.opacity = '0.7';
       
@@ -1009,7 +1023,7 @@
     // Continue reading function
     function continueReading() {
       // Navigate to continue reading page
-      window.location.href = '/continue_reading';
+      window.location.href = "{{ url_for('continue_reading_main_page') }}";
     }
     
     // Pause reading function
@@ -1167,7 +1181,7 @@
     // Pause reading function
     function pauseReading() {
       // Redirect to continue reading page where the user can manage their reading session
-      window.location.href = '/continue_reading';
+      window.location.href = "{{ url_for('continue_reading_main_page') }}";
     }
     
     // Continue reading function

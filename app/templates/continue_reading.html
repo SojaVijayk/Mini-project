@@ -626,6 +626,8 @@
     
     // Function to resume reading a book
     function resumeReading(bookId) {
+      // Set a flag in localStorage to indicate we're resuming reading
+      localStorage.setItem('resumingReading', 'true');
       // Redirect to book description page
       window.location.href = `/book_description/${bookId}`;
     }

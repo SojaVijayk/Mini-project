@@ -477,6 +477,7 @@ def add_book():
 # Recommended Books Page
 @app.route("/recommended_books")
 def recommended_books():
+    print("=== RECOMMENDED BOOKS ROUTE CALLED ===")
     if 'loggedin' not in session:
         flash("Please log in to view recommendations.", "error")
         return redirect(url_for('login'))
@@ -501,6 +502,7 @@ def recommended_books():
         
         # Read all books from CSV for consistent data source
         all_books_csv = read_books_csv('data/books_data.csv')
+        print(f"Total books in CSV: {len(all_books_csv)}")
         
         # For debugging - return a simple list of books
         recommended_books_list = []
@@ -514,6 +516,7 @@ def recommended_books():
                 'recommendation_type': 'Top Trending' if i < 5 else 'Based on Your Preferences'
             }
             recommended_books_list.append(book_info)
+            print(f"Added book to recommended list: ID={book_info['id']}, Title={book_info['title']}")
         
         # Prepare user info for template
         user_info = {
@@ -522,12 +525,16 @@ def recommended_books():
             'preferred_genre': preferred_genre
         }
         
+        print(f"Total recommended books: {len(recommended_books_list)}")
         return render_template('recommendedbooks.html', 
                              username=username,
                              user=user_info,
                              recommended_books=recommended_books_list)
         
     except Exception as e:
+        print(f"Error in recommended_books route: {e}")
+        import traceback
+        traceback.print_exc()
         flash(f"An error occurred while fetching recommendations: {e}", "error")
         return redirect(url_for('user_home'))
 
@@ -980,16 +987,42 @@ def explore_books():
                         search_query.lower() in book['genre'].lower() or
                         search_query.lower() in book['isbn'].lower())]
         
+        # Also try to find the books in the database for story content and get the database book_id
+        cur = mysql.connection.cursor()
+        enriched_books = []
+        
+        for book in books:
+            # Find the book in the database using ISBN
+            cur.execute(
+                "SELECT book_id, story_content FROM book_table WHERE ISBN = %s",
+                (book['isbn'],)
+            )
+            db_book_data = cur.fetchone()
+            
+            # Include both the CSV serial_number (as 'id') and database book_id
+            enriched_book = {
+                'id': book['id'],  # CSV serial_number
+                'db_id': db_book_data[0] if db_book_data else None,  # Database book_id
+                'title': book['title'],
+                'author': book['author'],
+                'genre': book['genre'],
+                'isbn': book['isbn'],
+                'story_content': db_book_data[1] if db_book_data else book.get('story_content', '')
+            }
+            enriched_books.append(enriched_book)
+        
+        cur.close()
+        
         # Get page number from query parameter (default to 1)
         page = request.args.get('page', 1, type=int)
         per_page = 20  # Number of books per page
         offset = (page - 1) * per_page
         
         # Apply pagination
-        paginated_books = books[offset:offset + per_page]
+        paginated_books = enriched_books[offset:offset + per_page]
         
         # Calculate pagination info
-        total_books = len(books)
+        total_books = len(enriched_books)
         total_pages = (total_books + per_page - 1) // per_page
         has_prev = page > 1
         has_next = page < total_pages
@@ -1036,11 +1069,37 @@ def books_by_author(author_name):
         author_books = [book for book in books 
                        if book['author'].lower() == author_name.lower()]
         
+        # Also try to find the books in the database for story content and get the database book_id
+        cur = mysql.connection.cursor()
+        enriched_books = []
+        
+        for book in author_books:
+            # Find the book in the database using ISBN
+            cur.execute(
+                "SELECT book_id, story_content FROM book_table WHERE ISBN = %s",
+                (book['isbn'],)
+            )
+            db_book_data = cur.fetchone()
+            
+            # Include both the CSV serial_number (as 'id') and database book_id
+            enriched_book = {
+                'id': book['id'],  # CSV serial_number
+                'db_id': db_book_data[0] if db_book_data else None,  # Database book_id
+                'title': book['title'],
+                'author': book['author'],
+                'genre': book['genre'],
+                'isbn': book['isbn'],
+                'story_content': db_book_data[1] if db_book_data else book.get('story_content', '')
+            }
+            enriched_books.append(enriched_book)
+        
+        cur.close()
+        
         return render_template('explore.html', 
                              explore_type='author_books',
                              title=f'Books by {author_name}',
                              subtitle=f'All books by {author_name} in our collection',
-                             books=author_books,
+                             books=enriched_books,
                              author_name=author_name,
                              username=session['username'])
         
@@ -1063,6 +1122,44 @@ def books_by_genre(genre_name):
         genre_books = [book for book in books 
                       if book['genre'].lower() == genre_name.lower()]
         
+        # Also try to find the books in the database for story content and get the database book_id
+        cur = mysql.connection.cursor()
+        enriched_books = []
+        
+        for book in genre_books:
+            # Find the book in the database using ISBN
+            cur.execute(
+                "SELECT book_id, story_content FROM book_table WHERE ISBN = %s",
+                (book['isbn'],)
+            )
+            db_book_data = cur.fetchone()
+            
+            # Include both the CSV serial_number (as 'id') and database book_id
+            enriched_book = {
+                'id': book['id'],  # CSV serial_number
+                'db_id': db_book_data[0] if db_book_data else None,  # Database book_id
+                'title': book['title'],
+                'author': book['author'],
+                'genre': book['genre'],
+                'isbn': book['isbn'],
+                'story_content': db_book_data[1] if db_book_data else book.get('story_content', '')
+            }
+            enriched_books.append(enriched_book)
+        
+        cur.close()
+        
+        return render_template('explore.html', 
+                             explore_type='genre_books',
+                             title=f'{genre_name} Books',
+                             subtitle=f'All {genre_name.lower()} books in our collection',
+                             books=genre_books,
+                             genre_name=genre_name,
+                             username=session['username'])
+        
+    except Exception as e:
+        flash(f"An error occurred while fetching books by genre: {e}", "error")
+        return redirect(url_for('explore_genres'))
+
         return render_template('explore.html', 
                              explore_type='genre_books',
                              title=f'{genre_name} Books',
@@ -1115,13 +1212,25 @@ def book_detail(book_id):
 # Book Description Page
 @app.route('/book_description/<int:book_id>')
 def book_description(book_id):
+    print(f"=== BOOK DESCRIPTION ROUTE CALLED ===")
+    print(f"Book ID received: {book_id}")
+    print(f"Book ID type: {type(book_id)}")
+    
+    # Log the full request URL for debugging
+    from flask import request
+    print(f"Full request URL: {request.url}")
+    print(f"Request method: {request.method}")
+    print(f"Request headers: {dict(request.headers)}")
+    
     if 'loggedin' not in session:
+        print("User not logged in, redirecting to login")
         flash("Please log in to view book descriptions.", "error")
         return redirect(url_for('login'))
     
     try:
         # Read books from CSV (as required by project specification)
         books = read_books_csv('data/books_data.csv')
+        print(f"Total books in CSV: {len(books)}")
         
         # Find the book with the matching ID (CSV serial_number)
         book_data = None
@@ -1131,8 +1240,11 @@ def book_description(book_id):
                 break
         
         if not book_data:
+            print(f"Book not found for ID: {book_id}")
             flash("Book not found.", "error")
             return redirect(url_for('user_home'))
+        
+        print(f"Book found: {book_data['title']} by {book_data['author']}")
         
         # Also try to find the book in the database for story content and get the database book_id
         cur = mysql.connection.cursor()
@@ -1155,9 +1267,14 @@ def book_description(book_id):
             'story_content': db_book_data[1] if db_book_data else book_data['story_content']
         }
         
+        print(f"Book info prepared: {book_info}")
+        print("Rendering book_description.html template")
         return render_template('book_description.html', book=book_info, username=session.get('username', 'User'))
         
     except Exception as e:
+        print(f"Error in book_description route: {e}")
+        import traceback
+        traceback.print_exc()
         flash(f"An error occurred while fetching book description: {e}", "error")
         return redirect(url_for('user_home'))
 

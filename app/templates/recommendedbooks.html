@@ -607,7 +607,7 @@
               <button class="fav-btn" onclick="addToFavorites('{{ book.id }}')">
                 <i class="fa fa-heart"></i> Add to Favorites
               </button>
-              <a href="{{ url_for('book_description', book_id=book.id) }}" class="read-btn">
+              <a href="{{ url_for('book_description', book_id=book.id) }}" class="read-btn" onclick="event.stopPropagation();">
                 📖 Read Now
               </a>
             </div>
@@ -646,7 +646,7 @@
               <button class="fav-btn" onclick="addToFavorites('{{ book.id }}')">
                 <i class="fa fa-heart"></i> Add to Favorites
               </button>
-              <a href="{{ url_for('book_description', book_id=book.id) }}" class="read-btn">
+              <a href="{{ url_for('book_description', book_id=book.id) }}" class="read-btn" onclick="event.stopPropagation();">
                 📖 Read Now
               </a>
             </div>
@@ -923,6 +923,34 @@
       console.log('Navigating to URL:', url);
       window.location.href = url;
     }
+    
+    // Add event listeners to all read-btn links to add debugging
+    // REMOVED: This event listener might be interfering with link navigation
+    /*
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM fully loaded and parsed');
+      
+      const readButtons = document.querySelectorAll('a.read-btn');
+      console.log('Found', readButtons.length, 'read buttons');
+      
+      readButtons.forEach((button, index) => {
+        console.log('Adding event listener to button', index, ':', button);
+        
+        button.addEventListener('click', function(e) {
+          console.log('Read Now button clicked');
+          console.log('Button href:', this.href);
+          console.log('Event target:', e.target);
+          console.log('Current target:', e.currentTarget);
+          
+          // Let the default behavior happen (navigation)
+          // We're not calling e.preventDefault() so navigation should work
+        });
+      });
+    });
+    */
+
+    // Add a simple debug function to log when the page loads
+    console.log('Recommended books page loaded');
   </script>
 </body>
 </html>
