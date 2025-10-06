@@ -509,9 +509,14 @@
           <h1>Welcome What will you read today?</h1>
           <p class="subtitle">Pick up where you left off in your books</p>
         </div>
-        <div class="search-container">
-          <span class="search-icon">🔍</span>
-          <input type="text" class="search-bar" placeholder="Search for books...">
+        <div style="display: flex; gap: 1rem; align-items: center;">
+          <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-bar" placeholder="Search for books...">
+          </div>
+          <button class="btn" onclick="loadContinueReadingBooks()" style="background: var(--primary-color); color: white; border: none; padding: 0.5rem 1rem; border-radius: var(--radius-md); display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-sync-alt"></i> Refresh
+          </button>
         </div>
       </div>
       
@@ -533,7 +538,7 @@
       // Show loading message
       bookList.innerHTML = `
         <div style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
-          <p>Loading your reading progress...</p>
+          <p><i class="fas fa-spinner fa-spin"></i> Loading your reading progress...</p>
         </div>
       `;
       
@@ -591,6 +596,9 @@
           }
         }
         
+        // Use the CSV serial_number for the resume function
+        const csvId = book.csv_id || book.book_id;
+        
         html += `
           <div class="book-card">
             <div class="book-header">
@@ -609,7 +617,7 @@
                 ${lastReadText ? `<div class="last-read">Last read: ${lastReadText}</div>` : ''}
               </div>
               <div class="book-actions">
-                <button class="btn btn-resume" onclick="resumeReading(${book.book_id})">
+                <button class="btn btn-resume" onclick="resumeReading(${csvId})">
                   <i class="fas fa-play"></i> Resume
                 </button>
                 <button class="btn btn-remove" onclick="removeFromContinueReading(${book.book_id}, this)">
@@ -628,7 +636,7 @@
     function resumeReading(bookId) {
       // Set a flag in localStorage to indicate we're resuming reading
       localStorage.setItem('resumingReading', 'true');
-      // Redirect to book description page
+      // Redirect to book description page using the CSV serial_number
       window.location.href = `/book_description/${bookId}`;
     }
     

@@ -1253,6 +1253,7 @@ def book_description(book_id):
             (book_data['isbn'],)
         )
         db_book_data = cur.fetchone()
+        print(f"Database book data: {db_book_data}")
         cur.close()
         
         # Include both the CSV serial_number (as 'id') and database book_id
@@ -1533,13 +1534,15 @@ def save_reading_progress():
         progress = data.get('progress')
         
         print(f"save_reading_progress called with book_id: {book_id}, progress: {progress}")  # Debug log
+        print(f"User ID from session: {session.get('user_id')}")  # Debug log
         
         if not book_id or progress is None:
             print("Missing book_id or progress")  # Debug log
             return jsonify({'success': False, 'message': 'Book ID and progress are required'})
         
         # Validate progress is between 0 and 100
-        progress = int(progress)
+        # Convert progress to float first, then to int
+        progress = int(float(progress))
         if progress < 0 or progress > 100:
             print(f"Invalid progress value: {progress}")  # Debug log
             return jsonify({'success': False, 'message': 'Progress must be between 0 and 100'})
@@ -1566,12 +1569,13 @@ def save_reading_progress():
             print(f"Deleted {rows_affected} rows from reading_positions")  # Debug log
         else:
             # Check if user has already saved progress for this book
-            print(f"Updating/inserting reading progress record for book_id: {book_id}, progress: {progress}")  # Debug log
+            print(f"Checking for existing progress record for user_id: {session['user_id']}, book_id: {book_id}")  # Debug log
             cur.execute(
                 "SELECT progress_id FROM reading_progress WHERE user_id = %s AND book_id = %s",
                 (session['user_id'], book_id)
             )
             existing_progress = cur.fetchone()
+            print(f"Existing progress record: {existing_progress}")  # Debug log
             
             if existing_progress:
                 # Update existing progress
@@ -1654,13 +1658,25 @@ def continue_reading_books():
             (session['user_id'],)
         )
         books_data = cur.fetchall()
+        print(f"Raw books data from database: {books_data}")  # Debug log
         cur.close()
+        
+        # Read books from CSV to get the serial_number
+        books_csv = read_books_csv('data/books_data.csv')
+        # Create a mapping from ISBN to CSV serial_number
+        isbn_to_serial = {}
+        for book in books_csv:
+            isbn_to_serial[book['isbn']] = book['id']
         
         print(f"Found {len(books_data)} books in continue reading")  # Debug log
         continue_reading_books = []
         for book in books_data:
+            # Get the CSV serial_number from the ISBN
+            csv_serial = isbn_to_serial.get(book[4])  # book[4] is ISBN
+            
             book_info = {
                 'book_id': book[0],
+                'csv_id': csv_serial,  # Add CSV serial_number
                 'title': book[1],
                 'author': book[2],
                 'genre': book[3],
@@ -1668,7 +1684,7 @@ def continue_reading_books():
                 'progress_percentage': book[5],
                 'last_read': book[6].isoformat() if book[6] else None
             }
-            print(f"Book: {book_info['title']} (ID: {book_info['book_id']}) - Progress: {book_info['progress_percentage']}%")  # Debug log
+            print(f"Book: {book_info['title']} (ID: {book_info['book_id']}, CSV ID: {book_info['csv_id']}) - Progress: {book_info['progress_percentage']}%")  # Debug log
             continue_reading_books.append(book_info)
         
         # If we don't have enough books, also check for books with reading positions but no progress
@@ -1692,8 +1708,12 @@ def continue_reading_books():
             cur.close()
             
             for book in additional_books:
+                # Get the CSV serial_number from the ISBN
+                csv_serial = isbn_to_serial.get(book[4])  # book[4] is ISBN
+                
                 book_info = {
                     'book_id': book[0],
+                    'csv_id': csv_serial,  # Add CSV serial_number
                     'title': book[1],
                     'author': book[2],
                     'genre': book[3],
@@ -1703,6 +1723,7 @@ def continue_reading_books():
                 }
                 continue_reading_books.append(book_info)
         
+        print(f"Final continue reading books list: {continue_reading_books}")  # Debug log
         return jsonify({'success': True, 'continue_reading_books': continue_reading_books})
         
     except Exception as e:

@@ -997,6 +997,29 @@
     
     // Function to save reading progress
     function saveReadingProgress(bookId, progress) {
+      console.log('saveReadingProgress called with bookId:', bookId, 'progress:', progress);
+      
+      // Check if bookId is valid
+      if (!bookId || bookId === 'None') {
+        console.error('Invalid book ID:', bookId);
+        return Promise.reject(new Error('Invalid book ID'));
+      }
+      
+      // If progress is not provided, calculate it from the current scroll position
+      if (progress === undefined) {
+        const storyContent = document.querySelector('.story-content');
+        if (storyContent) {
+          // Calculate progress percentage based on scroll position
+          const scrollHeight = storyContent.scrollHeight - storyContent.clientHeight;
+          const scrollTop = storyContent.scrollTop;
+          progress = (scrollTop / scrollHeight) * 100;
+        } else {
+          progress = 0;
+        }
+      }
+      
+      console.log(`Saving reading position: ${progress.toFixed(2)}%`);
+      
       return fetch('/save_reading_progress', {
         method: 'POST',
         headers: {
@@ -1004,13 +1027,19 @@
         },
         body: JSON.stringify({
           book_id: bookId,
-          progress: progress
+          progress: progress.toFixed(2)
         })
       })
-      .then(response => response.json())
+      .then(response => {
+        console.log('Fetch response status:', response.status);
+        return response.json();
+      })
       .then(data => {
+        console.log('Fetch response data:', data);
         if (data.success) {
           console.log(`Reading progress saved: ${progress}%`);
+        } else {
+          console.error('Failed to save reading progress:', data.message);
         }
         return data;
       })
@@ -1245,8 +1274,7 @@
             console.error('Error saving reading progress:', error);
             // Still navigate to continue reading page even if save fails
             console.log('Navigating to continue reading page (error):', continueUrl);
-            // Let's try a simple navigation as a fallback
-            window.location.href = '/continue_reading';
+            window.location.href = continueUrl;
           });
       } else {
         console.log('Not in reading mode, navigating to continue reading page');
@@ -1274,19 +1302,75 @@
         const savedProgress = Math.max(1, progress);
         // Use the database book_id
         const bookId = '{{ book.db_id }}';
-        saveReadingProgress(bookId, savedProgress);
+        
+        console.log('Pause Reading - Book ID:', bookId);
+        console.log('Pause Reading - Progress:', savedProgress);
+        
+        // Update button text immediately to give user feedback
+        const pauseButton = document.getElementById('pauseButton');
+        if (pauseButton) {
+          pauseButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+          pauseButton.disabled = true;
+        }
+        
+        // Save progress and handle the response
+        saveReadingProgress(bookId, savedProgress)
+          .then((data) => {
+            if (data.success) {
+              console.log('Reading progress saved successfully after pausing');
+              // Update button text to indicate success
+              const pauseButton = document.getElementById('pauseButton');
+              if (pauseButton) {
+                pauseButton.innerHTML = '<i class="fas fa-check"></i> Progress Saved!';
+                setTimeout(() => {
+                  pauseButton.innerHTML = '<i class="fas fa-play"></i> Resume Reading';
+                  pauseButton.disabled = false;
+                  pauseButton.onclick = function() {
+                    resumeReading();
+                  };
+                }, 2000);
+              }
+            } else {
+              console.error('Failed to save reading progress after pausing:', data.message);
+              // Update button text to indicate error
+              const pauseButton = document.getElementById('pauseButton');
+              if (pauseButton) {
+                pauseButton.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Save Failed';
+                setTimeout(() => {
+                  pauseButton.innerHTML = '<i class="fas fa-play"></i> Resume Reading';
+                  pauseButton.disabled = false;
+                  pauseButton.onclick = function() {
+                    resumeReading();
+                  };
+                }, 2000);
+              }
+            }
+          })
+          .catch((error) => {
+            console.error('Error saving reading progress after pausing:', error);
+            // Update button text to indicate error
+            const pauseButton = document.getElementById('pauseButton');
+            if (pauseButton) {
+              pauseButton.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Save Failed';
+              setTimeout(() => {
+                pauseButton.innerHTML = '<i class="fas fa-play"></i> Resume Reading';
+                pauseButton.disabled = false;
+                pauseButton.onclick = function() {
+                  resumeReading();
+                };
+              }, 2000);
+            }
+          });
+      } else {
+        // Update button text immediately if no story content
+        const pauseButton = document.getElementById('pauseButton');
+        if (pauseButton) {
+          pauseButton.innerHTML = '<i class="fas fa-play"></i> Resume Reading';
+          pauseButton.onclick = function() {
+            resumeReading();
+          };
+        }
       }
-      
-      // Update button text
-      const pauseButton = document.getElementById('pauseButton');
-      if (pauseButton) {
-        pauseButton.innerHTML = '<i class="fas fa-play"></i> Resume Reading';
-        pauseButton.onclick = function() {
-          resumeReading();
-        };
-      }
-      
-      // Removed toast notification per user preference
     }
     
     function createPersistentMarker(storyContent) {
@@ -1331,67 +1415,93 @@
     function resumeReading() {
       isReadingPaused = false;
       
-      // Scroll to saved position
-      const storyContent = document.querySelector('.story-content');
-      if (storyContent && readingPosition > 0) {
-        storyContent.scrollTo({ top: readingPosition, behavior: 'smooth' });
-        
-        // Recreate the highlight at the saved position
-        const bookId = '{{ book.db_id }}';
-        let savedHighlightedPosition = null;
-        
-        // First check if we have a highlighted position in memory
-        if (highlightedPosition !== null) {
-          savedHighlightedPosition = highlightedPosition;
-        } 
-        // If not, try to get it from localStorage
-        else if (bookId && bookId !== 'None') {
-          const storedPosition = localStorage.getItem(`highlightedPosition_${bookId}`);
-          if (storedPosition !== null) {
-            savedHighlightedPosition = parseFloat(storedPosition);
-          }
-        }
-        
-        if (savedHighlightedPosition !== null) {
-          // Remove existing highlight first
-          removeManualHighlight();
-          
-          // Create a highlight element
-          highlightedElement = document.createElement('div');
-          highlightedElement.id = 'manual-highlight';
-          highlightedElement.style.position = 'absolute';
-          highlightedElement.style.left = '0';
-          highlightedElement.style.right = '0';
-          highlightedElement.style.height = '30px';
-          highlightedElement.style.backgroundColor = 'rgba(124, 58, 237, 0.4)';
-          highlightedElement.style.border = '2px solid #7c3aed';
-          highlightedElement.style.borderRadius = '6px';
-          highlightedElement.style.zIndex = '999';
-          highlightedElement.style.pointerEvents = 'none';
-          highlightedElement.style.boxShadow = '0 0 10px rgba(124, 58, 237, 0.6)';
-          
-          // Position the highlight at the saved position
-          highlightedElement.style.top = `${savedHighlightedPosition}px`;
-          highlightedPosition = savedHighlightedPosition;
-          
-          // Add the highlight to the story content
-          storyContent.appendChild(highlightedElement);
-        }
-        
-        // Show the marker briefly to confirm the position, then remove it
-        if (persistentMarker) {
-          // Keep the marker visible for a moment to confirm position
-          setTimeout(() => {
-            removePersistentMarker();
-          }, 3000); // Remove after 3 seconds
-        }
-      }
+      // Get the book ID
+      const bookId = '{{ book.db_id }}';
       
-      // Update button text
-      const pauseButton = document.getElementById('pauseButton');
-      if (pauseButton) {
-        pauseButton.innerHTML = '<i class="fas fa-pause"></i> Pause Reading';
-        pauseButton.onclick = pauseReading;
+      // Load reading position from server
+      if (bookId && bookId !== 'None') {
+        fetch(`/get_reading_progress/${bookId}`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.success && data.progress !== null) {
+              // Scroll to the saved position when the page loads
+              const storyContent = document.querySelector('.story-content');
+              if (storyContent) {
+                // Calculate scroll position based on progress percentage
+                const scrollHeight = storyContent.scrollHeight - storyContent.clientHeight;
+                const scrollTop = (data.progress / 100) * scrollHeight;
+                storyContent.scrollTop = scrollTop;
+                readingPosition = scrollTop;
+                console.log(`Reading position loaded: ${data.progress}%`);
+                
+                // Restore the highlighted line if it exists
+                const savedHighlightedPosition = localStorage.getItem(`highlightedPosition_${bookId}`);
+                if (savedHighlightedPosition !== null) {
+                  // Remove existing highlight first
+                  removeManualHighlight();
+                  
+                  // Create a highlight element
+                  highlightedElement = document.createElement('div');
+                  highlightedElement.id = 'manual-highlight';
+                  highlightedElement.style.position = 'absolute';
+                  highlightedElement.style.left = '0';
+                  highlightedElement.style.right = '0';
+                  highlightedElement.style.height = '30px';
+                  highlightedElement.style.backgroundColor = 'rgba(124, 58, 237, 0.4)';
+                  highlightedElement.style.border = '2px solid #7c3aed';
+                  highlightedElement.style.borderRadius = '6px';
+                  highlightedElement.style.zIndex = '999';
+                  highlightedElement.style.pointerEvents = 'none';
+                  highlightedElement.style.boxShadow = '0 0 10px rgba(124, 58, 237, 0.6)';
+                  
+                  // Position the highlight at the saved position
+                  highlightedElement.style.top = `${savedHighlightedPosition}px`;
+                  highlightedPosition = parseFloat(savedHighlightedPosition);
+                  
+                  // Add the highlight to the story content
+                  storyContent.appendChild(highlightedElement);
+                }
+                
+                // Create a persistent marker at the current position
+                createPersistentMarker(storyContent);
+                
+                // Remove the marker after 3 seconds
+                setTimeout(() => {
+                  removePersistentMarker();
+                }, 3000);
+              }
+            }
+          })
+          .catch(error => {
+            console.error('Error loading reading progress:', error);
+            
+            // Fallback to using the readingPosition variable if available
+            const storyContent = document.querySelector('.story-content');
+            if (storyContent && readingPosition > 0) {
+              storyContent.scrollTo({ top: readingPosition, behavior: 'smooth' });
+            }
+          })
+          .finally(() => {
+            // Update button text
+            const pauseButton = document.getElementById('pauseButton');
+            if (pauseButton) {
+              pauseButton.innerHTML = '<i class="fas fa-pause"></i> Pause Reading';
+              pauseButton.onclick = pauseReading;
+            }
+          });
+      } else {
+        // Fallback to using the readingPosition variable if available
+        const storyContent = document.querySelector('.story-content');
+        if (storyContent && readingPosition > 0) {
+          storyContent.scrollTo({ top: readingPosition, behavior: 'smooth' });
+        }
+        
+        // Update button text
+        const pauseButton = document.getElementById('pauseButton');
+        if (pauseButton) {
+          pauseButton.innerHTML = '<i class="fas fa-pause"></i> Pause Reading';
+          pauseButton.onclick = pauseReading;
+        }
       }
       
       // Removed toast notification per user preference
@@ -1420,60 +1530,6 @@
         continueButton.innerHTML = '<i class="fas fa-play"></i> Continue Reading';
         continueButton.onclick = continueReading;
       }
-    }
-    
-    // Function to save reading progress
-    function saveReadingProgress(bookId, progress) {
-      console.log('saveReadingProgress called with bookId:', bookId, 'progress:', progress);
-      
-      // Check if bookId is valid
-      if (!bookId || bookId === 'None') {
-        console.error('Invalid book ID:', bookId);
-        return Promise.reject(new Error('Invalid book ID'));
-      }
-      
-      // If progress is not provided, calculate it from the current scroll position
-      if (progress === undefined) {
-        const storyContent = document.querySelector('.story-content');
-        if (storyContent) {
-          // Calculate progress percentage based on scroll position
-          const scrollHeight = storyContent.scrollHeight - storyContent.clientHeight;
-          const scrollTop = storyContent.scrollTop;
-          progress = (scrollTop / scrollHeight) * 100;
-        } else {
-          progress = 0;
-        }
-      }
-      
-      console.log(`Saving reading position: ${progress.toFixed(2)}%`);
-      
-      return fetch('/save_reading_progress', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          book_id: bookId,
-          progress: progress.toFixed(2)
-        })
-      })
-      .then(response => {
-        console.log('Fetch response status:', response.status);
-        return response.json();
-      })
-      .then(data => {
-        console.log('Fetch response data:', data);
-        if (data.success) {
-          console.log(`Reading progress saved: ${progress}%`);
-        } else {
-          console.error('Failed to save reading progress:', data.message);
-        }
-        return data;
-      })
-      .catch(error => {
-        console.error('Error saving reading progress:', error);
-        throw error;
-      });
     }
     
     // Function to remove reading progress
@@ -1580,21 +1636,7 @@
       }
     }
     
-    // Function to handle pause button click
-    function pauseReading() {
-      isReadingPaused = true;
-      
-      // Update button text
-      const pauseButton = document.getElementById('pauseButton');
-      if (pauseButton) {
-        pauseButton.innerHTML = '<i class="fas fa-play"></i> Resume Reading';
-        pauseButton.onclick = function() {
-          resumeReading();
-        };
-      }
-      
-      // Removed toast notification per user preference
-    }
+
     
 
     
