@@ -209,6 +209,79 @@
       margin-bottom: 2rem;
     }
     
+    .search-container {
+      position: relative;
+      margin-bottom: 1.5rem;
+      width: 100%;
+      max-width: 500px;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      background: var(--bg-primary);
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+    
+    .suggestions-container {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-top: none;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      z-index: 1000;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+    }
+    
+    .suggestion-item {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.2s ease;
+    }
+    
+    .suggestion-item:hover,
+    .suggestion-item.highlighted {
+      background-color: var(--bg-muted);
+    }
+    
+    .suggestion-item:last-child {
+      border-bottom: none;
+    }
+    
+    .suggestion-title {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    .suggestion-author {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+    
     .table-container {
       overflow-x: auto;
       border-radius: var(--radius-lg);
@@ -358,9 +431,16 @@
 
       <!-- Feedback Table -->
       <div class="card">
+        <!-- Search Bar with Suggestions -->
+        <div class="search-container">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" class="search-input" placeholder="Search feedback by book title..." autocomplete="off">
+          <div id="suggestionsContainer" class="suggestions-container"></div>
+        </div>
+        
         {% if feedbacks and feedbacks|length > 0 %}
           <div class="table-container">
-            <table>
+            <table id="feedbackTable">
               <thead>
                 <tr>
                   <th>User</th>
@@ -374,7 +454,7 @@
               </thead>
               <tbody>
                 {% for feedback in feedbacks %}
-                <tr>
+                <tr class="feedback-row" data-title="{{ feedback.title.lower() }}">
                   <td>{{ feedback.username }}</td>
                   <td>{{ feedback.email }}</td>
                   <td>{{ feedback.title }}</td>
@@ -397,5 +477,157 @@
       </div>
     </div>
   </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('searchInput');
+      const suggestionsContainer = document.getElementById('suggestionsContainer');
+      const feedbackTable = document.getElementById('feedbackTable');
+      const feedbackRows = document.querySelectorAll('.feedback-row');
+      
+      // Extract unique book titles for suggestions
+      const bookTitles = [];
+      const bookData = [];
+      
+      feedbackRows.forEach(row => {
+        const title = row.getAttribute('data-title');
+        const titleElement = row.querySelector('td:nth-child(3)');
+        const authorElement = row.querySelector('td:nth-child(4)');
+        
+        if (title && titleElement && authorElement) {
+          const displayTitle = titleElement.textContent;
+          const author = authorElement.textContent;
+          
+          // Check if we already have this title
+          const existingBook = bookData.find(book => book.title.toLowerCase() === title);
+          if (!existingBook) {
+            bookData.push({
+              title: title,
+              displayTitle: displayTitle,
+              author: author
+            });
+            bookTitles.push(title);
+          }
+        }
+      });
+      
+      let highlightedIndex = -1;
+      
+      // Function to filter and show suggestions
+      function showSuggestions(searchTerm) {
+        if (searchTerm.length === 0) {
+          suggestionsContainer.style.display = 'none';
+          highlightedIndex = -1;
+          return;
+        }
+        
+        const filteredBooks = bookData.filter(book => 
+          book.displayTitle.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        
+        if (filteredBooks.length === 0) {
+          suggestionsContainer.style.display = 'none';
+          highlightedIndex = -1;
+          return;
+        }
+        
+        let suggestionsHTML = '';
+        filteredBooks.forEach((book, index) => {
+          const highlighted = index === highlightedIndex ? 'highlighted' : '';
+          suggestionsHTML += `
+            <div class="suggestion-item ${highlighted}" data-title="${book.title}">
+              <div class="suggestion-title">${book.displayTitle}</div>
+              <div class="suggestion-author">by ${book.author}</div>
+            </div>
+          `;
+        });
+        
+        suggestionsContainer.innerHTML = suggestionsHTML;
+        suggestionsContainer.style.display = 'block';
+        
+        // Add event listeners to suggestion items
+        const suggestionItems = suggestionsContainer.querySelectorAll('.suggestion-item');
+        suggestionItems.forEach(item => {
+          item.addEventListener('click', function() {
+            const title = this.getAttribute('data-title');
+            searchInput.value = bookData.find(book => book.title === title)?.displayTitle || '';
+            filterTable(title);
+            suggestionsContainer.style.display = 'none';
+            highlightedIndex = -1;
+          });
+        });
+      }
+      
+      // Function to filter the table based on selected book title
+      function filterTable(searchTerm) {
+        feedbackRows.forEach(row => {
+          const title = row.getAttribute('data-title');
+          if (searchTerm === '' || title.includes(searchTerm.toLowerCase())) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      }
+      
+      // Event listeners for search input
+      searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.trim();
+        showSuggestions(searchTerm);
+        if (searchTerm === '') {
+          // Show all rows if search is empty
+          feedbackRows.forEach(row => {
+            row.style.display = '';
+          });
+        }
+        highlightedIndex = -1;
+      });
+      
+      searchInput.addEventListener('keydown', function(e) {
+        const suggestionItems = suggestionsContainer.querySelectorAll('.suggestion-item');
+        
+        if (suggestionItems.length === 0) return;
+        
+        switch (e.key) {
+          case 'ArrowDown':
+            e.preventDefault();
+            highlightedIndex = (highlightedIndex + 1) % suggestionItems.length;
+            showSuggestions(this.value.trim());
+            break;
+          case 'ArrowUp':
+            e.preventDefault();
+            highlightedIndex = (highlightedIndex - 1 + suggestionItems.length) % suggestionItems.length;
+            showSuggestions(this.value.trim());
+            break;
+          case 'Enter':
+            e.preventDefault();
+            if (highlightedIndex >= 0 && highlightedIndex < suggestionItems.length) {
+              const selectedItem = suggestionItems[highlightedIndex];
+              const title = selectedItem.getAttribute('data-title');
+              searchInput.value = bookData.find(book => book.title === title)?.displayTitle || '';
+              filterTable(title);
+              suggestionsContainer.style.display = 'none';
+              highlightedIndex = -1;
+            }
+            break;
+          case 'Escape':
+            suggestionsContainer.style.display = 'none';
+            highlightedIndex = -1;
+            break;
+        }
+      });
+      
+      // Hide suggestions when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+          suggestionsContainer.style.display = 'none';
+          highlightedIndex = -1;
+        }
+      });
+      
+      // Initialize suggestions container display
+      suggestionsContainer.style.display = 'none';
+    });
+  </script>
 </body>
 </html>

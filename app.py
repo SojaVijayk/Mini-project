@@ -2241,24 +2241,46 @@ def view_feedback():
         return redirect(url_for('admin_home'))
     
     try:
+        # Get search query if provided
+        search_query = request.args.get('search', '').strip()
+        
         cur = mysql.connection.cursor()
         
-        # Get all feedback with user and book information
-        cur.execute("""
-            SELECT 
-                bf.feedback_id,
-                bf.feedback_text,
-                bf.submitted_at,
-                u.username,
-                u.email,
-                bt.title,
-                bt.author,
-                bt.isbn
-            FROM book_feedback bf
-            JOIN user_table u ON bf.user_id = u.user_id
-            JOIN book_table bt ON bf.book_id = bt.book_id
-            ORDER BY bf.submitted_at DESC
-        """)
+        # Get feedback with user and book information, with optional search filter
+        if search_query:
+            cur.execute("""
+                SELECT 
+                    bf.feedback_id,
+                    bf.feedback_text,
+                    bf.submitted_at,
+                    u.username,
+                    u.email,
+                    bt.title,
+                    bt.author,
+                    bt.isbn
+                FROM book_feedback bf
+                JOIN user_table u ON bf.user_id = u.user_id
+                JOIN book_table bt ON bf.book_id = bt.book_id
+                WHERE bt.title LIKE %s
+                ORDER BY bf.submitted_at DESC
+            """, (f'%{search_query}%',))
+        else:
+            # Get all feedback with user and book information
+            cur.execute("""
+                SELECT 
+                    bf.feedback_id,
+                    bf.feedback_text,
+                    bf.submitted_at,
+                    u.username,
+                    u.email,
+                    bt.title,
+                    bt.author,
+                    bt.isbn
+                FROM book_feedback bf
+                JOIN user_table u ON bf.user_id = u.user_id
+                JOIN book_table bt ON bf.book_id = bt.book_id
+                ORDER BY bf.submitted_at DESC
+            """)
         
         feedback_data = cur.fetchall()
         cur.close()
